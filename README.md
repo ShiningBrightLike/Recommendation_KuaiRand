@@ -7,7 +7,7 @@
 ---
 
 ## 📁 项目结构
-
+```
 Recommendation\_KuaiRand/
 ├── KuaiRand-Pure/
 │   ├── data/
@@ -18,7 +18,7 @@ Recommendation\_KuaiRand/
 │   │   └── merged\_train\_sample.csv       # ← 脚本执行后生成
 ├── sample\_merge.py                        # 样本拼接脚本
 └── README.md
-
+```
 ---
 
 ## ✅ 已完成工作
