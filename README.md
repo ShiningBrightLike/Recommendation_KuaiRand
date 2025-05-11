@@ -1,6 +1,6 @@
 # Recommendation_KuaiRand
 
-## 基于 KuaiRand 的推荐系统
+## KuaiRand场景中多目标CVR预测的任务特化专家优化实践
 
 本项目基于 KuaiRand 数据集，构建用于点击、点赞、关注、评论等多任务反馈预测的推荐系统模型。当前已完成数据加载与样本拼接的基础处理流程。
 
