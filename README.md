@@ -11,11 +11,12 @@
 Recommendation\_KuaiRand/
 ├── KuaiRand-Pure/
 │   ├── data/
-│   │   ├── log\_standard\_4\_08\_to\_4\_21\_pure.csv
-│   │   ├── user\_features\_pure.csv
-│   │   ├── video\_features\_basic\_pure.csv
-│   │   ├── video\_features\_statistic\_pure.csv
-│   │   └── merged\_train\_sample.csv       # ← 脚本执行后生成
+│   │   ├── log_standard_4_08_to_4_21_pure.csv
+│   │   ├── log_standard_4_22_to_5_08_pure.csv
+│   │   ├── user_features_pure.csv
+│   │   ├── video_features_basic_pure.csv
+│   │   ├── video_features_statistic_pure.csv
+│   │   └── merged_train_sample.csv       # ← 脚本执行后生成
 ├── sample\_merge.py                        # 样本拼接脚本
 └── README.md
 ```
