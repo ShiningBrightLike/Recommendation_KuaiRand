@@ -3,15 +3,15 @@ import pandas as pd
 
 # The "nrows=10000" argument reads the first 10000 lines of each file
 
-df_rand = pd.read_csv("data/log_random_4_22_to_5_08_pure.csv", nrows=10000)
+df_rand = pd.read_csv("KuaiRand-Pure/data/log_random_4_22_to_5_08_pure.csv", nrows=100)
 
-df1 = pd.read_csv("data/log_standard_4_08_to_4_21_pure.csv", nrows=10000)
-df2 = pd.read_csv("data/log_standard_4_22_to_5_08_pure.csv", nrows=10000)
+df1 = pd.read_csv("KuaiRand-Pure/data/log_standard_4_08_to_4_21_pure.csv", nrows=100)
+df2 = pd.read_csv("KuaiRand-Pure/data/log_standard_4_22_to_5_08_pure.csv", nrows=100)
 
-user_features = pd.read_csv("data/user_features_pure.csv")
+user_features = pd.read_csv("KuaiRand-Pure/data/user_features_pure.csv")
 
-video_features_basic = pd.read_csv("data/video_features_basic_pure.csv", nrows=10000)
-video_features_statistics = pd.read_csv("data/video_features_statistic_pure.csv", nrows=10000)
+video_features_basic = pd.read_csv("KuaiRand-Pure/data/video_features_basic_pure.csv", nrows=100)
+video_features_statistics = pd.read_csv("KuaiRand-Pure/data/video_features_statistic_pure.csv", nrows=100)
 
 print("===================================================")
 print("The random data in 'log_random_4_22_to_5_08_pure.csv'")
