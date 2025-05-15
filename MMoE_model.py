@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Layer
 from tensorflow.keras.models import Model
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # --------------------------
 # 自定义 MMoE 层
@@ -48,10 +50,17 @@ if __name__ == '__main__':
     input_dim = 50
     num_samples = 1024
 
-    # 虚拟输入和标签
-    X = np.random.rand(num_samples, input_dim).astype(np.float32)
-    y_task1 = np.random.randint(0, 2, size=(num_samples, 1)).astype(np.float32)
-    y_task2 = np.random.randint(0, 2, size=(num_samples, 1)).astype(np.float32)
+    # 读取真实数据
+    X = pd.read_parquet("processed_X.parquet").values.astype(np.float32)
+    y = pd.read_parquet("processed_y.parquet")
+
+    # 提取两个任务的标签（一共有四个）
+    y_task1 = y.iloc[:, 0].values.reshape(-1, 1).astype(np.float32)
+    y_task2 = y.iloc[:, 1].values.reshape(-1, 1).astype(np.float32)
+
+    # 获取特征维度（自动推断）
+    input_dim = X.shape[1]
+    num_samples = X.shape[0]
 
     model = build_mmoe_model(input_dim=input_dim, num_experts=8, num_tasks=2, units=64)
 
@@ -70,9 +79,34 @@ if __name__ == '__main__':
     model.summary()
 
     # 模型训练
-    model.fit(
+    history = model.fit(
         X,
         {'output_1': y_task1, 'output_2': y_task2},
-        epochs=5,
-        batch_size=32
+        epochs=30,
+        batch_size=256
     )
+
+    # 绘制 loss 曲线
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['output_1_loss'], label='Task 1 Loss')
+    plt.plot(history.history['output_2_loss'], label='Task 2 Loss')
+    plt.plot(history.history['loss'], label='Total Loss', linestyle='--')
+    plt.title('Loss Curve')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    # 绘制 AUC 曲线
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['output_1_auc'], label='Task 1 AUC')
+    plt.plot(history.history['output_2_auc'], label='Task 2 AUC')
+    plt.title('AUC Curve')
+    plt.xlabel('Epoch')
+    plt.ylabel('AUC')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('loss_auc.png')
+    plt.show()
