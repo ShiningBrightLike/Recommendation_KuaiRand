@@ -1,13 +1,12 @@
 import pandas as pd
-
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+import joblib
 
 # The "nrows=10000" argument reads the first 10000 lines of each file
 
 df_train = pd.read_csv("KuaiRand-Pure/data/log_standard_4_08_to_4_21_pure.csv")
 df_test = pd.read_csv("KuaiRand-Pure/data/log_standard_4_22_to_5_08_pure.csv")
-
 user_features = pd.read_csv("KuaiRand-Pure/data/user_features_pure.csv")
-
 video_features_basic = pd.read_csv("KuaiRand-Pure/data/video_features_basic_pure.csv")
 video_features_statistics = pd.read_csv("KuaiRand-Pure/data/video_features_statistic_pure.csv")
 
@@ -19,7 +18,6 @@ print("Video statistic features columns:", video_features_statistics.columns)
 
 # 合并用户特征
 df_merged = df_train.merge(user_features, on='user_id', how='left')
-
 # 合并视频特征（基本 + 统计）
 df_merged = df_merged.merge(video_features_basic, on='video_id', how='left')
 df_merged = df_merged.merge(video_features_statistics, on='video_id', how='left')
@@ -28,5 +26,86 @@ df_merged = df_merged.merge(video_features_statistics, on='video_id', how='left'
 print("Merged Data Shape:", df_merged.shape)
 print("Sample rows:\n", df_merged.head())
 
-# 保存合并后的数据（可选）
-df_merged.to_csv("KuaiRand-Pure/data/merged_train_sample.csv", index=False)
+# 1. 缺失值处理
+df_processed = df_merged.copy()
+df_processed.fillna(-1, inplace=True)  # 用 -1 填充所有缺失值
+
+# 2. 编码类别特征
+categorical_cols = [
+    'date', 'hourmin', 'tab', 
+    'user_active_degree', 'follow_user_num_range', 'fans_user_num_range', 'friend_user_num_range', 'register_days_range', 
+    'author_id', 'video_type', 'upload_dt', 'upload_type', 'music_id', 'music_type', 'tag']
+
+# 初始化
+label_encoders = {}
+feature_offsets = {}
+offset = 0
+
+# 对每列进行LabelEncoder，并加上全局偏移量形成feature_id
+for col in categorical_cols:
+    le = LabelEncoder()
+    df_processed[col] = le.fit_transform(df_processed[col].astype(str)) + offset
+    label_encoders[col] = le
+    # 保存偏移量
+    feature_offsets[col] = offset
+    # 更新偏移量
+    offset += df_processed[col].nunique()
+
+# 3. 数值标准化
+numeric_cols = [
+    'follow_user_num', 'fans_user_num', 'friend_user_num', 'register_days',
+    'video_duration', 'server_width', 'server_height',
+    'counts', 'show_cnt', 'show_user_num', 'play_cnt',
+    'play_user_num', 'play_duration', 'complete_play_cnt',
+    'complete_play_user_num', 'valid_play_cnt', 'valid_play_user_num',
+    'long_time_play_cnt', 'long_time_play_user_num', 'short_time_play_cnt',
+    'short_time_play_user_num', 'play_progress', 'comment_stay_duration',
+    'like_cnt', 'like_user_num', 'click_like_cnt', 'double_click_cnt',
+    'cancel_like_cnt', 'cancel_like_user_num', 'comment_cnt',
+    'comment_user_num', 'direct_comment_cnt', 'reply_comment_cnt',
+    'delete_comment_cnt', 'delete_comment_user_num', 'comment_like_cnt',
+    'comment_like_user_num', 'follow_cnt', 'follow_user_num1', ########################## follow_user_num 重名
+    'cancel_follow_cnt', 'cancel_follow_user_num', 'share_cnt',
+    'share_user_num', 'download_cnt', 'download_user_num', 'report_cnt',
+    'report_user_num', 'reduce_similar_cnt', 'reduce_similar_user_num',
+    'collect_cnt', 'collect_user_num', 'cancel_collect_cnt',
+    'cancel_collect_user_num', 'direct_comment_user_num',
+    'reply_comment_user_num', 'share_all_cnt', 'share_all_user_num',
+    'outsite_share_all_cnt']
+
+scaler = StandardScaler()
+df_processed[numeric_cols] = scaler.fit_transform(df_processed[numeric_cols])
+
+# 4. 标签列（多任务）
+label_cols = ['is_click', 'is_like', 'is_follow', 'is_comment']
+y = df_processed[label_cols]
+
+# 5. 特征列
+drop_cols = ['user_id', 'video_id', 'time_ms', 'is_forward', 'is_hate', 'long_view', 'play_time_ms', 'duration_ms', 'profile_stay_time', 'comment_stay_time', 'is_profile_enter', 'is_rand'] + label_cols
+feature_cols = [col for col in df_processed.columns if col not in drop_cols]
+X = df_processed[feature_cols]
+
+# 打印处理结果
+print("Processed feature shape:", X.shape)
+print("Processed label shape:", y.shape)
+
+# 保存特征和标签
+X.to_parquet("processed_X.parquet")
+y.to_parquet("processed_y.parquet")
+
+# 保存编码器和标准化器
+joblib.dump(label_encoders, "label_encoders.pkl")
+joblib.dump(scaler, "scaler.pkl")
+joblib.dump(feature_offsets, "feature_offsets.pkl")  # 可选：用于后续Embedding映射
+
+"""加载
+import pandas as pd
+import joblib
+
+X = pd.read_parquet("processed_X.parquet")
+y = pd.read_parquet("processed_y.parquet")
+
+label_encoders = joblib.load("label_encoders.pkl")
+scaler = joblib.load("scaler.pkl")
+feature_offsets = joblib.load("feature_offsets.pkl")
+"""
