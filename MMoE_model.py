@@ -71,6 +71,10 @@ if __name__ == '__main__':
             'output_1': 'binary_crossentropy',
             'output_2': 'binary_crossentropy',
         },
+        loss_weights={
+        'output_1': 0.5,
+        'output_2': 1.0,
+        },
         metrics={
             'output_1': AUC(name='auc'),
             'output_2': AUC(name='auc'),
@@ -83,7 +87,7 @@ if __name__ == '__main__':
     history = model.fit(
         X,
         {'output_1': y_task1, 'output_2': y_task2},
-        epochs=30,
+        epochs=50,
         batch_size=256
     )
     print(history.history.keys())
