@@ -4,6 +4,7 @@ from tensorflow.keras.models import Model
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from tensorflow.keras.metrics import AUC
 
 # --------------------------
 # 自定义 MMoE 层
@@ -71,8 +72,8 @@ if __name__ == '__main__':
             'output_2': 'binary_crossentropy',
         },
         metrics={
-            'output_1': 'AUC',
-            'output_2': 'AUC',
+            'output_1': AUC(name='auc'),
+            'output_2': AUC(name='auc'),
         }
     )
 
@@ -85,6 +86,7 @@ if __name__ == '__main__':
         epochs=30,
         batch_size=256
     )
+    print(history.history.keys())
 
     # 绘制 loss 曲线
     plt.figure(figsize=(12, 5))
@@ -108,5 +110,4 @@ if __name__ == '__main__':
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('loss_auc.png')
     plt.show()
