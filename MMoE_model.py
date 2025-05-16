@@ -88,7 +88,7 @@ if __name__ == '__main__':
         X,
         {'output_1': y_task1, 'output_2': y_task2},
         epochs=50,
-        batch_size=256
+        batch_size=1024
     )
     print(history.history.keys())
 
