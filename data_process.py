@@ -33,8 +33,13 @@ df_processed.fillna(-1, inplace=True)  # 用 -1 填充所有缺失值
 # 2. 编码类别特征
 categorical_cols = [
     'date', 'hourmin', 'tab', 
-    'user_active_degree', 'follow_user_num_range', 'fans_user_num_range', 'friend_user_num_range', 'register_days_range', 
-    'author_id', 'video_type', 'upload_dt', 'upload_type', 'music_id', 'music_type', 'tag']
+    'user_active_degree', 'is_lowactive_period', 'is_live_streamer','is_video_author',
+    'onehot_feat0', 'onehot_feat1', 'onehot_feat2', 'onehot_feat3', 'onehot_feat4',
+    'onehot_feat5', 'onehot_feat6', 'onehot_feat7', 'onehot_feat8', 'onehot_feat9',
+    'onehot_feat10', 'onehot_feat11', 'onehot_feat12', 'onehot_feat13', 'onehot_feat14',
+    'onehot_feat15', 'onehot_feat16', 'onehot_feat17',
+    'follow_user_num_range', 'fans_user_num_range', 'friend_user_num_range', 'register_days_range', 
+    'video_type', 'upload_dt', 'upload_type', 'visible_status','music_type', 'tag'] # author_id music_id 暂时不处理 
 
 # 初始化
 label_encoders = {}
@@ -64,7 +69,7 @@ numeric_cols = [
     'cancel_like_cnt', 'cancel_like_user_num', 'comment_cnt',
     'comment_user_num', 'direct_comment_cnt', 'reply_comment_cnt',
     'delete_comment_cnt', 'delete_comment_user_num', 'comment_like_cnt',
-    'comment_like_user_num', 'follow_cnt', 'follow_user_num1', ########################## follow_user_num 重名
+    'comment_like_user_num', 'follow_cnt', 'follow_user_num1',
     'cancel_follow_cnt', 'cancel_follow_user_num', 'share_cnt',
     'share_user_num', 'download_cnt', 'download_user_num', 'report_cnt',
     'report_user_num', 'reduce_similar_cnt', 'reduce_similar_user_num',
@@ -81,22 +86,20 @@ label_cols = ['is_click', 'is_like', 'is_follow', 'is_comment']
 y = df_processed[label_cols]
 
 # 5. 特征列
-drop_cols = ['user_id', 'video_id', 'time_ms', 'is_forward', 'is_hate', 'long_view', 'play_time_ms', 'duration_ms', 'profile_stay_time', 'comment_stay_time', 'is_profile_enter', 'is_rand'] + label_cols
-feature_cols = [col for col in df_processed.columns if col not in drop_cols]
-X = df_processed[feature_cols]
+X = df_processed[categorical_cols + numeric_cols]
 
 # 打印处理结果
 print("Processed feature shape:", X.shape)
 print("Processed label shape:", y.shape)
 
 # 保存特征和标签
-X.to_parquet("processed_X.parquet")
-y.to_parquet("processed_y.parquet")
+X.to_parquet("KuaiRand-Pure/data_processed/processed_X.parquet")
+y.to_parquet("KuaiRand-Pure/data_processed/processed_y.parquet")
 
 # 保存编码器和标准化器
-joblib.dump(label_encoders, "label_encoders.pkl")
-joblib.dump(scaler, "scaler.pkl")
-joblib.dump(feature_offsets, "feature_offsets.pkl")  # 可选：用于后续Embedding映射
+joblib.dump(label_encoders, "KuaiRand-Pure/data_processed/label_encoders.pkl")
+joblib.dump(scaler, "KuaiRand-Pure/data_processed/scaler.pkl")
+joblib.dump(feature_offsets, "KuaiRand-Pure/data_processed/feature_offsets.pkl")  # 可选：用于后续Embedding映射
 
 """加载
 import pandas as pd
