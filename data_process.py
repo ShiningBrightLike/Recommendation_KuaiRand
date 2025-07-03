@@ -118,3 +118,39 @@ y.to_parquet("KuaiRand-Pure/data_processed/processed_y.parquet")
 joblib.dump(label_encoders, "KuaiRand-Pure/data_processed/label_encoders.pkl")
 joblib.dump(scaler, "KuaiRand-Pure/data_processed/scaler.pkl")
 joblib.dump(feature_offsets, "KuaiRand-Pure/data_processed/feature_offsets.pkl")  # 可选：用于后续Embedding映射
+
+# 6. 测试集
+df_test_merged = df_test.merge(user_features, on='user_id', how='left')
+df_test_merged = df_test_merged.merge(video_features_basic, on='video_id', how='left')
+df_test_merged = df_test_merged.merge(video_features_statistics, on='video_id', how='left')
+df_test_merged['date'] = pd.to_datetime(df_test_merged['date'], format='%Y%m%d').dt.dayofweek
+
+df_test_processed = df_test_merged.copy()
+df_test_processed.fillna(-1, inplace=True)
+
+# 对测试集进行相同的预处理
+for col in categorical_cols:
+    # 先将测试数据中不存在的标签替换为'UNK'
+    df_test_processed[col] = df_test_processed[col].astype(str).apply(
+        lambda x: x if x in label_encoders[col].classes_ else 'UNK')
+    # 然后进行转换
+    df_test_processed[col] = label_encoders[col].transform(df_test_processed[col]) + feature_offsets[col]
+
+# 对数值特征进行相同的标准化（使用训练集的scaler）
+df_test_processed[numeric_cols] = scaler.transform(df_test_processed[numeric_cols])
+
+# 提取测试集的标签
+y_test = df_test_processed[label_cols]
+
+# 提取测试集的特征
+X_test = df_test_processed[categorical_cols + numeric_cols]
+
+# 打印处理结果
+print("Processed test feature shape:", X_test.shape)
+print("Processed test label shape:", y_test.shape)
+
+# 保存测试集的特征和标签
+X_test.to_parquet("KuaiRand-Pure/data_processed/processed_X_test.parquet")
+y_test.to_parquet("KuaiRand-Pure/data_processed/processed_y_test.parquet")
+
+print("数据预处理完成并保存KuaiRand-Pure/data_processed！")
