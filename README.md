@@ -17,7 +17,11 @@ Recommendation\_KuaiRand/
 │   │   ├── video_features_basic_pure.csv
 │   │   ├── video_features_statistic_pure.csv
 │   │   └── merged_train_sample.csv       # ← 脚本执行后生成
-├── sample\_merge.py                        # 样本拼接脚本
+│   ├── data_processed/
+│   └── saved/
+├── data_process.py                        # 数据预处理脚本
+├── main.py                        # 模型训练评估
+├── MMoE_model.py                        # MMoE网络模型
 └── README.md
 ```
 ---
@@ -27,7 +31,7 @@ Recommendation\_KuaiRand/
 - [x] 加载行为日志、用户特征、视频特征数据
 - [x] 将用户和视频特征合并至行为数据，生成训练样本
 - [x] 特征处理（缺失值填充、编码、归一化等）
-- [ ] 构建 CVR 预测模型（点击/点赞/评论等）
+- [ ] 构建 CVR 预测模型（点击/点赞/关注/评论等）
 - [ ] 模型评估与优化
 
 ---
