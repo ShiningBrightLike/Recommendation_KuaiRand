@@ -1,0 +1,75 @@
+2025-07-03 21:58:06,977 - __main__ - INFO - Loading data...
+2025-07-03 21:58:07,810 - __main__ - INFO - Data loaded successfully.
+2025-07-03 21:58:08,079 - __main__ - INFO - Positive sample ratios:
+2025-07-03 21:58:08,079 - __main__ - INFO - task1 positive sample ratio:0.46344706416130066
+2025-07-03 21:58:08,079 - __main__ - INFO - task2 positive sample ratio:0.0186765193939209
+2025-07-03 21:58:08,085 - __main__ - INFO - task3 positive sample ratio:0.001006912556476891
+2025-07-03 21:58:08,086 - __main__ - INFO - task4 positive sample ratio:0.002567670773714781
+2025-07-03 21:58:08,142 - __main__ - INFO - Building MMoE model...
+2025-07-03 21:58:09,098 - tensorflow - WARNING - From C:\Users\11605\.conda\envs\env_tf\Lib\site-packages\keras\src\backend\tensorflow\core.py:219: The name tf.placeholder is deprecated. Please use tf.compat.v1.placeholder instead.
+
+2025-07-03 21:58:09,282 - __main__ - INFO - Starting model training...
+2025-07-03 21:58:26,299 - __main__ - INFO - Epoch 1/30
+2025-07-03 21:58:26,300 - __main__ - INFO - Train - Loss: 0.6988, Task1 AUC: 0.7191, Task2 AUC: 0.7750, Task3 AUC: 0.6265, Task4 AUC: 0.6086
+2025-07-03 21:58:26,300 - __main__ - INFO - Val - Loss: 0.6909, Task1 AUC: 0.7159, Task2 AUC: 0.8005, Task3 AUC: 0.6943, Task4 AUC: 0.6647
+2025-07-03 21:58:37,376 - __main__ - INFO - Epoch 2/30
+2025-07-03 21:58:37,376 - __main__ - INFO - Train - Loss: 0.6758, Task1 AUC: 0.7338, Task2 AUC: 0.8242, Task3 AUC: 0.6785, Task4 AUC: 0.6642
+2025-07-03 21:58:37,376 - __main__ - INFO - Val - Loss: 0.6984, Task1 AUC: 0.7161, Task2 AUC: 0.8066, Task3 AUC: 0.6959, Task4 AUC: 0.6333
+2025-07-03 21:58:48,514 - __main__ - INFO - Epoch 3/30
+2025-07-03 21:58:48,514 - __main__ - INFO - Train - Loss: 0.6716, Task1 AUC: 0.7380, Task2 AUC: 0.8326, Task3 AUC: 0.6905, Task4 AUC: 0.6688
+2025-07-03 21:58:48,514 - __main__ - INFO - Val - Loss: 0.6897, Task1 AUC: 0.7211, Task2 AUC: 0.8106, Task3 AUC: 0.6702, Task4 AUC: 0.6865
+2025-07-03 21:58:59,711 - __main__ - INFO - Epoch 4/30
+2025-07-03 21:58:59,711 - __main__ - INFO - Train - Loss: 0.6675, Task1 AUC: 0.7423, Task2 AUC: 0.8387, Task3 AUC: 0.6934, Task4 AUC: 0.6844
+2025-07-03 21:58:59,711 - __main__ - INFO - Val - Loss: 0.6843, Task1 AUC: 0.7219, Task2 AUC: 0.8124, Task3 AUC: 0.6841, Task4 AUC: 0.6490
+2025-07-03 21:59:10,860 - __main__ - INFO - Epoch 5/30
+2025-07-03 21:59:10,860 - __main__ - INFO - Train - Loss: 0.6631, Task1 AUC: 0.7465, Task2 AUC: 0.8445, Task3 AUC: 0.7014, Task4 AUC: 0.6885
+2025-07-03 21:59:10,860 - __main__ - INFO - Val - Loss: 0.6840, Task1 AUC: 0.7218, Task2 AUC: 0.8166, Task3 AUC: 0.6725, Task4 AUC: 0.6411
+2025-07-03 21:59:22,197 - __main__ - INFO - Epoch 6/30
+2025-07-03 21:59:22,197 - __main__ - INFO - Train - Loss: 0.6582, Task1 AUC: 0.7506, Task2 AUC: 0.8531, Task3 AUC: 0.7027, Task4 AUC: 0.6917
+2025-07-03 21:59:22,198 - __main__ - INFO - Val - Loss: 0.6829, Task1 AUC: 0.7259, Task2 AUC: 0.8212, Task3 AUC: 0.7118, Task4 AUC: 0.6819
+2025-07-03 21:59:33,357 - __main__ - INFO - Epoch 7/30
+2025-07-03 21:59:33,357 - __main__ - INFO - Train - Loss: 0.6530, Task1 AUC: 0.7551, Task2 AUC: 0.8616, Task3 AUC: 0.7114, Task4 AUC: 0.6984
+2025-07-03 21:59:33,357 - __main__ - INFO - Val - Loss: 0.6870, Task1 AUC: 0.7270, Task2 AUC: 0.8242, Task3 AUC: 0.7164, Task4 AUC: 0.6573
+2025-07-03 21:59:44,546 - __main__ - INFO - Epoch 8/30
+2025-07-03 21:59:44,546 - __main__ - INFO - Train - Loss: 0.6475, Task1 AUC: 0.7597, Task2 AUC: 0.8701, Task3 AUC: 0.7155, Task4 AUC: 0.7069
+2025-07-03 21:59:44,546 - __main__ - INFO - Val - Loss: 0.6832, Task1 AUC: 0.7267, Task2 AUC: 0.8274, Task3 AUC: 0.6707, Task4 AUC: 0.6805
+2025-07-03 21:59:55,753 - __main__ - INFO - Epoch 9/30
+2025-07-03 21:59:55,753 - __main__ - INFO - Train - Loss: 0.6424, Task1 AUC: 0.7640, Task2 AUC: 0.8772, Task3 AUC: 0.7231, Task4 AUC: 0.7113
+2025-07-03 21:59:55,753 - __main__ - INFO - Val - Loss: 0.6824, Task1 AUC: 0.7286, Task2 AUC: 0.8234, Task3 AUC: 0.6648, Task4 AUC: 0.6789
+2025-07-03 22:00:07,157 - __main__ - INFO - Epoch 10/30
+2025-07-03 22:00:07,157 - __main__ - INFO - Train - Loss: 0.6376, Task1 AUC: 0.7679, Task2 AUC: 0.8829, Task3 AUC: 0.7219, Task4 AUC: 0.7157
+2025-07-03 22:00:07,157 - __main__ - INFO - Val - Loss: 0.6820, Task1 AUC: 0.7283, Task2 AUC: 0.8202, Task3 AUC: 0.6651, Task4 AUC: 0.6584
+2025-07-03 22:00:18,237 - __main__ - INFO - Epoch 11/30
+2025-07-03 22:00:18,237 - __main__ - INFO - Train - Loss: 0.6330, Task1 AUC: 0.7716, Task2 AUC: 0.8886, Task3 AUC: 0.7297, Task4 AUC: 0.7205
+2025-07-03 22:00:18,237 - __main__ - INFO - Val - Loss: 0.6840, Task1 AUC: 0.7295, Task2 AUC: 0.8240, Task3 AUC: 0.6561, Task4 AUC: 0.6801
+2025-07-03 22:00:29,333 - __main__ - INFO - Epoch 12/30
+2025-07-03 22:00:29,333 - __main__ - INFO - Train - Loss: 0.6288, Task1 AUC: 0.7749, Task2 AUC: 0.8935, Task3 AUC: 0.7381, Task4 AUC: 0.7180
+2025-07-03 22:00:29,333 - __main__ - INFO - Val - Loss: 0.6825, Task1 AUC: 0.7292, Task2 AUC: 0.8246, Task3 AUC: 0.6682, Task4 AUC: 0.6771
+2025-07-03 22:00:40,500 - __main__ - INFO - Epoch 13/30
+2025-07-03 22:00:40,500 - __main__ - INFO - Train - Loss: 0.6249, Task1 AUC: 0.7779, Task2 AUC: 0.8980, Task3 AUC: 0.7465, Task4 AUC: 0.7272
+2025-07-03 22:00:40,500 - __main__ - INFO - Val - Loss: 0.6896, Task1 AUC: 0.7302, Task2 AUC: 0.8212, Task3 AUC: 0.6715, Task4 AUC: 0.6417
+2025-07-03 22:00:51,671 - __main__ - INFO - Epoch 14/30
+2025-07-03 22:00:51,671 - __main__ - INFO - Train - Loss: 0.6213, Task1 AUC: 0.7806, Task2 AUC: 0.9017, Task3 AUC: 0.7544, Task4 AUC: 0.7301
+2025-07-03 22:00:51,671 - __main__ - INFO - Val - Loss: 0.6836, Task1 AUC: 0.7301, Task2 AUC: 0.8225, Task3 AUC: 0.6422, Task4 AUC: 0.6568
+2025-07-03 22:01:02,853 - __main__ - INFO - Epoch 15/30
+2025-07-03 22:01:02,853 - __main__ - INFO - Train - Loss: 0.6180, Task1 AUC: 0.7831, Task2 AUC: 0.9053, Task3 AUC: 0.7566, Task4 AUC: 0.7277
+2025-07-03 22:01:02,853 - __main__ - INFO - Val - Loss: 0.6852, Task1 AUC: 0.7302, Task2 AUC: 0.8210, Task3 AUC: 0.6499, Task4 AUC: 0.6779
+2025-07-03 22:01:02,902 - __main__ - INFO - Saving model...
+2025-07-03 22:01:02,902 - absl - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-07-03 22:01:02,988 - __main__ - INFO - Model saved successfully.
+2025-07-03 22:01:02,988 - __main__ - INFO - Evaluating on test set...
+2025-07-03 22:01:04,128 - __main__ - INFO - 
+Test set evaluation:
+2025-07-03 22:01:04,129 - __main__ - INFO - loss: 0.6820
+2025-07-03 22:01:04,129 - __main__ - INFO - compile_metrics: 0.6030
+2025-07-03 22:01:04,129 - __main__ - INFO - output_1_loss: 0.0728
+2025-07-03 22:01:04,129 - __main__ - INFO - output_2_loss: 0.0090
+2025-07-03 22:01:04,129 - __main__ - INFO - output_3_loss: 0.0161
+2025-07-03 22:01:04,130 - __main__ - INFO - output_4_loss: 0.7283
+2025-07-03 22:01:04,130 - __main__ - INFO - 
+AUC for each task:
+2025-07-03 22:01:04,131 - __main__ - INFO - output_1 AUC: 0.7283
+2025-07-03 22:01:04,131 - __main__ - INFO - output_2 AUC: 0.8202
+2025-07-03 22:01:04,131 - __main__ - INFO - output_3 AUC: 0.6651
+2025-07-03 22:01:04,131 - __main__ - INFO - output_4 AUC: 0.6584
+2025-07-03 22:01:06,114 - __main__ - INFO - Training curves saved to KuaiRand-Pure/saved/MMoE_model_loss_auc_train_val.png
