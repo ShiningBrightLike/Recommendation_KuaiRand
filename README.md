@@ -15,13 +15,12 @@ Recommendation\_KuaiRand/
 │   │   ├── log_standard_4_22_to_5_08_pure.csv
 │   │   ├── user_features_pure.csv
 │   │   ├── video_features_basic_pure.csv
-│   │   ├── video_features_statistic_pure.csv
-│   │   └── merged_train_sample.csv       # ← 脚本执行后生成
+│   │   └── video_features_statistic_pure.csv
 │   ├── data_processed/
 │   └── saved/
 ├── data_process.py                        # 数据预处理脚本
-├── main.py                        # 模型训练评估
-├── MMoE_model.py                        # MMoE网络模型
+├── main.py                                # 模型训练评估
+├── MMoE_model.py                          # MMoE网络模型
 └── README.md
 ```
 ---
@@ -31,7 +30,7 @@ Recommendation\_KuaiRand/
 - [x] 加载行为日志、用户特征、视频特征数据
 - [x] 将用户和视频特征合并至行为数据，生成训练样本
 - [x] 特征处理（缺失值填充、编码、归一化等）
-- [ ] 构建 CVR 预测模型（点击/点赞/关注/评论等）
+- [x] 构建 CVR 预测模型（点击/点赞/关注/评论等）
 - [ ] 模型评估与优化
 
 ---
@@ -39,16 +38,22 @@ Recommendation\_KuaiRand/
 ## 🚀 使用说明
 
 1. 确保将原始数据放置在 `KuaiRand-Pure/data/` 目录下；
-2. 运行样本拼接脚本：
+2. 运行数据预处理（样本拼接、缺失值处理、映射编码、归一化）脚本：
 
 ```bash
-python sample_merge.py
+python data_process.py
 ````
 
-3. 合并结果将保存在：
+3. 预处理数据结果将保存在：
 
 ```
-KuaiRand-Pure/data/merged_train_sample.csv
+KuaiRand-Pure/data_processed/
+```
+
+4. MMoE模型训练评估：
+
+```
+python main.py
 ```
 
 ---
