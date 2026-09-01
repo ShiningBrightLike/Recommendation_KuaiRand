@@ -187,10 +187,10 @@ plt.legend()
 plt.subplot(1, 2, 2)
 
 # 训练 AUC（train）
-plt.plot(history.history['output_1_auc'], label='Task 1 Train AUC', color='blue', alpha=0.6)
-plt.plot(history.history['output_2_auc'], label='Task 2 Train AUC', color='orange', alpha=0.6)
-plt.plot(history.history['output_3_auc'], label='Task 3 Train AUC', color='green', alpha=0.6)
-plt.plot(history.history['output_4_auc'], label='Task 4 Train AUC', color='red', alpha=0.6)
+plt.plot(history.history['output_1_auc'], label='Task 1 Train AUC', color='blue', alpha=0.3)
+plt.plot(history.history['output_2_auc'], label='Task 2 Train AUC', color='orange', alpha=0.3)
+plt.plot(history.history['output_3_auc'], label='Task 3 Train AUC', color='green', alpha=0.3)
+plt.plot(history.history['output_4_auc'], label='Task 4 Train AUC', color='red', alpha=0.3)
 
 # 验证 AUC（val）
 plt.plot(history.history['val_output_1_auc'], label='Task 1 Val AUC', color='blue')
