@@ -12,7 +12,9 @@
 
 - 数据预处理管线已完成：原始 CSV → 样本拼接 → 特征编码/归一化 → parquet + 编码器产物；
 - 已实现 **MMoE（Multi-gate Mixture-of-Experts）** 多任务模型并完成两轮训练/评估；
-- 训练产物（模型权重、训练日志、损失/AUC 曲线）保存在 `KuaiRand-Pure/saved/`。
+- 已切换到 **train/val/test 时间切分协议**：验证集（4/16–4/21）从训练日志内切出，测试集（4/22–5/08）仅在训练结束后评估一次；
+- 新增单一配置源 `config.py` 与动态 `cat_vocab_size`（写于 `pipeline_meta.json`），特征清单不再三处重复；
+- 每次运行的产物（`model.keras` / `metrics.json` / `curves.png` / `training.log`）统一保存到 `KuaiRand-Pure/saved/runs/<run>/`；`KuaiRand-Pure/saved/` 根目录下为旧协议历史产物。
 
 ---
 
@@ -66,7 +68,10 @@
 | Batch size | 1024 |
 | Epochs | 30（早停生效时提前结束） |
 | 早停 | `monitor=val_loss`，`patience=5`，`restore_best_weights=True` |
-| 验证集 | 按时间切分的测试集（4/22–5/08） |
+| 随机种子 | 2025（可通过 `--seed` 覆盖） |
+| 验证集 | 训练日志尾部按时间切分（4/16–4/21，约 19.1 万行，行数见 `pipeline_meta.json`） |
+| 测试集 | 仅最终评估一次（4/22–5/08，29.5 万行） |
+| 运行产物 | `saved/runs/<tag>_<时间戳>/`：`model.keras` + `metrics.json` + `curves.png` + `training.log` |
 
 损失权重体现了对标签稀疏度的先验调整：点击/点赞样本充足给满权重，关注、评论更稀疏给低权重。
 
@@ -86,20 +91,22 @@ KuaiRand-Pure/data/（原始 CSV）
                     │
                     ▼  data_process.py
   ① 按 user_id / video_id 左连接拼接样本
-  ② date → 星期几；缺失值统一填 -1
-  ③ 35 个类别特征：LabelEncoder + 全局偏移量 → feature_id（预留 UNK）
-  ④ 58 个数值特征：StandardScaler（训练集 fit，测试集 transform）
-  ⑤ 提取 4 个标签列
+  ② 训练日志按 date ≥ 20220416 切出验证集（train / val）
+  ③ date → 星期几；缺失值统一填 -1
+  ④ 35 个类别特征：仅在训练集 fit LabelEncoder + 全局偏移量 → feature_id（预留 UNK），val/test 复用并映射未见值到 UNK
+  ⑤ 58 个数值特征：StandardScaler（训练集 fit，val/test 仅 transform）
+  ⑥ 提取 4 个标签列；记录总 vocab 与各行数到 pipeline_meta.json
                     │
                     ▼  KuaiRand-Pure/data_processed/
   processed_X.parquet / processed_y.parquet          （训练集）
+  processed_X_val.parquet / processed_y_val.parquet  （验证集）
   processed_X_test.parquet / processed_y_test.parquet（测试集）
-  label_encoders.pkl / scaler.pkl / feature_offsets.pkl
+  label_encoders.pkl / scaler.pkl / feature_offsets.pkl / pipeline_meta.json
                     │
                     ▼  main.py
-  MMoE 四任务训练 → 早停 → 保存模型与训练曲线
+  MMoE 四任务训练（seed 固定）→ 早停只盯 val → 测试集最终评估一次
                     ▼
-  KuaiRand-Pure/saved/（.h5 模型 / PNG 曲线 / 训练日志）
+  KuaiRand-Pure/saved/runs/<run>/（model.keras / metrics.json / curves.png / training.log）
 ```
 
 ### 3.2 数据规模
@@ -131,13 +138,15 @@ Recommendation_KuaiRand/
 │   └── project_overview.md            # 本文档
 ├── KuaiRand-Pure/
 │   ├── data/                          # 原始 CSV 数据（入库）
-│   ├── data_processed/                # 预处理产物（parquet + pkl）
-│   ├── saved/                         # 训练产物（.h5 / PNG / 日志）
+│   ├── data_processed/                # 预处理产物（本地生成，不入库）
+│   ├── saved/                         # 训练产物（本地生成，不入库；每次运行一个 runs/<run>/ 子目录）
 │   └── LICENSE
+├── config.py                          # 特征清单、路径与超参数唯一配置源
 ├── data_process.py                    # 数据预处理脚本
 ├── MMoE_model.py                      # MMoE 网络模型定义
 ├── main.py                            # 模型训练与评估
-├── .gitignore                         # 忽略大文件（data_processed 目录）
+├── requirements.txt                   # 锁版本依赖（env_tf）
+├── .gitignore                         # 忽略 data_processed 与 saved/runs
 └── README.md
 ```
 
@@ -153,42 +162,67 @@ Recommendation_KuaiRand/
 
 ### 5.2 大文件与版本控制
 
-- `processed_X.parquet`（约 101 MB）超过 GitHub 单文件 100 MB 上限，已加入 `.gitignore`，**不入库**；完整复现需先运行 `data_process.py` 本地生成；
-- 其余预处理产物（测试集 parquet、编码器 pkl）体积较小，已入库。
+- 生成类产物（`data_processed/` 全部内容、`saved/` 下的模型/曲线/日志）已**停止入库**并加入 `.gitignore`，仓库只保留源码、文档与原始数据 CSV；
+- 完整复现请运行 `python data_process.py` 本地重新生成全部 parquet/pkl/meta（当前实现约 30 秒）；
+- 说明：停止跟踪只影响后续提交；`git` 历史中已提交过的旧版本仍占用仓库体积，如需彻底瘦身需重写历史（风险高，暂不建议）。
 
 ### 5.3 已知问题 / 建议
 
-- `data_process.py` 顶部注释提到 `nrows=10000`，已过时——当前实际全量读取；
-- 共享 Embedding 的 `cat_vocab_size=2500` 是硬编码。当前数据最大 feature_id 为 2413，恰好能覆盖；若扩充数据/特征导致 id 超限，需要根据 `feature_offsets.pkl` 动态计算 vocab 大小；
-- `demo.py` 是快速排序练习脚本，与推荐建模无关，建议移出或归档；
-- `__pycache__/MMoE_model.cpython-311.pyc` 被误提交到仓库，建议删除并加入 `.gitignore`；
-- 模型以 `.h5`（legacy 格式）保存，Keras 新版本建议使用 `.keras`；
+- ~~`data_process.py` 顶部过时的 `nrows=10000` 注释~~ 已解决（脚本已重写）；
+- ~~`cat_vocab_size=2500` 硬编码~~ 已解决：vocab 由编码器动态算出并写入 `pipeline_meta.json`（当前 2385），`main.py` 直接读取；
+- `demo.py` 当前不存在于磁盘/未入库，无清理对象（IDE 中若仍有该标签属过期状态）；
+- ~~误提交的 `__pycache__`~~ 已解决：`.gitignore` 已忽略，当前跟踪列表中无 pyc；
+- ~~`.h5` legacy 保存格式~~ 已解决：新运行保存为 Keras 3 原生 `model.keras`；
 - `log_random_*` 随机曝光数据尚未接入，可作为后续去偏实验的对照数据。
 
 ---
 
 ## 6. 运行方式
 
-依赖：`pandas`、`numpy`、`scikit-learn`、`joblib`、`pyarrow`、`tensorflow`、`matplotlib`。
+依赖：`tensorflow`、`pandas`、`numpy`、`scikit-learn`、`joblib`、`pyarrow`、`matplotlib`，版本锁定见 `requirements.txt`。标准环境为 conda 环境 `env_tf`（Python 3.11，CPU）。
 
 ```bash
-# 1. 数据预处理（需原始 CSV 位于 KuaiRand-Pure/data/）
+# 0. 使用标准环境
+conda activate env_tf
+
+# 1. 数据预处理（生成 train/val/test parquet + pipeline_meta.json）
 python data_process.py
 
-# 2. 模型训练与评估（需先完成第 1 步）
+# 2. 快速自检（每份数据取前 2048 行、1 个 epoch）
+python main.py --smoke
+
+# 3. 正式训练与评估（早停看 val，测试集最后评估一次）
 python main.py
 
-# 3. 单独验证模型结构/前向（读取前 10 条样本预测）
+# 4. 模型结构轻量自检（随机输入，不需要数据文件）
 python MMoE_model.py
 ```
 
-训练产物自动写入 `KuaiRand-Pure/saved/`：模型 `mmoe_model_<时间戳>.h5`、训练日志 `training_log_<时间戳>.log`、损失/AUC 曲线 `MMoE_model_loss_auc_train_val_<时间戳>.png`。
+正式训练产物自动写入 `KuaiRand-Pure/saved/runs/<tag>_<时间戳>/`：`model.keras`、`metrics.json`（含种子、超参、正样本占比、逐 epoch history 与测试集指标）、`curves.png`、`training.log`。常用覆盖参数：`--seed`、`--epochs`、`--batch-size`、`--patience`、`--tag`。
 
 ---
 
 ## 7. 训练结果
 
-已完成两轮训练（2025-07-03），均在约第 15/16 epoch 因早停结束，测试集指标如下：
+### 7.1 新协议基线（可复现，2026-09-07）
+
+运行：`baseline-v1_20260907_001737`（seed=2025，best epoch=9，早停于 epoch 13；train 950,310 / val 190,802 / test 295,497）。
+
+| 指标（测试集 4/22–5/08） | Baseline v1 |
+| --- | --- |
+| 总 loss | 0.6914 |
+| 点击 AUC | 0.7223 |
+| 点赞 AUC | 0.8090 |
+| 关注 AUC | 0.7110 |
+| 评论 AUC | 0.6495 |
+
+完整逐 epoch 历史与配置见 `KuaiRand-Pure/saved/runs/baseline-v1_20260907_001737/metrics.json`。
+
+### 7.2 旧协议历史结果（仅参考）
+
+> ⚠️ 旧协议直接使用 4/22–5/08 测试集做早停，成绩偏乐观；下表仅作历史记录。
+
+旧协议下两轮训练（2025-07-03）均在约第 15/16 epoch 因早停结束：
 
 | 指标 | Run 1（215806） | Run 2（233116） |
 | --- | --- | --- |
@@ -198,11 +232,7 @@ python MMoE_model.py
 | Task3 关注 AUC | 0.6651 | 0.6540 |
 | Task4 评论 AUC | 0.6584 | 0.6749 |
 
-观察：
-
-- 点赞任务 AUC 最高（≈0.82），与行为分布及特征相关性一致；
-- 关注、评论任务 AUC 较低且两轮之间波动（0.65–0.68），与标签稀疏及损失权重较低有关；
-- 日志 `training_log_20250703_232935.log` 仅包含 "Loading data..."，该次运行未完成训练。
+观察：新协议下关注任务 AUC（0.7110）明显优于旧协议（0.6540–0.6651），点赞/点击略降——早停不再“看到”测试集，测试指标更可信；评论任务仍是最弱项，可作为里程碑 2 的优化重点。
 
 ---
 

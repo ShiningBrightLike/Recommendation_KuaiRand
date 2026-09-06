@@ -1,0 +1,11 @@
+# Standard runtime: conda env `env_tf` (Python 3.11, Windows, CPU).
+# Recreate with: conda create -n env_tf python=3.11 && pip install -r requirements.txt
+tensorflow==2.19.0
+keras==3.9.2
+pandas==2.2.3
+numpy==2.1.3
+scikit-learn==1.6.1
+joblib==1.5.0
+pyarrow==20.0.0
+matplotlib==3.10.3
+h5py==3.13.0

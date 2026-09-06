@@ -2,3 +2,9 @@
 KuaiRand-Pure/data_processed/
 .vscode/
 __pycache__/
+
+# Generated experiment outputs (models, metrics, curves, logs)
+KuaiRand-Pure/saved/
+
+# Legacy root-level training figure
+MMoE_model_loss_auc.png
