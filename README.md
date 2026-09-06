@@ -75,6 +75,26 @@ training.log     # 训练日志
 
 ---
 
+## 📈 运行效果（Baseline v1，2026-09-07）
+
+可复现基线的默认配置运行结果（`seed=2025`，best epoch=9，早停于 epoch 13；train 950,310 / val 190,802 / test 295,497）：
+
+| 指标（测试集 4/22–5/08） | Baseline v1 |
+| --- | --- |
+| 总 loss | 0.6914 |
+| 点击 AUC | 0.7223 |
+| 点赞 AUC | 0.8090 |
+| 关注 AUC | 0.7110 |
+| 评论 AUC | 0.6495 |
+
+训练与验证的 loss / AUC 曲线：
+
+![Baseline v1 训练曲线](docs/assets/baseline_v1_curves.png)
+
+完整逐 epoch 历史与配置见 [`docs/assets/baseline_v1_metrics.json`](docs/assets/baseline_v1_metrics.json)。
+
+---
+
 ## 📚 数据集引用
 
 本项目使用的 KuaiRand 数据集来自 CIKM 2022：
@@ -98,10 +118,11 @@ training.log     # 训练日志
 
 ## 📌 后续计划
 
-* 模块化数据处理与建模流程
-* 支持多反馈目标的多任务学习
+* ~~模块化数据处理与建模流程~~ 已完成（里程碑 1：train/val/test 协议 + 单一配置源 + run 产物归档）
+* ~~支持多反馈目标的多任务学习~~ 已完成（MMoE 四任务可复现基线）
 * 引入深度模型（如 Transformer）进行序列建模
 * 支持线上推理与实验评估
+* 多任务结构升级（PLE/CGC）、稀疏任务 focal loss、随机曝光日志去偏等模型实验
 
 ---
 

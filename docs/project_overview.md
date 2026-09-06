@@ -216,7 +216,7 @@ python MMoE_model.py
 | 关注 AUC | 0.7110 |
 | 评论 AUC | 0.6495 |
 
-完整逐 epoch 历史与配置见 `KuaiRand-Pure/saved/runs/baseline-v1_20260907_001737/metrics.json`。
+完整逐 epoch 历史与配置见 `docs/assets/baseline_v1_metrics.json`；训练曲线图见 `docs/assets/baseline_v1_curves.png`（已在 README 展示）。
 
 ### 7.2 旧协议历史结果（仅参考）
 
