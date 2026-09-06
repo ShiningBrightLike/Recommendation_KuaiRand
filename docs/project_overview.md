@@ -137,7 +137,6 @@ Recommendation_KuaiRand/
 ├── data_process.py                    # 数据预处理脚本
 ├── MMoE_model.py                      # MMoE 网络模型定义
 ├── main.py                            # 模型训练与评估
-├── demo.py                            # 快排练习脚本（与建模链路无关）
 ├── .gitignore                         # 忽略大文件（data_processed 目录）
 └── README.md
 ```
