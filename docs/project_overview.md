@@ -15,6 +15,7 @@
 - 已切换到 **train/val/test 时间切分协议**：验证集（4/16–4/21）从训练日志内切出，测试集（4/22–5/08）仅在训练结束后评估一次；
 - 新增单一配置源 `config.py` 与动态 `cat_vocab_size`（写于 `pipeline_meta.json`），特征清单不再三处重复；
 - 每次运行的产物（`model.keras` / `metrics.json` / `curves.png` / `training.log`）统一保存到 `KuaiRand-Pure/saved/runs/<run>/`；`KuaiRand-Pure/saved/` 根目录下为旧协议历史产物。
+- 新增**特征优选模块**：`feature_importance.py` 用置换重要度（AUC 下降）评估特征，支持影子特征噪声对照与报告产物；筛选纪律与术语见 `docs/adr/0001-0002`、`CONTEXT.md`。
 
 ---
 
@@ -135,18 +136,25 @@ KuaiRand-Pure/data/（原始 CSV）
 ```
 Recommendation_KuaiRand/
 ├── docs/
-│   └── project_overview.md            # 本文档
+│   ├── project_overview.md            # 本文档
+│   ├── assets/                        # 留档的运行曲线/指标（入库展示用）
+│   ├── agents/                        # 工程技能消费规则（issue tracker 等）
+│   └── adr/                           # 架构决策记录（特征筛选纪律等）
+├── CONTEXT.md                         # 项目术语表
 ├── KuaiRand-Pure/
 │   ├── data/                          # 原始 CSV 数据（入库）
 │   ├── data_processed/                # 预处理产物（本地生成，不入库）
 │   ├── saved/                         # 训练产物（本地生成，不入库；每次运行一个 runs/<run>/ 子目录）
 │   └── LICENSE
 ├── config.py                          # 特征清单、路径与超参数唯一配置源
+├── data_loading.py                    # 共享数据加载与 pipeline schema 解析
 ├── data_process.py                    # 数据预处理脚本
+├── feature_importance.py              # 置换重要度（特征优选）模块
 ├── MMoE_model.py                      # MMoE 网络模型定义
 ├── main.py                            # 模型训练与评估
 ├── requirements.txt                   # 锁版本依赖（env_tf）
-├── .gitignore                         # 忽略 data_processed 与 saved/runs
+├── tests/                             # 单元测试（env_tf 下 unittest 运行）
+├── .gitignore                         # 忽略 data_processed、saved 与生成类产物
 └── README.md
 ```
 

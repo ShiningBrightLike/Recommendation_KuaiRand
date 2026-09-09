@@ -95,6 +95,39 @@ training.log     # 训练日志
 
 ---
 
+## 🔬 特征优选（置换重要度）
+
+在训练好的模型上，把单个特征取值随机打乱后重新预测，用“各任务 AUC 相对基线的下降幅度”衡量该特征的重要性；下降越多越重要。该模块适合定期体检现有特征，也用于将来大量新特征加入时先筛一轮再决定是否纳入模型。
+
+```powershell
+# 1.（可选）如需精确噪声对照，预处理时注入影子特征
+python data_process.py --shadow-features 1
+
+# 2. 训练模型（会读取 data_process 记录的完整特征 schema，含影子特征）
+python main.py --tag fi-base
+
+# 3. 计算置换重要度（默认在验证集上、每特征打乱 3 次）
+python feature_importance.py --model KuaiRand-Pure/saved/runs/fi-base_<时间戳>/model.keras
+
+# 快速自检 / 只分析部分特征 / 更高重复次数
+python feature_importance.py --model ... --smoke
+python feature_importance.py --model ... --candidate-cols shadow_0,some_new_feat
+python feature_importance.py --model ... --repeats 5
+```
+
+结果写入模型目录下的 `feature_importance/`：`importance.json`（机器可读）、`importance.csv`、`importance.md`（含结论表与相关特征提示）、`importance_top.png`（Top-N 条形图）。
+
+判定口径（详见 `docs/adr/0002` 与 `CONTEXT.md`）：
+
+- 报告输出 4 个任务的逐任务下降（含负值，不隐式归零）；门控默认只看点击、点赞两个信号充足任务（`--tasks` 可改）；
+- 判定规则：`均值 − std ≥ cutoff` 为“通过”；仅均值过线为“待确认”；否则“不通过”（默认 `--cutoff 0.001`）；
+- `shadow_*` 影子特征是随机噪声，其重要度即噪声下限参考；
+- 强相关数值特征（默认 `|r| ≥ 0.9`）会在报告中列出——置换重要度会在相关特征间摊薄，请合并解读，不单独按排名下结论。
+
+设计决策与术语表见 [docs/adr/0002-permutation-importance-and-two-stage-gate.md](docs/adr/0002-permutation-importance-and-two-stage-gate.md) 与 [CONTEXT.md](CONTEXT.md)。
+
+---
+
 ## 📚 数据集引用
 
 本项目使用的 KuaiRand 数据集来自 CIKM 2022：
