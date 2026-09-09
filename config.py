@@ -68,6 +68,11 @@ NUMERIC_COLS = [
 
 LABEL_COLS = ["is_click", "is_like", "is_follow", "is_comment"]
 
+# Tasks whose permutation signal is trusted for default feature gating
+# (positive-sample-rich). The sparse tasks stay visible in reports as
+# reference columns but do not drive gate decisions by default.
+GATE_TASKS = ["is_click", "is_like"]
+
 # Mapping from processed split name to (X, y) file names under PROCESSED_DIR.
 SPLIT_FILES = {
     "train": ("processed_X.parquet", "processed_y.parquet"),
