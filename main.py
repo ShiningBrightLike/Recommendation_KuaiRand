@@ -24,12 +24,12 @@ import matplotlib
 matplotlib.use("Agg")  # headless by default; `--show` still displays afterwards
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback, EarlyStopping
 from tensorflow.keras.metrics import AUC
 
 import config as C
+from data_loading import load_cat_vocab_size, load_feature_schema, load_split
 from MMoE_model import build_mmoe_model
 
 
@@ -77,61 +77,6 @@ def setup_logging(run_dir):
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
     return logger
-
-
-def load_split(name, max_rows=None):
-    """Load a processed split as model inputs / targets."""
-    if name not in C.SPLIT_FILES:
-        raise ValueError(f"unknown split: {name}")
-    x_file, y_file = (C.PROCESSED_DIR / f for f in C.SPLIT_FILES[name])
-    if not x_file.exists() or not y_file.exists():
-        raise FileNotFoundError(
-            f"missing processed files for split '{name}'. "
-            f"Run `python data_process.py` first."
-        )
-
-    df_x = pd.read_parquet(x_file)
-    df_y = pd.read_parquet(y_file)
-    if max_rows is not None:
-        df_x = df_x.head(max_rows)
-        df_y = df_y.head(max_rows)
-
-    missing_cat = [c for c in C.CATEGORICAL_COLS if c not in df_x.columns]
-    missing_num = [c for c in C.NUMERIC_COLS if c not in df_x.columns]
-    if missing_cat or missing_num:
-        raise ValueError(
-            "processed X is out of sync with config.py; regenerate with "
-            f"`python data_process.py`. missing categorical={missing_cat}, "
-            f"missing numeric={missing_num}"
-        )
-    if list(df_y.columns) != C.LABEL_COLS:
-        raise ValueError(
-            f"processed y columns {list(df_y.columns)} != config.LABEL_COLS "
-            f"{C.LABEL_COLS}; regenerate with `python data_process.py`"
-        )
-
-    x_categorical = [df_x[col].astype("int32").values for col in C.CATEGORICAL_COLS]
-    x_numeric = df_x[C.NUMERIC_COLS].astype("float32").values
-    targets = [
-        df_y[col].values.reshape(-1, 1).astype("float32") for col in C.LABEL_COLS
-    ]
-    positive_ratios = {col: float(df_y[col].mean()) for col in C.LABEL_COLS}
-    return x_categorical + [x_numeric], targets, len(df_x), positive_ratios
-
-
-def load_cat_vocab_size():
-    """Vocab size comes from pipeline metadata; fall back to the encoders."""
-    meta_file = C.PROCESSED_DIR / "pipeline_meta.json"
-    if meta_file.exists():
-        meta = json.loads(meta_file.read_text(encoding="utf-8"))
-        return int(meta["cat_vocab_size"])
-
-    import joblib
-
-    encoders = joblib.load(C.PROCESSED_DIR / "label_encoders.pkl")
-    offsets = joblib.load(C.PROCESSED_DIR / "feature_offsets.pkl")
-    return max(offsets[col] + len(encoders[col].classes_) for col in C.CATEGORICAL_COLS)
-
 
 class TrainingLogger(Callback):
     """Log per-epoch train/val loss and AUC per task."""
@@ -195,9 +140,18 @@ def main():
     logger = setup_logging(run_dir)
 
     logger.info("Loading processed data...")
-    x_train, y_train, n_train, ratios_train = load_split("train", args.max_rows)
-    x_val, y_val, n_val, ratios_val = load_split("val", args.max_rows)
-    x_test, y_test, n_test, ratios_test = load_split("test", args.max_rows)
+    cat_cols, num_cols, shadow_cols = load_feature_schema()
+    if shadow_cols:
+        logger.info(f"Schema includes shadow features: {shadow_cols}")
+    x_train, y_train, n_train, ratios_train = load_split(
+        "train", args.max_rows, cat_cols, num_cols
+    )
+    x_val, y_val, n_val, ratios_val = load_split(
+        "val", args.max_rows, cat_cols, num_cols
+    )
+    x_test, y_test, n_test, ratios_test = load_split(
+        "test", args.max_rows, cat_cols, num_cols
+    )
 
     for split, ratios in (
         ("train", ratios_train),
@@ -209,8 +163,8 @@ def main():
     cat_vocab_size = load_cat_vocab_size()
     logger.info(f"Building MMoE model (cat_vocab_size={cat_vocab_size})...")
     model = build_mmoe_model(
-        categorical_cols=C.CATEGORICAL_COLS,
-        numeric_cols=C.NUMERIC_COLS,
+        categorical_cols=cat_cols,
+        numeric_cols=num_cols,
         cat_vocab_size=cat_vocab_size,
         embed_dim=C.EMBED_DIM,
         num_experts=C.NUM_EXPERTS,
@@ -274,6 +228,7 @@ def main():
         "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "config": vars(args),
         "cat_vocab_size": cat_vocab_size,
+        "shadow_cols": shadow_cols,
         "row_counts": {"train": n_train, "val": n_val, "test": n_test},
         "positive_ratios": {
             "train": ratios_train,

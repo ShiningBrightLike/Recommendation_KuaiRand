@@ -11,8 +11,10 @@ Layout decisions:
 
 Usage:
     python data_process.py
+    python data_process.py --shadow-features 1   # add random noise features
 """
 
+import argparse
 import json
 import time
 
@@ -51,6 +53,22 @@ def _fill_missing(df):
     return df
 
 
+def _add_shadow_features(df, count, seed):
+    """Append `count` independent standard-normal noise columns.
+
+    Shadow features are real model inputs (unlike post-hoc noise columns), so
+    permutation importance can later shuffle them to estimate a null/noise
+    floor for feature gating.
+    """
+    if count <= 0:
+        return df
+    rng = np.random.default_rng(seed)
+    df = df.copy()
+    for i in range(count):
+        df[f"shadow_{i}"] = rng.standard_normal(len(df)).astype("float32")
+    return df
+
+
 def _fit_categorical(train_df):
     """Fit one LabelEncoder per categorical column on train data.
 
@@ -83,10 +101,10 @@ def _positive_ratios(df):
     return {col: float((df[col] == 1).mean()) for col in C.LABEL_COLS}
 
 
-def _save_split(name, df):
+def _save_split(name, df, feature_cols):
     """Persist feature/label parquet files for a split and return (rows, ratios)."""
     x_file, y_file = (C.PROCESSED_DIR / f for f in C.SPLIT_FILES[name])
-    x = df[C.CATEGORICAL_COLS + C.NUMERIC_COLS]
+    x = df[feature_cols]
     y = df[C.LABEL_COLS]
     x.to_parquet(x_file, index=False)
     y.to_parquet(y_file, index=False)
@@ -95,6 +113,16 @@ def _save_split(name, df):
 
 def main():
     started = time.time()
+    parser = argparse.ArgumentParser(description="Preprocess KuaiRand raw CSVs.")
+    parser.add_argument(
+        "--shadow-features",
+        type=int,
+        default=0,
+        help="number of random noise (shadow) numeric features to add; "
+        "used later as the permutation-importance null reference",
+    )
+    args = parser.parse_args()
+    n_shadow = args.shadow_features
     C.PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
     print("Loading and merging raw data...")
@@ -113,24 +141,36 @@ def main():
     val_df = _fill_missing(_convert_date_to_weekday(val_df))
     test_df = _fill_missing(_convert_date_to_weekday(test_df))
 
+    # Inject shadow features before scaling so they go through the same
+    # numeric pipeline as real numeric features.
+    shadow_cols = [f"shadow_{i}" for i in range(n_shadow)]
+    if shadow_cols:
+        train_df = _add_shadow_features(train_df, n_shadow, seed=777)
+        val_df = _add_shadow_features(val_df, n_shadow, seed=777)
+        test_df = _add_shadow_features(test_df, n_shadow, seed=777)
+        print(f"Added shadow features: {shadow_cols}")
+
     print(
         f"Row counts -> train: {len(train_df):,}, "
         f"val: {len(val_df):,}, test: {len(test_df):,}"
     )
+
+    feature_cols = C.CATEGORICAL_COLS + C.NUMERIC_COLS + shadow_cols
 
     # Fit encoders/scaler on train only, then apply to all splits.
     label_encoders, feature_offsets, cat_vocab_size = _fit_categorical(train_df)
     _transform_categorical(val_df, label_encoders, feature_offsets)
     _transform_categorical(test_df, label_encoders, feature_offsets)
 
-    scaler = StandardScaler().fit(train_df[C.NUMERIC_COLS])
+    numeric_cols = C.NUMERIC_COLS + shadow_cols
+    scaler = StandardScaler().fit(train_df[numeric_cols])
     for df in (train_df, val_df, test_df):
-        df[C.NUMERIC_COLS] = scaler.transform(df[C.NUMERIC_COLS])
+        df[numeric_cols] = scaler.transform(df[numeric_cols])
 
     print("Saving processed splits...")
     rows, ratios = {}, {}
     for name, df in (("train", train_df), ("val", val_df), ("test", test_df)):
-        n_rows, n_ratios = _save_split(name, df)
+        n_rows, n_ratios = _save_split(name, df, feature_cols)
         rows[name] = n_rows
         ratios[name] = n_ratios
         print(f"  {name:5s}: {n_rows:,} rows | positive ratios: {n_ratios}")
@@ -145,7 +185,8 @@ def main():
         "val_start_date": C.VAL_START_DATE,
         "cat_vocab_size": cat_vocab_size,
         "categorical_cols": C.CATEGORICAL_COLS,
-        "numeric_cols": C.NUMERIC_COLS,
+        "numeric_cols": numeric_cols,
+        "shadow_cols": shadow_cols,
         "label_cols": C.LABEL_COLS,
         "rows": rows,
         "positive_ratios": ratios,
