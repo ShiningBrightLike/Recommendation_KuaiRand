@@ -42,6 +42,7 @@ import tensorflow as tf
 
 import config as C
 from data_loading import load_feature_schema, load_split
+from MMoE_model import MMoE
 
 SHADOW_PREFIX = "shadow_"
 
@@ -164,13 +165,12 @@ def shuffled_inputs(inputs, spec, rng):
 
 def _stats(values):
     values = np.asarray(values, dtype=float)
-    if values.size == 0:
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
         return float("nan"), float("nan")
-    mean = float(np.nanmean(values))
+    mean = float(np.mean(finite))
     std = (
-        float(np.nanstd(values, ddof=1))
-        if np.sum(~np.isnan(values)) > 1
-        else 0.0
+        float(np.std(finite, ddof=1)) if finite.size > 1 else 0.0
     )
     return mean, std
 
@@ -468,7 +468,7 @@ def plot_importance(records_sorted, path, cutoff, top=20):
     ax.axvline(cutoff, color="red", linestyle="--", linewidth=1, label=f"cutoff={cutoff}")
     ax.set_yticks(range(len(valid)))
     ax.set_yticklabels(names, fontsize=8)
-    ax.set_xlabel("总体重要度（门控任务平均绝对 AUC 下降）")
+    ax.set_xlabel("Overall importance (mean absolute AUC drop over gate tasks)")
     ax.set_title("Permutation Feature Importance (AUC drop)")
     ax.legend(loc="lower right")
     fig.tight_layout()
@@ -502,7 +502,9 @@ def main():
     )
     print(f"Loaded {n_rows:,} rows; analyzing {len(specs)} features × {args.repeats} repeats")
 
-    model = tf.keras.models.load_model(str(args.model))
+    model = tf.keras.models.load_model(
+        str(args.model), custom_objects={"MMoE": MMoE}
+    )
     if len(model.inputs) != len(cat_cols) + 1:
         raise ValueError(
             f"model has {len(model.inputs)} inputs but schema expects "

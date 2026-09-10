@@ -1,0 +1,4925 @@
+{
+  "baseline_auc": {
+    "is_click": 0.7377557171711931,
+    "is_like": 0.8317722430087254,
+    "is_follow": 0.8274558926941603,
+    "is_comment": 0.7614221941294272
+  },
+  "gate_tasks": [
+    "is_click",
+    "is_like"
+  ],
+  "cutoff": 0.001,
+  "repeats": 3,
+  "seed": 2025,
+  "decision_summary": {
+    "不通过": 44,
+    "通过": 50
+  },
+  "noise_reference": {
+    "present": true,
+    "features": [
+      "shadow_0"
+    ],
+    "overall_mean": 9.506367714886185e-05,
+    "overall_std": 0.0
+  },
+  "correlated_pairs": [
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "show_user_num",
+      "correlation": 0.9962
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "play_cnt",
+      "correlation": 0.9867
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "play_user_num",
+      "correlation": 0.983
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "valid_play_cnt",
+      "correlation": 0.9711
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "valid_play_user_num",
+      "correlation": 0.9668
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9597
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.956
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9629
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9587
+    },
+    {
+      "feature_a": "show_cnt",
+      "feature_b": "reduce_similar_cnt",
+      "correlation": 0.9056
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "play_cnt",
+      "correlation": 0.9896
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "play_user_num",
+      "correlation": 0.9902
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "valid_play_cnt",
+      "correlation": 0.9764
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "valid_play_user_num",
+      "correlation": 0.9762
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.964
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9645
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9638
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9625
+    },
+    {
+      "feature_a": "show_user_num",
+      "feature_b": "reduce_similar_cnt",
+      "correlation": 0.9014
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "play_user_num",
+      "correlation": 0.9984
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "valid_play_cnt",
+      "correlation": 0.9905
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "valid_play_user_num",
+      "correlation": 0.9872
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9819
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9791
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9674
+    },
+    {
+      "feature_a": "play_cnt",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9638
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "valid_play_cnt",
+      "correlation": 0.9902
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "valid_play_user_num",
+      "correlation": 0.99
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9817
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9818
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9656
+    },
+    {
+      "feature_a": "play_user_num",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9642
+    },
+    {
+      "feature_a": "complete_play_cnt",
+      "feature_b": "complete_play_user_num",
+      "correlation": 0.9992
+    },
+    {
+      "feature_a": "complete_play_cnt",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9019
+    },
+    {
+      "feature_a": "complete_play_cnt",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9021
+    },
+    {
+      "feature_a": "complete_play_user_num",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9002
+    },
+    {
+      "feature_a": "complete_play_user_num",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9023
+    },
+    {
+      "feature_a": "valid_play_cnt",
+      "feature_b": "valid_play_user_num",
+      "correlation": 0.9984
+    },
+    {
+      "feature_a": "valid_play_cnt",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9953
+    },
+    {
+      "feature_a": "valid_play_cnt",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9943
+    },
+    {
+      "feature_a": "valid_play_cnt",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9278
+    },
+    {
+      "feature_a": "valid_play_cnt",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9236
+    },
+    {
+      "feature_a": "valid_play_user_num",
+      "feature_b": "long_time_play_cnt",
+      "correlation": 0.9932
+    },
+    {
+      "feature_a": "valid_play_user_num",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9953
+    },
+    {
+      "feature_a": "valid_play_user_num",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9232
+    },
+    {
+      "feature_a": "valid_play_user_num",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9209
+    },
+    {
+      "feature_a": "long_time_play_cnt",
+      "feature_b": "long_time_play_user_num",
+      "correlation": 0.9985
+    },
+    {
+      "feature_a": "long_time_play_cnt",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.9174
+    },
+    {
+      "feature_a": "long_time_play_cnt",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9125
+    },
+    {
+      "feature_a": "long_time_play_user_num",
+      "feature_b": "short_time_play_cnt",
+      "correlation": 0.913
+    },
+    {
+      "feature_a": "long_time_play_user_num",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9101
+    },
+    {
+      "feature_a": "short_time_play_cnt",
+      "feature_b": "short_time_play_user_num",
+      "correlation": 0.9992
+    },
+    {
+      "feature_a": "like_cnt",
+      "feature_b": "like_user_num",
+      "correlation": 0.9999
+    },
+    {
+      "feature_a": "like_cnt",
+      "feature_b": "click_like_cnt",
+      "correlation": 0.9887
+    },
+    {
+      "feature_a": "like_cnt",
+      "feature_b": "double_click_cnt",
+      "correlation": 0.9927
+    },
+    {
+      "feature_a": "like_user_num",
+      "feature_b": "click_like_cnt",
+      "correlation": 0.9874
+    },
+    {
+      "feature_a": "like_user_num",
+      "feature_b": "double_click_cnt",
+      "correlation": 0.9937
+    },
+    {
+      "feature_a": "click_like_cnt",
+      "feature_b": "double_click_cnt",
+      "correlation": 0.9635
+    },
+    {
+      "feature_a": "cancel_like_cnt",
+      "feature_b": "cancel_like_user_num",
+      "correlation": 0.9944
+    },
+    {
+      "feature_a": "cancel_like_cnt",
+      "feature_b": "cancel_collect_cnt",
+      "correlation": 0.9062
+    },
+    {
+      "feature_a": "cancel_like_user_num",
+      "feature_b": "cancel_collect_cnt",
+      "correlation": 0.9251
+    },
+    {
+      "feature_a": "cancel_like_user_num",
+      "feature_b": "cancel_collect_user_num",
+      "correlation": 0.917
+    },
+    {
+      "feature_a": "comment_cnt",
+      "feature_b": "comment_user_num",
+      "correlation": 0.9905
+    },
+    {
+      "feature_a": "comment_cnt",
+      "feature_b": "direct_comment_cnt",
+      "correlation": 0.9907
+    },
+    {
+      "feature_a": "comment_cnt",
+      "feature_b": "reply_comment_cnt",
+      "correlation": 0.9828
+    },
+    {
+      "feature_a": "comment_cnt",
+      "feature_b": "direct_comment_user_num",
+      "correlation": 0.9865
+    },
+    {
+      "feature_a": "comment_cnt",
+      "feature_b": "reply_comment_user_num",
+      "correlation": 0.979
+    },
+    {
+      "feature_a": "comment_user_num",
+      "feature_b": "direct_comment_cnt",
+      "correlation": 0.9729
+    },
+    {
+      "feature_a": "comment_user_num",
+      "feature_b": "reply_comment_cnt",
+      "correlation": 0.9848
+    },
+    {
+      "feature_a": "comment_user_num",
+      "feature_b": "direct_comment_user_num",
+      "correlation": 0.9958
+    },
+    {
+      "feature_a": "comment_user_num",
+      "feature_b": "reply_comment_user_num",
+      "correlation": 0.9871
+    },
+    {
+      "feature_a": "direct_comment_cnt",
+      "feature_b": "reply_comment_cnt",
+      "correlation": 0.9485
+    },
+    {
+      "feature_a": "direct_comment_cnt",
+      "feature_b": "direct_comment_user_num",
+      "correlation": 0.9784
+    },
+    {
+      "feature_a": "direct_comment_cnt",
+      "feature_b": "reply_comment_user_num",
+      "correlation": 0.9445
+    },
+    {
+      "feature_a": "reply_comment_cnt",
+      "feature_b": "direct_comment_user_num",
+      "correlation": 0.968
+    },
+    {
+      "feature_a": "reply_comment_cnt",
+      "feature_b": "reply_comment_user_num",
+      "correlation": 0.9967
+    },
+    {
+      "feature_a": "comment_like_cnt",
+      "feature_b": "comment_like_user_num",
+      "correlation": 0.979
+    },
+    {
+      "feature_a": "follow_cnt",
+      "feature_b": "follow_user_num1",
+      "correlation": 1.0
+    },
+    {
+      "feature_a": "cancel_follow_cnt",
+      "feature_b": "cancel_follow_user_num",
+      "correlation": 0.9999
+    },
+    {
+      "feature_a": "share_cnt",
+      "feature_b": "share_user_num",
+      "correlation": 0.9987
+    },
+    {
+      "feature_a": "share_cnt",
+      "feature_b": "share_all_cnt",
+      "correlation": 0.9878
+    },
+    {
+      "feature_a": "share_cnt",
+      "feature_b": "share_all_user_num",
+      "correlation": 0.9867
+    },
+    {
+      "feature_a": "share_user_num",
+      "feature_b": "share_all_cnt",
+      "correlation": 0.9873
+    },
+    {
+      "feature_a": "share_user_num",
+      "feature_b": "share_all_user_num",
+      "correlation": 0.9878
+    },
+    {
+      "feature_a": "download_cnt",
+      "feature_b": "download_user_num",
+      "correlation": 0.996
+    },
+    {
+      "feature_a": "report_cnt",
+      "feature_b": "report_user_num",
+      "correlation": 0.9762
+    },
+    {
+      "feature_a": "reduce_similar_cnt",
+      "feature_b": "reduce_similar_user_num",
+      "correlation": 0.9977
+    },
+    {
+      "feature_a": "collect_cnt",
+      "feature_b": "collect_user_num",
+      "correlation": 0.9998
+    },
+    {
+      "feature_a": "cancel_collect_cnt",
+      "feature_b": "cancel_collect_user_num",
+      "correlation": 0.9993
+    },
+    {
+      "feature_a": "direct_comment_user_num",
+      "feature_b": "reply_comment_user_num",
+      "correlation": 0.9686
+    },
+    {
+      "feature_a": "share_all_cnt",
+      "feature_b": "share_all_user_num",
+      "correlation": 0.9993
+    },
+    {
+      "feature_a": "share_all_cnt",
+      "feature_b": "outsite_share_all_cnt",
+      "correlation": 0.9161
+    },
+    {
+      "feature_a": "share_all_user_num",
+      "feature_b": "outsite_share_all_cnt",
+      "correlation": 0.9079
+    }
+  ],
+  "features": [
+    {
+      "feature": "date",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0005079228798854178,
+      "overall_std": 0.00015501749705542,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004965140673237242,
+          "std": 0.00021487894234530053,
+          "drops": [
+            0.0004137334055167585,
+            0.0003353371713948894,
+            0.0007404716250595245
+          ]
+        },
+        "is_like": {
+          "mean": 0.0005193316924471114,
+          "std": 9.515605176553952e-05,
+          "drops": [
+            0.000610386926327533,
+            0.00042054637676913753,
+            0.0005270617742446637
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00334574920401202,
+          "std": 0.002358562048066864,
+          "drops": [
+            0.006052368450219503,
+            0.0017307639675512299,
+            0.002254115194265327
+          ]
+        },
+        "is_comment": {
+          "mean": 0.000684726025197017,
+          "std": 0.001739684828022828,
+          "drops": [
+            0.0025051906300264104,
+            0.0005099763995159989,
+            -0.0009609889539513583
+          ]
+        }
+      }
+    },
+    {
+      "feature": "hourmin",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0009452209419318347,
+      "overall_std": 9.002356960234857e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0013044187392285596,
+          "std": 7.90322003808693e-05,
+          "drops": [
+            0.0013049565622601511,
+            0.0013831806556018345,
+            0.0012251189998236933
+          ]
+        },
+        "is_like": {
+          "mean": 0.0005860231446351097,
+          "std": 0.00010101493882382783,
+          "drops": [
+            0.0005106838799088242,
+            0.0007008096639845585,
+            0.0005465758900119466
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0006327111640449153,
+          "std": 0.001122058678116756,
+          "drops": [
+            0.0012679940272183332,
+            0.0012929896882601932,
+            -0.0006628502233437805
+          ]
+        },
+        "is_comment": {
+          "mean": 0.000901981704537147,
+          "std": 0.0013154019539571105,
+          "drops": [
+            -0.00045768172481541747,
+            0.0009954954000164218,
+            0.0021681314384104367
+          ]
+        }
+      }
+    },
+    {
+      "feature": "tab",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.06119887292987643,
+      "overall_std": 0.00119391386298051,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0925876333598183,
+          "std": 0.0013329156762228271,
+          "drops": [
+            0.09146531414913073,
+            0.09223667241835276,
+            0.09406091351197143
+          ]
+        },
+        "is_like": {
+          "mean": 0.029810112499934555,
+          "std": 0.0010549120497381926,
+          "drops": [
+            0.03040317844700613,
+            0.03043501537305382,
+            0.02859214367974372
+          ]
+        },
+        "is_follow": {
+          "mean": 0.005325452253328662,
+          "std": 0.00035083250009783416,
+          "drops": [
+            0.0056274003962631935,
+            0.005408366899756656,
+            0.0049405894639661385
+          ]
+        },
+        "is_comment": {
+          "mean": 0.028903223868658217,
+          "std": 0.0027795732399423603,
+          "drops": [
+            0.02959152792074793,
+            0.025844167508182525,
+            0.031273976177044194
+          ]
+        }
+      }
+    },
+    {
+      "feature": "user_active_degree",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.005644990825814693,
+      "overall_std": 0.0003279413908159021,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0054314733839665825,
+          "std": 0.00012596042560953117,
+          "drops": [
+            0.005544918705900459,
+            0.005453577419100797,
+            0.005295924026898491
+          ]
+        },
+        "is_like": {
+          "mean": 0.005858508267662803,
+          "std": 0.000529922356022273,
+          "drops": [
+            0.005762833366483977,
+            0.006429750378506127,
+            0.005382941057998303
+          ]
+        },
+        "is_follow": {
+          "mean": 0.008962211167261258,
+          "std": 0.001011127945321977,
+          "drops": [
+            0.008615516156427971,
+            0.0081700372338126,
+            0.010101080111543204
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004083679843347195,
+          "std": 0.0001545919389270409,
+          "drops": [
+            0.003933259290822555,
+            0.004242130197786187,
+            0.004075650041432843
+          ]
+        }
+      }
+    },
+    {
+      "feature": "is_lowactive_period",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0,
+      "overall_std": 0.0,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_like": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "feature": "is_live_streamer",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0018856492392634872,
+      "overall_std": 0.0003746372300828777,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0013936122915146159,
+          "std": 4.9687003240097996e-05,
+          "drops": [
+            0.0013966452114392292,
+            0.001441713362108854,
+            0.0013424783009957642
+          ]
+        },
+        "is_like": {
+          "mean": 0.0023776861870123587,
+          "std": 0.0006995874569256575,
+          "drops": [
+            0.00316107554493239,
+            0.0018152623502879495,
+            0.002156720665816736
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0013855882803224622,
+          "std": 0.0007235418728720033,
+          "drops": [
+            -0.0018984157517951683,
+            -0.0005579750783956117,
+            -0.0017003740107766063
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0010978031911291024,
+          "std": 0.0014131872338217397,
+          "drops": [
+            8.801266784586037e-05,
+            0.0004925901327621496,
+            0.002712806772779297
+          ]
+        }
+      }
+    },
+    {
+      "feature": "is_video_author",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0007876482956594526,
+      "overall_std": 6.580701654291148e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.000641234363361276,
+          "std": 6.0247145096082665e-05,
+          "drops": [
+            0.0007107068392501192,
+            0.0006096445221868141,
+            0.0006033517286468948
+          ]
+        },
+        "is_like": {
+          "mean": 0.000934062227957629,
+          "std": 7.13668879897403e-05,
+          "drops": [
+            0.0009299521343880679,
+            0.0008648392062396981,
+            0.001007395343245121
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0024426681321309354,
+          "std": 0.0011356203326977198,
+          "drops": [
+            0.001137694604706918,
+            0.0032065847373503598,
+            0.0029837250543355287
+          ]
+        },
+        "is_comment": {
+          "mean": -0.0002357949916801383,
+          "std": 0.0006845707827836116,
+          "drops": [
+            0.00044738357462847933,
+            -0.0009217495482627402,
+            -0.00023301900140615395
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat0",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0027419499940795995,
+      "overall_std": 0.00031634658992157454,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0029697109744547534,
+          "std": 2.9528308543716993e-05,
+          "drops": [
+            0.0029762273841309472,
+            0.0029374687514488462,
+            0.0029954367877844668
+          ]
+        },
+        "is_like": {
+          "mean": 0.002514189013704445,
+          "std": 0.0006031648712994321,
+          "drops": [
+            0.0032106615283886697,
+            0.0021644070569301066,
+            0.0021674984557945587
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0009777265556641934,
+          "std": 0.0021832738676458552,
+          "drops": [
+            -0.00039622983889808783,
+            -0.00016583277754300685,
+            0.003495242283433675
+          ]
+        },
+        "is_comment": {
+          "mean": 0.009590068855730882,
+          "std": 0.0015717570089741892,
+          "drops": [
+            0.007794731586386883,
+            0.010257535052887956,
+            0.010717939927917808
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat1",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.011044526878825197,
+      "overall_std": 0.0004771922758964486,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.005886501908398937,
+          "std": 0.0001957733236537619,
+          "drops": [
+            0.0056736018335927785,
+            0.006058772633014242,
+            0.005927131258589791
+          ]
+        },
+        "is_like": {
+          "mean": 0.016202551849251456,
+          "std": 0.0007586112281391354,
+          "drops": [
+            0.01706370066413998,
+            0.015910930795206224,
+            0.015633024088408165
+          ]
+        },
+        "is_follow": {
+          "mean": 0.002343713470677781,
+          "std": 0.002274570871292062,
+          "drops": [
+            0.00010012900102795985,
+            0.004648053461066892,
+            0.002282957949938491
+          ]
+        },
+        "is_comment": {
+          "mean": 0.02028392315219533,
+          "std": 0.002036744069784191,
+          "drops": [
+            0.021340665842724205,
+            0.021575111525739654,
+            0.017935992088122132
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat2",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0021284277548660286,
+      "overall_std": 0.0002431421828199449,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0021517645553262854,
+          "std": 0.00024380672306261478,
+          "drops": [
+            0.0024330591860201034,
+            0.002001282797054027,
+            0.002020951682904726
+          ]
+        },
+        "is_like": {
+          "mean": 0.0021050909544057714,
+          "std": 0.00024247764257727506,
+          "drops": [
+            0.0018548617299870562,
+            0.002338991634587728,
+            0.0021214194986425294
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00305070422635334,
+          "std": 0.0019848214444854358,
+          "drops": [
+            0.0007731405721479456,
+            0.003968027214681924,
+            0.004410944892230151
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00913611990369719,
+          "std": 0.006072248229819777,
+          "drops": [
+            0.015506874159616824,
+            0.0034145416357327374,
+            0.008486943915742007
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat3",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.03161609731893853,
+      "overall_std": 0.0003534003195435712,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.019458077267114942,
+          "std": 0.0003448817312159718,
+          "drops": [
+            0.019221535424888248,
+            0.01929889661374451,
+            0.019853799762712065
+          ]
+        },
+        "is_like": {
+          "mean": 0.043774117370762124,
+          "std": 0.00036191890787117063,
+          "drops": [
+            0.04410205375915455,
+            0.04338580883300114,
+            0.04383448952013069
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00516123985531769,
+          "std": 0.003736971898542625,
+          "drops": [
+            0.008944380023032772,
+            0.0014722141185822268,
+            0.00506712542433807
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0013635528351682025,
+          "std": 0.003183696388544084,
+          "drops": [
+            0.004016465400389468,
+            -0.002166868938414779,
+            0.0022410620435299178
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat4",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.002188077052575306,
+      "overall_std": 0.00019506973448045435,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0014616235054542015,
+          "std": 0.00014521998495904158,
+          "drops": [
+            0.0016128995833054605,
+            0.00132333161402165,
+            0.001448639319035494
+          ]
+        },
+        "is_like": {
+          "mean": 0.0029145305996964113,
+          "std": 0.00024491948400186714,
+          "drops": [
+            0.00317089304536855,
+            0.0026829362443263616,
+            0.0028897625093943224
+          ]
+        },
+        "is_follow": {
+          "mean": 3.6746026165509114e-05,
+          "std": 0.0013504433622042837,
+          "drops": [
+            0.001592028117410993,
+            -0.0006433220364654435,
+            -0.0008384680024490221
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0007905042759385564,
+          "std": 0.001020846405049622,
+          "drops": [
+            -0.0003453079023484351,
+            0.0010853253884832714,
+            0.001631495341680833
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat5",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 2.1304185790567885e-05,
+      "overall_std": 9.880157448068752e-06,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 8.012367519312965e-06,
+          "std": 4.565689654713803e-06,
+          "drops": [
+            1.2813732753857998e-05,
+            3.7260309209141695e-06,
+            7.4973388831667265e-06
+          ]
+        },
+        "is_like": {
+          "mean": -9.937932780405372e-08,
+          "std": 4.501318770560032e-05,
+          "drops": [
+            2.747759184051901e-05,
+            -5.204307508444028e-05,
+            2.426734526050911e-05
+          ]
+        },
+        "is_follow": {
+          "mean": -2.759872235480465e-05,
+          "std": 3.324976011948596e-05,
+          "drops": [
+            -5.33157136406448e-06,
+            -1.1645824508854652e-05,
+            -6.581877119149482e-05
+          ]
+        },
+        "is_comment": {
+          "mean": -8.295889357246011e-06,
+          "std": 0.00012809059852773546,
+          "drops": [
+            9.3209865136612e-05,
+            -0.0001522133402610537,
+            3.411580705270367e-05
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat6",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0013553075077523495,
+      "overall_std": 0.00020251561693588617,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0015814648283754378,
+          "std": 0.0001331815404157244,
+          "drops": [
+            0.0017156982721490133,
+            0.001449360725890414,
+            0.0015793354870868859
+          ]
+        },
+        "is_like": {
+          "mean": 0.0011291501871292613,
+          "std": 0.00027184969345604796,
+          "drops": [
+            0.0014334874939877507,
+            0.001043587528721024,
+            0.0009103755386790091
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0018561255883485412,
+          "std": 0.0003546707006941705,
+          "drops": [
+            0.0014488806533187182,
+            0.002097231093364571,
+            0.0020222650183623347
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0036385740527167623,
+          "std": 0.0014549844047959672,
+          "drops": [
+            0.004173938213725914,
+            0.004750028850672661,
+            0.0019917550937517126
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat7",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.003083309030095312,
+      "overall_std": 0.000369075840841975,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.002363154313470598,
+          "std": 0.00018405362538330376,
+          "drops": [
+            0.0022384763976127653,
+            0.0022764385834834755,
+            0.002574547959315554
+          ]
+        },
+        "is_like": {
+          "mean": 0.003803463746720026,
+          "std": 0.0005540980563006463,
+          "drops": [
+            0.003198040580124739,
+            0.004285400741185996,
+            0.003926949918849343
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0011927840241143794,
+          "std": 0.0002726495667571996,
+          "drops": [
+            0.001497512947407409,
+            0.000971914097471327,
+            0.0011089250274644025
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0035150019119044584,
+          "std": 0.0006263590035604412,
+          "drops": [
+            0.0028556730839258693,
+            0.0035871984176245597,
+            0.004102134234162946
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat8",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.015320558633109754,
+      "overall_std": 0.0005239182962590025,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.008204806919401694,
+          "std": 0.0002453693056103277,
+          "drops": [
+            0.007930690726113965,
+            0.008279805926713069,
+            0.008403924105378047
+          ]
+        },
+        "is_like": {
+          "mean": 0.02243631034681781,
+          "std": 0.0008024672869076775,
+          "drops": [
+            0.023193579240621043,
+            0.02159522415820092,
+            0.02252012764163147
+          ]
+        },
+        "is_follow": {
+          "mean": 0.007222763359292246,
+          "std": 0.0023495745335114257,
+          "drops": [
+            0.009880478505811863,
+            0.0063660425654678,
+            0.005421769006597077
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004875378682061597,
+          "std": 0.0014662336839325228,
+          "drops": [
+            0.0034211032388482554,
+            0.004851747852549937,
+            0.006353284954786598
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat9",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0015019546632863794,
+      "overall_std": 0.000269104013150696,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.001053525046859331,
+          "std": 4.9277904028396545e-05,
+          "drops": [
+            0.0010727746845461406,
+            0.000997527817984456,
+            0.001090272638047396
+          ]
+        },
+        "is_like": {
+          "mean": 0.0019503842797134279,
+          "std": 0.0004889301222729955,
+          "drops": [
+            0.0015777794867702921,
+            0.0025040106689662167,
+            0.0017693626834037746
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0023444278315468323,
+          "std": 0.0022152432869380666,
+          "drops": [
+            0.003293447534337468,
+            -0.00018722178736807482,
+            0.003927057747671103
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0010156123655644667,
+          "std": 0.0008236274268965049,
+          "drops": [
+            0.0008717817233300229,
+            0.00027337370978175457,
+            0.0019016816635816225
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat10",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0017620619925881598,
+      "overall_std": 9.832482079124853e-05,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0011759722478019707,
+          "std": 9.593809270451475e-05,
+          "drops": [
+            0.001098902838209792,
+            0.0011455914448322835,
+            0.0012834224603638367
+          ]
+        },
+        "is_like": {
+          "mean": 0.002348151737374349,
+          "std": 0.0001007115488779823,
+          "drops": [
+            0.002366886212127439,
+            0.0024381805797454303,
+            0.002239388420250177
+          ]
+        },
+        "is_follow": {
+          "mean": 0.003081111606563917,
+          "std": 0.00044242373101889885,
+          "drops": [
+            0.0025825818065332573,
+            0.0032337339350606564,
+            0.003427019078097837
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00024219618747201022,
+          "std": 0.0022940980131792147,
+          "drops": [
+            0.002834408734226357,
+            -0.0015263624945240917,
+            -0.0005814576772862345
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat11",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.001392655242874315,
+      "overall_std": 0.00017283196162003672,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0019224126852399603,
+          "std": 0.00011882647457380613,
+          "drops": [
+            0.0017918691644512874,
+            0.002024270275469253,
+            0.0019510986157993404
+          ]
+        },
+        "is_like": {
+          "mean": 0.0008628978005086699,
+          "std": 0.00022683744866626728,
+          "drops": [
+            0.0007099731624200523,
+            0.0007551977742797922,
+            0.0011235224648261655
+          ]
+        },
+        "is_follow": {
+          "mean": 0.002195568965189317,
+          "std": 0.0009063035666247046,
+          "drops": [
+            0.0028692635349937268,
+            0.0011651887864466692,
+            0.002552254574127555
+          ]
+        },
+        "is_comment": {
+          "mean": 0.026252598523159754,
+          "std": 0.0023709683275326024,
+          "drops": [
+            0.025064372780038258,
+            0.028982731174053145,
+            0.02471069161538786
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat12",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0013679979679579826,
+      "overall_std": 0.00026110274141122824,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0015005524267570254,
+          "std": 7.973274564719255e-05,
+          "drops": [
+            0.0015142658321080082,
+            0.0015725390346011947,
+            0.0014148524135618734
+          ]
+        },
+        "is_like": {
+          "mean": 0.00123544350915894,
+          "std": 0.0004424727371752639,
+          "drops": [
+            0.0013894493218943316,
+            0.0015803336939602675,
+            0.0007365475116222209
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0010725309547025736,
+          "std": 0.002519493258564888,
+          "drops": [
+            0.0010478628542544,
+            -0.0014345376809433708,
+            0.003604267690796692
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002879541693705856,
+          "std": 0.00068328031304408,
+          "drops": [
+            0.0025237941052959068,
+            0.0024475345764215506,
+            0.0036672963994001107
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat13",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0001643361029531702,
+      "overall_std": 0.00012074841030680663,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00013296420122432817,
+          "std": 2.4121338771389693e-05,
+          "drops": [
+            0.0001607831745537025,
+            0.000117864115425248,
+            0.00012024531369403402
+          ]
+        },
+        "is_like": {
+          "mean": 0.0001957080046820122,
+          "std": 0.00021737548184222355,
+          "drops": [
+            0.00044091212130970003,
+            2.664837435062406e-05,
+            0.00011956351838571244
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0001461652031781909,
+          "std": 0.0010472458357886508,
+          "drops": [
+            -0.0010630107893651042,
+            0.0007387571638808321,
+            0.0007627492350188447
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0010835797793714574,
+          "std": 6.330120537139613e-05,
+          "drops": [
+            0.0010996658032300655,
+            0.001013787496363161,
+            0.0011372860385211458
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat14",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0004567030256309076,
+      "overall_std": 0.0001516471531634613,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.000661020136964415,
+          "std": 0.00012549620395160753,
+          "drops": [
+            0.0007963051487310802,
+            0.000638352862039171,
+            0.0005484024001229937
+          ]
+        },
+        "is_like": {
+          "mean": 0.00025238591429740015,
+          "std": 0.00017779810237531507,
+          "drops": [
+            0.00024406091479223235,
+            0.00043420028146401446,
+            7.889654663595369e-05
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00024390022412323908,
+          "std": 0.00010517991461568514,
+          "drops": [
+            0.0001564241221948537,
+            0.00036060239731283694,
+            0.00021467415286202662
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0014940526852232165,
+          "std": 0.0005105974775525386,
+          "drops": [
+            0.0017508497134499645,
+            0.0009060334048215379,
+            0.001825274937398147
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat15",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.00020424574282793911,
+      "overall_std": 6.0946151196938076e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00028296905599959715,
+          "std": 4.4036604329439244e-05,
+          "drops": [
+            0.0002817862047589381,
+            0.0002395357934543707,
+            0.0003275851697854826
+          ]
+        },
+        "is_like": {
+          "mean": 7.991252482149787e-05,
+          "std": 0.00014183198795160784,
+          "drops": [
+            0.00021420568951047159,
+            -6.841485725217478e-05,
+            9.394674220619681e-05
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0006323940575127714,
+          "std": 5.34708898342001e-05,
+          "drops": [
+            -0.0005989968157137371,
+            -0.0006940660509767715,
+            -0.0006041193058478056
+          ]
+        },
+        "is_comment": {
+          "mean": 9.394207739114406e-05,
+          "std": 0.00028431750549708513,
+          "drops": [
+            0.00023848794757519443,
+            0.00027694607523987,
+            -0.00023360779064163228
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat16",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0005120063802744139,
+      "overall_std": 9.29378921382294e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00027185114924288545,
+          "std": 5.001308813159511e-05,
+          "drops": [
+            0.00027664233677071604,
+            0.00021961488557964426,
+            0.00031929622537829605
+          ]
+        },
+        "is_like": {
+          "mean": 0.0007521616113059423,
+          "std": 0.0001358626961448637,
+          "drops": [
+            0.0008891357540815603,
+            0.0007499107487612955,
+            0.0006174383310749709
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0016592547022176534,
+          "std": 0.00037630443839049995,
+          "drops": [
+            0.001887773517190161,
+            0.001865056841554913,
+            0.001224933747907886
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0016695175388539523,
+          "std": 0.0002889995685460679,
+          "drops": [
+            0.0018703739282679432,
+            0.0013383009481139352,
+            0.0017998777401799781
+          ]
+        }
+      }
+    },
+    {
+      "feature": "onehot_feat17",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 6.466290032941524e-05,
+      "overall_std": 3.5413802352737894e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 6.256507723090277e-05,
+          "std": 1.3400867305245741e-05,
+          "drops": [
+            5.20301971941306e-05,
+            5.801694434237614e-05,
+            7.764809015620155e-05
+          ]
+        },
+        "is_like": {
+          "mean": 6.676072342792772e-05,
+          "std": 5.7426737400230045e-05,
+          "drops": [
+            0.00013299806415412174,
+            3.094183296703523e-05,
+            3.634227316262617e-05
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0003633343920509402,
+          "std": 0.0005292621747081313,
+          "drops": [
+            -0.0005025685524558954,
+            -0.0008090607274550132,
+            0.000221626103758088
+          ]
+        },
+        "is_comment": {
+          "mean": 0.000851223165855286,
+          "std": 0.0006620864373907557,
+          "drops": [
+            0.0005587723074126361,
+            0.0016091779650793114,
+            0.00038571922507391054
+          ]
+        }
+      }
+    },
+    {
+      "feature": "follow_user_num_range",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.008114669619851023,
+      "overall_std": 0.0002426776511913237,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0028501271566825728,
+          "std": 0.00011164323824921623,
+          "drops": [
+            0.0029207519506918578,
+            0.0029082134561363437,
+            0.0027214160632195172
+          ]
+        },
+        "is_like": {
+          "mean": 0.013379212083019473,
+          "std": 0.00037371206413343115,
+          "drops": [
+            0.013746434772271665,
+            0.012999332225247073,
+            0.013391869251539679
+          ]
+        },
+        "is_follow": {
+          "mean": 0.02981400071058345,
+          "std": 0.0020913326158026008,
+          "drops": [
+            0.03214663636076054,
+            0.029188774654571037,
+            0.028106591116418778
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0016109839628306959,
+          "std": 0.001115588363836566,
+          "drops": [
+            0.002814939059408439,
+            0.001405751284194734,
+            0.0006122615448889146
+          ]
+        }
+      }
+    },
+    {
+      "feature": "fans_user_num_range",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.002612983370523995,
+      "overall_std": 0.0005120539937154976,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0012937805050386626,
+          "std": 0.0002095906291811181,
+          "drops": [
+            0.001489313946267723,
+            0.0010725097890985635,
+            0.0013195177797497015
+          ]
+        },
+        "is_like": {
+          "mean": 0.003932186236009327,
+          "std": 0.0008145173582498771,
+          "drops": [
+            0.003048203492498458,
+            0.004652331178246261,
+            0.0040960240372832635
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0005840544771459344,
+          "std": 0.002270459894487194,
+          "drops": [
+            -0.0017342974403377065,
+            0.002803382039433089,
+            0.0006830788323424208
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0026143978232071228,
+          "std": 0.0016780308510525516,
+          "drops": [
+            0.004476275824748854,
+            0.0021480503286170904,
+            0.001218867316255423
+          ]
+        }
+      }
+    },
+    {
+      "feature": "friend_user_num_range",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.003176695923391833,
+      "overall_std": 0.00034258900285248607,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0016715321046911387,
+          "std": 0.0001791998389550195,
+          "drops": [
+            0.001465653803960465,
+            0.0017564941516275967,
+            0.0017924483584853546
+          ]
+        },
+        "is_like": {
+          "mean": 0.004681859742092527,
+          "std": 0.0005059781667499526,
+          "drops": [
+            0.005155336137469324,
+            0.0041486776500608835,
+            0.004741565438747375
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00847886763390012,
+          "std": 0.0015515632528781656,
+          "drops": [
+            0.006702642437581008,
+            0.009164208028213272,
+            0.009569752435906076
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002146665164197481,
+          "std": 0.002550669525684222,
+          "drops": [
+            0.003874657777579893,
+            0.003348206602338366,
+            -0.000782868887325816
+          ]
+        }
+      }
+    },
+    {
+      "feature": "register_days_range",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.002735874022516923,
+      "overall_std": 0.00011571117071731849,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0010442233197739774,
+          "std": 0.00015723667090905983,
+          "drops": [
+            0.0011038000756077304,
+            0.0011629655053846388,
+            0.0008659043783295628
+          ]
+        },
+        "is_like": {
+          "mean": 0.004427524725259868,
+          "std": 7.418567052557716e-05,
+          "drops": [
+            0.0043529381627321895,
+            0.004501302896945059,
+            0.0044283331161023565
+          ]
+        },
+        "is_follow": {
+          "mean": 0.005667502176169663,
+          "std": 0.001226604990364766,
+          "drops": [
+            0.007022756254711937,
+            0.005346280228519906,
+            0.004633470045277144
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0027665696462784903,
+          "std": 0.0014849340673690169,
+          "drops": [
+            0.0015728655212634557,
+            0.002297432951399392,
+            0.004429410466172623
+          ]
+        }
+      }
+    },
+    {
+      "feature": "video_type",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 2.9431460243626674e-05,
+      "overall_std": 1.9500557674793944e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": -2.381179930603198e-06,
+          "std": 2.4731732176110123e-05,
+          "drops": [
+            -2.873254628987798e-05,
+            1.2623107058518102e-06,
+            2.0326695792216576e-05
+          ]
+        },
+        "is_like": {
+          "mean": -4.20890695579379e-05,
+          "std": 2.4925587269783685e-05,
+          "drops": [
+            -3.1373080392027575e-05,
+            -2.431352608700532e-05,
+            -7.05806021947808e-05
+          ]
+        },
+        "is_follow": {
+          "mean": -0.00012146225585836963,
+          "std": 0.0003363763393767803,
+          "drops": [
+            0.00020023709393324207,
+            -9.38147478832807e-05,
+            -0.0004708091136250703
+          ]
+        },
+        "is_comment": {
+          "mean": -0.00022069217035910102,
+          "std": 0.00015511267276088533,
+          "drops": [
+            -0.00018133576168122278,
+            -8.904871044268514e-05,
+            -0.0003916920389533951
+          ]
+        }
+      }
+    },
+    {
+      "feature": "upload_dt",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0002863806163288518,
+      "overall_std": 0.00016144397591453323,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00014125483274674,
+          "std": 9.270951515223109e-06,
+          "drops": [
+            0.00014094209290826942,
+            0.00013214420815088612,
+            0.00015067819718106445
+          ]
+        },
+        "is_like": {
+          "mean": 0.0003698128903219337,
+          "std": 0.00041534313748952214,
+          "drops": [
+            0.0007113619828678086,
+            -9.25402643835449e-05,
+            0.0004906169524815374
+          ]
+        },
+        "is_follow": {
+          "mean": 9.38077785089438e-05,
+          "std": 0.0016757588727986119,
+          "drops": [
+            0.0013931814136571852,
+            -0.0017976072367696938,
+            0.00068584915863934
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00010290412892840124,
+          "std": 0.0005733450838455688,
+          "drops": [
+            0.0007607439995132026,
+            -0.00016152073933084488,
+            -0.000290510873397154
+          ]
+        }
+      }
+    },
+    {
+      "feature": "upload_type",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.00098047898478378,
+      "overall_std": 0.00019781275398518658,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0006652421431211364,
+          "std": 2.6700718664445606e-05,
+          "drops": [
+            0.0006573796171182034,
+            0.0006433555074699671,
+            0.0006949913047752387
+          ]
+        },
+        "is_like": {
+          "mean": 0.0012957158264464235,
+          "std": 0.00036892478930592755,
+          "drops": [
+            0.000994447054415759,
+            0.0017071822377457968,
+            0.0011855181871777143
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0029547429111758117,
+          "std": 0.000683295637222791,
+          "drops": [
+            -0.002208504123949573,
+            -0.0035497602141459916,
+            -0.0031059643954318705
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00036232995012034735,
+          "std": 0.0001239069006796665,
+          "drops": [
+            0.00034551737544219474,
+            0.0004937846955381797,
+            0.00024768777938066755
+          ]
+        }
+      }
+    },
+    {
+      "feature": "visible_status",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0,
+      "overall_std": 0.0,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_like": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0,
+          "std": 0.0,
+          "drops": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "feature": "music_type",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.00013408621761729078,
+      "overall_std": 2.8674886049262054e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 8.134382635379318e-05,
+          "std": 2.7625059004707154e-05,
+          "drops": [
+            0.00010867304110084852,
+            8.19263029273598e-05,
+            5.3432135033171235e-05
+          ]
+        },
+        "is_like": {
+          "mean": -0.00018682860888078837,
+          "std": 2.972471309381695e-05,
+          "drops": [
+            -0.00022043059328724635,
+            -0.0001639663831833893,
+            -0.00017608885017172948
+          ]
+        },
+        "is_follow": {
+          "mean": -0.000609008321941662,
+          "std": 7.527280385823147e-05,
+          "drops": [
+            -0.0005318503787119511,
+            -0.000682242507422548,
+            -0.0006129320796904869
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00016956752555023305,
+          "std": 0.00032110534009082336,
+          "drops": [
+            -4.829204018341748e-06,
+            0.0005401348635332148,
+            -2.66030828641739e-05
+          ]
+        }
+      }
+    },
+    {
+      "feature": "tag",
+      "kind": "categorical",
+      "is_shadow": false,
+      "overall_mean": 0.0030760209234114155,
+      "overall_std": 0.0002097329487234381,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.003931052863956193,
+          "std": 0.0001485983916193404,
+          "drops": [
+            0.003894647903889381,
+            0.004094470670845118,
+            0.0038040400171340805
+          ]
+        },
+        "is_like": {
+          "mean": 0.0022209889828666376,
+          "std": 0.0002708675058275358,
+          "drops": [
+            0.002091672934129263,
+            0.002039015246572906,
+            0.0025322787678977443
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0018562998227067418,
+          "std": 0.0016133019129530748,
+          "drops": [
+            0.003223300781685645,
+            7.67955357644512e-05,
+            0.002268803150670129
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0007239276879859776,
+          "std": 0.001406016244513514,
+          "drops": [
+            -0.00021377012255141548,
+            4.498576217049077e-05,
+            0.0023405674243388574
+          ]
+        }
+      }
+    },
+    {
+      "feature": "follow_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.014158050348801946,
+      "overall_std": 0.0004899618920438569,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00207914408724319,
+          "std": 0.00025979772068241596,
+          "drops": [
+            0.0018824372756283125,
+            0.0023736471256529112,
+            0.001981347860448346
+          ]
+        },
+        "is_like": {
+          "mean": 0.0262369566103607,
+          "std": 0.0007201260634052979,
+          "drops": [
+            0.026829236804249867,
+            0.02543536159342763,
+            0.02644627143340461
+          ]
+        },
+        "is_follow": {
+          "mean": 0.08301841692711039,
+          "std": 0.005592398616533457,
+          "drops": [
+            0.08726252893658082,
+            0.08511128170745608,
+            0.07668144013729428
+          ]
+        },
+        "is_comment": {
+          "mean": 0.005828920961899353,
+          "std": 0.0010046596972664967,
+          "drops": [
+            0.006172832376958537,
+            0.004697468088529444,
+            0.006616462420210079
+          ]
+        }
+      }
+    },
+    {
+      "feature": "fans_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0002707758245275952,
+      "overall_std": 6.261272709954888e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00010490061450774135,
+          "std": 8.524340764056417e-06,
+          "drops": [
+            0.00010831902195096443,
+            9.51976473810845e-05,
+            0.00011118517419117513
+          ]
+        },
+        "is_like": {
+          "mean": 0.0004366510345474491,
+          "std": 0.00011670111343504134,
+          "drops": [
+            0.0003695274294280848,
+            0.0005714055547493269,
+            0.0003690201194649356
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0012974570572068893,
+          "std": 0.0021544732224972425,
+          "drops": [
+            0.0037849347816054646,
+            2.0615409274116203e-05,
+            8.68209807410869e-05
+          ]
+        },
+        "is_comment": {
+          "mean": 0.000696652781506916,
+          "std": 0.0014508938927610244,
+          "drops": [
+            -0.0006921726993105448,
+            0.0005796063880553204,
+            0.0022025246557759726
+          ]
+        }
+      }
+    },
+    {
+      "feature": "friend_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0038487508612330967,
+      "overall_std": 0.0006194717894313678,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00122164024133035,
+          "std": 2.572977655124114e-05,
+          "drops": [
+            0.0012073689142692023,
+            0.0012513428789450165,
+            0.0012062089307768309
+          ]
+        },
+        "is_like": {
+          "mean": 0.006475861481135843,
+          "std": 0.0012132138023114945,
+          "drops": [
+            0.005516849835218829,
+            0.006070997343407214,
+            0.007839737264781488
+          ]
+        },
+        "is_follow": {
+          "mean": 0.013089401468250625,
+          "std": 0.006035122486481431,
+          "drops": [
+            0.02005764327693771,
+            0.009678819659514892,
+            0.00953174146829927
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0008433386741047988,
+          "std": 0.00048056774427728894,
+          "drops": [
+            0.00038312062642853473,
+            0.0008049428222245414,
+            0.0013419525736613203
+          ]
+        }
+      }
+    },
+    {
+      "feature": "register_days",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0025674125651158897,
+      "overall_std": 0.00024062688736280964,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0020201570148997336,
+          "std": 0.00019639564746878993,
+          "drops": [
+            0.0017975116850538209,
+            0.0020941561863093705,
+            0.002168803173336009
+          ]
+        },
+        "is_like": {
+          "mean": 0.0031146681153320457,
+          "std": 0.00028485812725682934,
+          "drops": [
+            0.0030791521167633507,
+            0.003415618828238265,
+            0.002849233400994522
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0009573934060504996,
+          "std": 0.00046296151203022254,
+          "drops": [
+            0.0013013111212124562,
+            0.0004310000474405662,
+            0.0011398690494984764
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0005299707006399812,
+          "std": 0.0009800473313889928,
+          "drops": [
+            -0.0005895931593197234,
+            0.000946835366558485,
+            0.001232669894681182
+          ]
+        }
+      }
+    },
+    {
+      "feature": "video_duration",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.003325207992944279,
+      "overall_std": 0.00017033033922481204,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.003181478903171923,
+          "std": 0.0001569253612821842,
+          "drops": [
+            0.0032713283949020733,
+            0.0030002791755955327,
+            0.003272829139018163
+          ]
+        },
+        "is_like": {
+          "mean": 0.0034689370827166353,
+          "std": 0.00018373531716743986,
+          "drops": [
+            0.003521539987135669,
+            0.0032646374068934225,
+            0.003620633854120814
+          ]
+        },
+        "is_follow": {
+          "mean": 0.001962558388459823,
+          "std": 0.002229479206197903,
+          "drops": [
+            0.002976344486917859,
+            -0.0005936652443497836,
+            0.0035049959228113936
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0012467272376800453,
+          "std": 0.0011535765335912377,
+          "drops": [
+            0.0022525943865379094,
+            -1.2455156905843978e-05,
+            0.0015000424834080706
+          ]
+        }
+      }
+    },
+    {
+      "feature": "server_width",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0007440120259291083,
+      "overall_std": 0.0002325406529614322,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.000500441415117329,
+          "std": 0.0001326355076854521,
+          "drops": [
+            0.00041842851916074064,
+            0.00042943183044141797,
+            0.0006534638957498284
+          ]
+        },
+        "is_like": {
+          "mean": 0.0009875826367408875,
+          "std": 0.0003324457982374123,
+          "drops": [
+            0.0009557420886675549,
+            0.000672202679281253,
+            0.0013348031422738549
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0009992723764115825,
+          "std": 0.000931987031169766,
+          "drops": [
+            -0.0020697264575632035,
+            -0.000559940441957063,
+            -0.0003681502297144812
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0005070966162677252,
+          "std": 0.0021723343116089346,
+          "drops": [
+            -0.0005834165337812447,
+            -0.0009039499967569142,
+            0.0030086563793413346
+          ]
+        }
+      }
+    },
+    {
+      "feature": "server_height",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0005362449661546014,
+      "overall_std": 4.651433496611703e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0003651526990321452,
+          "std": 3.454116513860322e-05,
+          "drops": [
+            0.00032669855399392045,
+            0.00039354771222332996,
+            0.0003752118308791852
+          ]
+        },
+        "is_like": {
+          "mean": 0.0007073372332770574,
+          "std": 5.848750479363083e-05,
+          "drops": [
+            0.0007275490417290031,
+            0.0007530381415054022,
+            0.0006414245165967669
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0017900594043681235,
+          "std": 0.0005882758684441506,
+          "drops": [
+            -0.002384926865790171,
+            -0.0017766468434661231,
+            -0.0012086045038480764
+          ]
+        },
+        "is_comment": {
+          "mean": -0.0010932929146127979,
+          "std": 0.001102402830359773,
+          "drops": [
+            0.0001769651338945355,
+            -0.0016568302631143617,
+            -0.0018000136146185675
+          ]
+        }
+      }
+    },
+    {
+      "feature": "counts",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0017324861013899109,
+      "overall_std": 0.00020959283017394747,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0009583702008609066,
+          "std": 7.313567812664736e-05,
+          "drops": [
+            0.0009646940409907545,
+            0.000882277942804488,
+            0.0010281386187874775
+          ]
+        },
+        "is_like": {
+          "mean": 0.0025066020019189152,
+          "std": 0.0003460499822212476,
+          "drops": [
+            0.002431507450298409,
+            0.00220426518508432,
+            0.0028840333703740173
+          ]
+        },
+        "is_follow": {
+          "mean": 0.000875809910119929,
+          "std": 0.0014022221818179726,
+          "drops": [
+            -0.0002423042374012363,
+            0.002449062533080526,
+            0.0004206714346804974
+          ]
+        },
+        "is_comment": {
+          "mean": 0.001361199565371063,
+          "std": 0.000604951938324292,
+          "drops": [
+            0.0008777205686002487,
+            0.001166300892677219,
+            0.002039577234835721
+          ]
+        }
+      }
+    },
+    {
+      "feature": "show_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0012561454997538912,
+      "overall_std": 2.5144717909364818e-05,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0009347519246879118,
+          "std": 1.6091393220134617e-05,
+          "drops": [
+            0.0009513061755489494,
+            0.0009191672333433987,
+            0.0009337823651713872
+          ]
+        },
+        "is_like": {
+          "mean": 0.0015775390748198708,
+          "std": 3.4198042598595014e-05,
+          "drops": [
+            0.0015914096219219465,
+            0.0016026227341038313,
+            0.0015385848684338344
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0009839571763170147,
+          "std": 0.0012358265583594422,
+          "drops": [
+            -0.00022668586952312442,
+            0.002243514775906452,
+            0.0009350426225677166
+          ]
+        },
+        "is_comment": {
+          "mean": -0.0003838679358424413,
+          "std": 0.0008266059017792701,
+          "drops": [
+            0.0005475400204574266,
+            -0.0006689155245058753,
+            -0.001030228303478875
+          ]
+        }
+      }
+    },
+    {
+      "feature": "show_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.004410098669799763,
+      "overall_std": 0.00017471592931744498,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0022778062655455975,
+          "std": 4.351668276418256e-05,
+          "drops": [
+            0.0022886621742918,
+            0.0023148672934240055,
+            0.0022298893289209865
+          ]
+        },
+        "is_like": {
+          "mean": 0.006542391074053929,
+          "std": 0.0003059151758707074,
+          "drops": [
+            0.006205281679408703,
+            0.006619556292444595,
+            0.006802335250308489
+          ]
+        },
+        "is_follow": {
+          "mean": 0.006220626570030159,
+          "std": 0.0018753303138704554,
+          "drops": [
+            0.007164408788010279,
+            0.004060890642968884,
+            0.007436580279111316
+          ]
+        },
+        "is_comment": {
+          "mean": 0.003952210000769433,
+          "std": 0.00507816086042392,
+          "drops": [
+            0.007419469031679116,
+            -0.0018766977511148752,
+            0.006313858721744059
+          ]
+        }
+      }
+    },
+    {
+      "feature": "play_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.002206034492252762,
+      "overall_std": 0.0003051784994411518,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0032481665934596857,
+          "std": 0.00010416781677681328,
+          "drops": [
+            0.003145374322989669,
+            0.0032454679424324118,
+            0.003353657514956976
+          ]
+        },
+        "is_like": {
+          "mean": 0.0011639023910458384,
+          "std": 0.0005061891821054904,
+          "drops": [
+            0.0011353685259846147,
+            0.0006725836711009014,
+            0.0016837549760519988
+          ]
+        },
+        "is_follow": {
+          "mean": 0.001752417813600952,
+          "std": 0.001963084718248649,
+          "drops": [
+            0.0019962448592937276,
+            -0.0003211905854653141,
+            0.0035821991669744424
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0015323013397945395,
+          "std": 0.0009714728641351747,
+          "drops": [
+            0.002293996460380421,
+            0.001864633233221169,
+            0.00043827432578202874
+          ]
+        }
+      }
+    },
+    {
+      "feature": "play_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.005762638587163822,
+      "overall_std": 0.0008144663532361037,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.005253603765350852,
+          "std": 0.00023479396929049218,
+          "drops": [
+            0.004982490545690332,
+            0.005387966805256661,
+            0.005390353945105564
+          ]
+        },
+        "is_like": {
+          "mean": 0.006271673408976793,
+          "std": 0.0013941387371817153,
+          "drops": [
+            0.007812012469692431,
+            0.005906645214495576,
+            0.005096362542742372
+          ]
+        },
+        "is_follow": {
+          "mean": 0.004471344974878629,
+          "std": 0.0010544827251669636,
+          "drops": [
+            0.0036390065371546543,
+            0.004117875732194576,
+            0.005657152655286657
+          ]
+        },
+        "is_comment": {
+          "mean": 0.006454234001509573,
+          "std": 0.0024162916181280614,
+          "drops": [
+            0.00518842206658876,
+            0.004933827336560337,
+            0.009240452601379623
+          ]
+        }
+      }
+    },
+    {
+      "feature": "play_duration",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.002024485757789722,
+      "overall_std": 0.00017130875599599826,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0025127022533981322,
+          "std": 7.35605449873987e-05,
+          "drops": [
+            0.002514479629416533,
+            0.002585358004197791,
+            0.0024382691265800727
+          ]
+        },
+        "is_like": {
+          "mean": 0.0015362692621813112,
+          "std": 0.0002690569670045978,
+          "drops": [
+            0.0015089870333475641,
+            0.0018179279347657618,
+            0.0012818928184306078
+          ]
+        },
+        "is_follow": {
+          "mean": 0.002457471083212185,
+          "std": 0.0033316919618939156,
+          "drops": [
+            0.0062360672188627175,
+            -5.779005196104858e-05,
+            0.0011941360827348868
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002010258550337022,
+          "std": 0.001239532054568336,
+          "drops": [
+            0.0023323866508256907,
+            0.0030569257737869115,
+            0.0006414632263984643
+          ]
+        }
+      }
+    },
+    {
+      "feature": "complete_play_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0006376484004107693,
+      "overall_std": 0.00021303919378631527,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004462699201213856,
+          "std": 0.00010387019064715958,
+          "drops": [
+            0.00034062314217486733,
+            0.0004499192789850781,
+            0.0005482673392042114
+          ]
+        },
+        "is_like": {
+          "mean": 0.000829026880700153,
+          "std": 0.000322208196925471,
+          "drops": [
+            0.0011907311875475335,
+            0.0007236440453600723,
+            0.000572705409192853
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0015021022804050748,
+          "std": 0.000498030563843223,
+          "drops": [
+            0.0009723845302387346,
+            0.0015730958120381278,
+            0.0019608264989383617
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0011870141960407625,
+          "std": 0.00013983217630070813,
+          "drops": [
+            0.0012883501074858472,
+            0.001027482507524935,
+            0.0012452099731115052
+          ]
+        }
+      }
+    },
+    {
+      "feature": "complete_play_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0006229025534846463,
+      "overall_std": 0.0001448054952890797,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0007127400516404222,
+          "std": 0.00020193541465952334,
+          "drops": [
+            0.0006702382418107833,
+            0.0009325434906982677,
+            0.0005354384224122155
+          ]
+        },
+        "is_like": {
+          "mean": 0.0005330650553288704,
+          "std": 8.767557591863607e-05,
+          "drops": [
+            0.00043669540436119814,
+            0.0005543858827494752,
+            0.0006081138788759377
+          ]
+        },
+        "is_follow": {
+          "mean": -0.00203394917442982,
+          "std": 0.0012137707870184984,
+          "drops": [
+            -0.0021505049907584173,
+            -0.0007661049887596194,
+            -0.003185237543771424
+          ]
+        },
+        "is_comment": {
+          "mean": -0.00040386789840152204,
+          "std": 0.00013104715461673857,
+          "drops": [
+            -0.00029554388907415685,
+            -0.00036652696056838074,
+            -0.0005495328455620285
+          ]
+        }
+      }
+    },
+    {
+      "feature": "valid_play_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.019017653120665723,
+      "overall_std": 0.00028426204821295183,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.03622840918558364,
+          "std": 0.00014661076399306858,
+          "drops": [
+            0.0363615044866733,
+            0.03625246477305777,
+            0.03607125829701985
+          ]
+        },
+        "is_like": {
+          "mean": 0.0018068970557478063,
+          "std": 0.0004219133324328351,
+          "drops": [
+            0.0017142974806947375,
+            0.0022674188237504778,
+            0.0014389748627982035
+          ]
+        },
+        "is_follow": {
+          "mean": 0.004372470461230349,
+          "std": 0.0021897366587700887,
+          "drops": [
+            0.004950060843683324,
+            0.0019518360060500894,
+            0.006215514533957633
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004990862519464863,
+          "std": 0.0034820042469238333,
+          "drops": [
+            0.001921598591761109,
+            0.0042762573277086435,
+            0.008774731638924838
+          ]
+        }
+      }
+    },
+    {
+      "feature": "valid_play_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.019912652696006228,
+      "overall_std": 0.0007373673360706354,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.03561940290646796,
+          "std": 0.00064900071100034,
+          "drops": [
+            0.03510458515969728,
+            0.03634843020462741,
+            0.03540519335507919
+          ]
+        },
+        "is_like": {
+          "mean": 0.004205902485544495,
+          "std": 0.0008257339611409307,
+          "drops": [
+            0.004290946515159599,
+            0.0033409376402911972,
+            0.00498582330118269
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0054736002435043325,
+          "std": 0.0022678279442836947,
+          "drops": [
+            0.00597127629517924,
+            0.0029982666538792557,
+            0.007451257781454501
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002687679437293977,
+          "std": 0.002259109303087613,
+          "drops": [
+            0.0002943493262984598,
+            0.0029857049220245457,
+            0.004782984063558926
+          ]
+        }
+      }
+    },
+    {
+      "feature": "long_time_play_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0049454693789805675,
+      "overall_std": 0.00019378464416136738,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00908819533253069,
+          "std": 0.00016852419621903077,
+          "drops": [
+            0.009225692500943627,
+            0.008900193651005583,
+            0.009138699845642861
+          ]
+        },
+        "is_like": {
+          "mean": 0.0008027434254304447,
+          "std": 0.000219045092103704,
+          "drops": [
+            0.0006998140596929936,
+            0.0010542953683293499,
+            0.0006541208482689909
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0003510892013496303,
+          "std": 0.0013810297055487915,
+          "drops": [
+            0.0012532224383215995,
+            -0.0012387749253313096,
+            0.001038820091058601
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00015834467431996568,
+          "std": 0.00014356000379129309,
+          "drops": [
+            0.00031054669171115545,
+            0.0001391241026400536,
+            2.5363228608688004e-05
+          ]
+        }
+      }
+    },
+    {
+      "feature": "long_time_play_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.004611452093649789,
+      "overall_std": 0.00022324783747932565,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.007711312238403341,
+          "std": 0.00015260530725770988,
+          "drops": [
+            0.007809647425198851,
+            0.0075355112249236855,
+            0.007788778065087487
+          ]
+        },
+        "is_like": {
+          "mean": 0.0015115919488962366,
+          "std": 0.0002938903677009414,
+          "drops": [
+            0.0018447481289566303,
+            0.0014009313694782755,
+            0.0012890963482538043
+          ]
+        },
+        "is_follow": {
+          "mean": 0.004468062399568244,
+          "std": 0.001010369534950218,
+          "drops": [
+            0.004476481403761334,
+            0.005474196125009656,
+            0.003453509669933741
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0016419312534520596,
+          "std": 0.0008906209892323556,
+          "drops": [
+            0.002558583623108346,
+            0.0007798513424939202,
+            0.0015873587947539125
+          ]
+        }
+      }
+    },
+    {
+      "feature": "short_time_play_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.01204349665202405,
+      "overall_std": 0.0005112720579907644,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.02015087468010131,
+          "std": 0.0006687644982413673,
+          "drops": [
+            0.02059647708936796,
+            0.019381882278404317,
+            0.02047426467253166
+          ]
+        },
+        "is_like": {
+          "mean": 0.00393611862394679,
+          "std": 0.0003537796177401616,
+          "drops": [
+            0.0042990811319431055,
+            0.003916975539428713,
+            0.0035922992004685517
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0019538292471090366,
+          "std": 0.004886735338394968,
+          "drops": [
+            0.004928985455703305,
+            -0.003686039359834248,
+            0.004618541645458052
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004882302617014352,
+          "std": 0.0006797457626062251,
+          "drops": [
+            0.005590304688465442,
+            0.004821736585841507,
+            0.004234866576736107
+          ]
+        }
+      }
+    },
+    {
+      "feature": "short_time_play_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.013118431658421284,
+      "overall_std": 0.0007510814455523609,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.023537567967438333,
+          "std": 0.00029233693619811824,
+          "drops": [
+            0.023662792361962892,
+            0.02320347828947522,
+            0.023746433250876886
+          ]
+        },
+        "is_like": {
+          "mean": 0.002699295349404237,
+          "std": 0.0012098259549066035,
+          "drops": [
+            0.003929859310926598,
+            0.0026566939895981134,
+            0.001511332747687999
+          ]
+        },
+        "is_follow": {
+          "mean": 0.008911226709335418,
+          "std": 0.005151049764763598,
+          "drops": [
+            0.01461416118460912,
+            0.004596640386619666,
+            0.007522878556777468
+          ]
+        },
+        "is_comment": {
+          "mean": 0.007125281999849631,
+          "std": 0.0019436843799576532,
+          "drops": [
+            0.005010754914759774,
+            0.008834074800146974,
+            0.007531016284642145
+          ]
+        }
+      }
+    },
+    {
+      "feature": "play_progress",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.007174996311473614,
+      "overall_std": 0.00035587852515087673,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.005770132907259177,
+          "std": 0.0003436095073589039,
+          "drops": [
+            0.006092181477944547,
+            0.0054084072713055376,
+            0.005809809972527447
+          ]
+        },
+        "is_like": {
+          "mean": 0.008579859715688051,
+          "std": 0.00036814754294284957,
+          "drops": [
+            0.008207960085857224,
+            0.008587482268600066,
+            0.00894413679260686
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00913296083839569,
+          "std": 0.003741214648086444,
+          "drops": [
+            0.012552024375693471,
+            0.009710171389947564,
+            0.005136686749546038
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002991485247115825,
+          "std": 0.0019472060345937397,
+          "drops": [
+            0.0029426497091744608,
+            0.0010691563302452911,
+            0.004962649701927724
+          ]
+        }
+      }
+    },
+    {
+      "feature": "comment_stay_duration",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0004634383819326904,
+      "overall_std": 0.00010315725321570673,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0008083317138080082,
+          "std": 0.00012821391725060686,
+          "drops": [
+            0.0007114135021839552,
+            0.0007598684085458052,
+            0.0009537132306942642
+          ]
+        },
+        "is_like": {
+          "mean": -6.20591077997723e-05,
+          "std": 0.00014629455245733158,
+          "drops": [
+            8.472891338640043e-05,
+            -0.00020785514671994854,
+            -6.305109006576881e-05
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0033487077034159984,
+          "std": 0.0023177452202153915,
+          "drops": [
+            0.0021284364669361677,
+            0.0018960426798351193,
+            0.006021643963476708
+          ]
+        },
+        "is_comment": {
+          "mean": 0.020203298656968904,
+          "std": 0.0007423338065273874,
+          "drops": [
+            0.01944901058045212,
+            0.020227814557478907,
+            0.020933070832975686
+          ]
+        }
+      }
+    },
+    {
+      "feature": "like_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.005900378465195108,
+      "overall_std": 0.0002483578824760013,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0007447738792244104,
+          "std": 0.00014018531624237043,
+          "drops": [
+            0.0009061924177502512,
+            0.0006535782161528614,
+            0.0006745510037701186
+          ]
+        },
+        "is_like": {
+          "mean": 0.011055983051165804,
+          "std": 0.0003565304487096321,
+          "drops": [
+            0.011259108964312481,
+            0.011264531136661815,
+            0.010644309052523115
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0002446250390536475,
+          "std": 0.0016934039519927785,
+          "drops": [
+            0.0009014537229744546,
+            0.001511218222031263,
+            -0.0016787968278447751
+          ]
+        },
+        "is_comment": {
+          "mean": 0.001707305730048699,
+          "std": 0.0018386489457210354,
+          "drops": [
+            0.0035014673080666636,
+            0.0017932651841499059,
+            -0.00017281530207047258
+          ]
+        }
+      }
+    },
+    {
+      "feature": "like_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0065223158227982,
+      "overall_std": 0.00030785873448007484,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004398373894191436,
+          "std": 6.179889773545506e-05,
+          "drops": [
+            0.00042971433057104047,
+            0.0005060728227646027,
+            0.00038372501492178746
+          ]
+        },
+        "is_like": {
+          "mean": 0.012604794256177257,
+          "std": 0.0005539185712246946,
+          "drops": [
+            0.012090384896544348,
+            0.01253281351470481,
+            0.013191184357282615
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0002495314785835312,
+          "std": 0.000981154473123252,
+          "drops": [
+            0.000833659134159892,
+            -0.0010786814275506318,
+            -0.0005035721423598538
+          ]
+        },
+        "is_comment": {
+          "mean": 0.003334341748128041,
+          "std": 0.0013889719987307545,
+          "drops": [
+            0.0025704046992991447,
+            0.004937597852241904,
+            0.002495022692843074
+          ]
+        }
+      }
+    },
+    {
+      "feature": "click_like_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.003190154047142235,
+      "overall_std": 0.00020007960664310525,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.000642842716095382,
+          "std": 3.40151231505837e-05,
+          "drops": [
+            0.0006619079814159656,
+            0.0006630492049191083,
+            0.0006035709619510721
+          ]
+        },
+        "is_like": {
+          "mean": 0.005737465378189088,
+          "std": 0.00036614409013562677,
+          "drops": [
+            0.005890255095823416,
+            0.006002469071478056,
+            0.005319671967265793
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0011429146660817031,
+          "std": 0.0006939344772887698,
+          "drops": [
+            0.0012423815765482127,
+            0.0004046139962196049,
+            0.001781748425477292
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004709592995062906,
+          "std": 0.0008969429888536726,
+          "drops": [
+            0.004304683392629016,
+            0.004086491689375915,
+            0.0057376039031837855
+          ]
+        }
+      }
+    },
+    {
+      "feature": "double_click_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.012936593916900033,
+      "overall_std": 0.0009287113371160489,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0021095676365811,
+          "std": 0.00012939452266981532,
+          "drops": [
+            0.002237438766659716,
+            0.0021125624313664826,
+            0.0019787017117171013
+          ]
+        },
+        "is_like": {
+          "mean": 0.023763620197218966,
+          "std": 0.0017280281515622824,
+          "drops": [
+            0.024799355853531213,
+            0.024722749332591998,
+            0.02176875540553369
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0008834483443878419,
+          "std": 0.0006996839297643287,
+          "drops": [
+            0.0008025478471417324,
+            0.0016200659103488002,
+            0.00022773127567299323
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00368887590231215,
+          "std": 0.0021530232961889297,
+          "drops": [
+            0.0012030662512896306,
+            0.00496452363689881,
+            0.004899037818748009
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_like_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0015607688972775944,
+      "overall_std": 3.271899057546066e-05,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0013932371100701484,
+          "std": 4.534666158770325e-05,
+          "drops": [
+            0.0014446419559549506,
+            0.0013589047345311522,
+            0.0013761646397243421
+          ]
+        },
+        "is_like": {
+          "mean": 0.0017283006844850402,
+          "std": 2.009131956321807e-05,
+          "drops": [
+            0.0017201699161036865,
+            0.0017135490796514885,
+            0.0017511830576999454
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0034913917041153875,
+          "std": 0.0028996997726693195,
+          "drops": [
+            0.0013374821739957632,
+            0.006788428466233731,
+            0.002348264472116668
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0053243474584778365,
+          "std": 0.0008213243840157401,
+          "drops": [
+            0.006242802051595442,
+            0.004660413996734114,
+            0.0050698263271039545
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_like_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.002660703538492034,
+      "overall_std": 0.0001815218263051663,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0040004543342947825,
+          "std": 8.844210491769656e-05,
+          "drops": [
+            0.004016958851929542,
+            0.004079481549556396,
+            0.0039049226013984084
+          ]
+        },
+        "is_like": {
+          "mean": 0.0013209527426892853,
+          "std": 0.000274601547692636,
+          "drops": [
+            0.0010336505014395536,
+            0.0013484183365698454,
+            0.0015807893900584569
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0006503123189203208,
+          "std": 0.0005450352266386993,
+          "drops": [
+            2.6929662418795353e-05,
+            0.001036896543742949,
+            0.0008871107505992182
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002655216769248995,
+          "std": 0.00022006472394882462,
+          "drops": [
+            0.002873874597313586,
+            0.002433771628040482,
+            0.0026580040823929174
+          ]
+        }
+      }
+    },
+    {
+      "feature": "comment_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0007439146910249717,
+      "overall_std": 0.00011336370663021024,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0008634462696066972,
+          "std": 4.758868401949299e-05,
+          "drops": [
+            0.0008453643908132857,
+            0.0009174256901880451,
+            0.000827548727818761
+          ]
+        },
+        "is_like": {
+          "mean": 0.0006243831124432461,
+          "std": 0.0001791387292409275,
+          "drops": [
+            0.0005163498598576011,
+            0.000831165234074116,
+            0.000525634243398021
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0012075486436367762,
+          "std": 0.001005977923760285,
+          "drops": [
+            4.8297764120852626e-05,
+            0.0017231847729654026,
+            0.0018511633938240735
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00996117780432478,
+          "std": 0.001973585483635206,
+          "drops": [
+            0.009865225917524034,
+            0.011980989082579496,
+            0.008037318412870809
+          ]
+        }
+      }
+    },
+    {
+      "feature": "comment_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0004902935036329806,
+      "overall_std": 0.00021815850413185695,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004101514762523036,
+          "std": 2.5355082575236698e-05,
+          "drops": [
+            0.0003876455225629849,
+            0.0004051874327541949,
+            0.000437621473439731
+          ]
+        },
+        "is_like": {
+          "mean": 0.0004176444551197515,
+          "std": 0.0006287641931530619,
+          "drops": [
+            -0.00022918661384085937,
+            0.0010266323740525385,
+            0.00045548760514757536
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0005389417170947874,
+          "std": 0.0015225343279283955,
+          "drops": [
+            -0.0011771273246774516,
+            0.00172779501408582,
+            0.001066157461875994
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0065963284703571086,
+          "std": 0.0011889704652635756,
+          "drops": [
+            0.005408329184633853,
+            0.006594388485311797,
+            0.007786267741125674
+          ]
+        }
+      }
+    },
+    {
+      "feature": "direct_comment_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.00029314334853586255,
+      "overall_std": 8.430338430454005e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0003763891806566703,
+          "std": 1.919225747390636e-05,
+          "drops": [
+            0.00036041872672043507,
+            0.0003976804663105016,
+            0.00037106834893907426
+          ]
+        },
+        "is_like": {
+          "mean": 0.0002098975164150548,
+          "std": 0.00014941451113517374,
+          "drops": [
+            5.65470639398713e-05,
+            0.00035503751594523347,
+            0.0002181079693600596
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0032426303413956026,
+          "std": 0.0014224642013978583,
+          "drops": [
+            0.0026857320313343758,
+            0.0021828707651564416,
+            0.00485928822769599
+          ]
+        },
+        "is_comment": {
+          "mean": 0.006883689698773139,
+          "std": 0.0017784170674183556,
+          "drops": [
+            0.004982679858806627,
+            0.007161596330810482,
+            0.00850679290670231
+          ]
+        }
+      }
+    },
+    {
+      "feature": "reply_comment_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.001370962000348604,
+      "overall_std": 0.000148760926836815,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.002026976665221336,
+          "std": 0.00010328384651535156,
+          "drops": [
+            0.002083602399577722,
+            0.0019077644162660556,
+            0.0020895631798202308
+          ]
+        },
+        "is_like": {
+          "mean": 0.0007149473354758721,
+          "std": 0.00019423800715827848,
+          "drops": [
+            0.0004908872461433234,
+            0.0008182475060859451,
+            0.0008357072541983479
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0006961289857790506,
+          "std": 0.0026838660046912617,
+          "drops": [
+            0.0005939788661947221,
+            -0.0019352035942067358,
+            0.0034296116853491654
+          ]
+        },
+        "is_comment": {
+          "mean": 0.005980088823838418,
+          "std": 0.000588391257103603,
+          "drops": [
+            0.006484330189742482,
+            0.005333620888937851,
+            0.0061223153928349205
+          ]
+        }
+      }
+    },
+    {
+      "feature": "delete_comment_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0002735883059124533,
+      "overall_std": 0.00019896929821630748,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00015636615986872973,
+          "std": 4.6423115345105774e-05,
+          "drops": [
+            0.00018005821066180427,
+            0.00010287735976566292,
+            0.00018616290917872202
+          ]
+        },
+        "is_like": {
+          "mean": 0.00039081045195617686,
+          "std": 0.0003515154810875092,
+          "drops": [
+            0.0007346955246486653,
+            0.0004056041628375251,
+            3.213166838234027e-05
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0013908780354403942,
+          "std": 0.0002197288574912423,
+          "drops": [
+            0.001142378024257984,
+            0.0015594741699062054,
+            0.0014707819121569932
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00020624796263842468,
+          "std": 0.00016765147913508927,
+          "drops": [
+            2.974517926568332e-05,
+            0.00036336221842758754,
+            0.00022563649022200316
+          ]
+        }
+      }
+    },
+    {
+      "feature": "delete_comment_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0004819551093145358,
+      "overall_std": 0.00017751393438274248,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00011870963528733587,
+          "std": 8.906476391144674e-05,
+          "drops": [
+            0.00016218087626607147,
+            0.00017769093109454293,
+            1.625709850139323e-05
+          ]
+        },
+        "is_like": {
+          "mean": 0.0008452005833417356,
+          "std": 0.00026596310485403824,
+          "drops": [
+            0.0007447704152803158,
+            0.0011467554953961123,
+            0.0006440758393487789
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0005273237700833174,
+          "std": 0.0012703358584256867,
+          "drops": [
+            0.0001812420641912338,
+            -0.0005341084559955522,
+            0.0019348377020542706
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0035375816016589936,
+          "std": 0.0010168236142185252,
+          "drops": [
+            0.002579451672360844,
+            0.0046043714520920265,
+            0.0034289216805241107
+          ]
+        }
+      }
+    },
+    {
+      "feature": "comment_like_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0006534524683489511,
+      "overall_std": 0.000147354900118736,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0005872587021131433,
+          "std": 3.2198664406748896e-05,
+          "drops": [
+            0.0005592555764759588,
+            0.0005800795495167765,
+            0.0006224409803466946
+          ]
+        },
+        "is_like": {
+          "mean": 0.0007196462345847587,
+          "std": 0.0002625111358307231,
+          "drops": [
+            0.0009799795522166255,
+            0.0004550101768959758,
+            0.000723948974641675
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0016978371585197511,
+          "std": 0.0011024793089947065,
+          "drops": [
+            -0.002631485906221087,
+            -0.0019804696804931465,
+            -0.00048155588884502
+          ]
+        },
+        "is_comment": {
+          "mean": 0.004271884812776665,
+          "std": 0.0007547016714003136,
+          "drops": [
+            0.004560687819961884,
+            0.004839536137347111,
+            0.003415430481020998
+          ]
+        }
+      }
+    },
+    {
+      "feature": "comment_like_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0008691372066913691,
+      "overall_std": 0.0002855562949701259,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0009215060520083215,
+          "std": 3.15339307346287e-05,
+          "drops": [
+            0.0009371795186288168,
+            0.0009421323758186384,
+            0.0008852062615775091
+          ]
+        },
+        "is_like": {
+          "mean": 0.0008167683613744167,
+          "std": 0.0005395786592056231,
+          "drops": [
+            0.0003437395125379661,
+            0.0014044635235851421,
+            0.0007021020480001416
+          ]
+        },
+        "is_follow": {
+          "mean": -2.8968204411043235e-05,
+          "std": 0.0013365490043153253,
+          "drops": [
+            -0.0015495114492986017,
+            0.000960048737670971,
+            0.000502558098394501
+          ]
+        },
+        "is_comment": {
+          "mean": 0.002164279775494493,
+          "std": 0.0006622367162669172,
+          "drops": [
+            0.002585990629736523,
+            0.0014009956788306743,
+            0.002505853017916282
+          ]
+        }
+      }
+    },
+    {
+      "feature": "follow_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0007662761795566575,
+      "overall_std": 0.0001150455096823447,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0007853110432320953,
+          "std": 4.793086352613648e-05,
+          "drops": [
+            0.0008286769128544869,
+            0.0007934092885902855,
+            0.0007338469282515137
+          ]
+        },
+        "is_like": {
+          "mean": 0.0007472413158812197,
+          "std": 0.00018216015583855292,
+          "drops": [
+            0.0009511993894134596,
+            0.0006007297005249379,
+            0.0006897948577052615
+          ]
+        },
+        "is_follow": {
+          "mean": 0.017001882769506427,
+          "std": 0.0012327045124541595,
+          "drops": [
+            0.01841626153519449,
+            0.01615609343932156,
+            0.01643329333400323
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00033350947189784524,
+          "std": 0.0015961564578669946,
+          "drops": [
+            -0.0011323888972828433,
+            9.89505601832752e-05,
+            0.002033966752793104
+          ]
+        }
+      }
+    },
+    {
+      "feature": "follow_user_num1",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0007854639938954522,
+      "overall_std": 0.0001133527162494433,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0011059859902752267,
+          "std": 0.00015770090984434568,
+          "drops": [
+            0.0009927323026389656,
+            0.0012861028281954123,
+            0.0010391228399913022
+          ]
+        },
+        "is_like": {
+          "mean": 0.00046494199751567766,
+          "std": 6.90045226545409e-05,
+          "drops": [
+            0.0003903237422638872,
+            0.0004780496554720459,
+            0.0005264525948110998
+          ]
+        },
+        "is_follow": {
+          "mean": 0.01143729734409756,
+          "std": 0.0028770050754658876,
+          "drops": [
+            0.011976340117120121,
+            0.014006654762835913,
+            0.008328897152336645
+          ]
+        },
+        "is_comment": {
+          "mean": 0.001043115616586876,
+          "std": 0.001432238992480512,
+          "drops": [
+            -0.00015915992095349996,
+            0.0006607857039075959,
+            0.002627721066806532
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_follow_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0009427679876550058,
+      "overall_std": 0.0003531704408210924,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0003539882498977039,
+          "std": 2.808267083332443e-05,
+          "drops": [
+            0.0003758947825071024,
+            0.00036374040010433983,
+            0.0003223295670816695
+          ]
+        },
+        "is_like": {
+          "mean": 0.0015315477254123078,
+          "std": 0.0006782582108088603,
+          "drops": [
+            0.0021681687569103936,
+            0.0008181809513653215,
+            0.0016082934679612082
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0017904705974537045,
+          "std": 0.0009921833956966456,
+          "drops": [
+            0.001059613219378197,
+            0.001391822385662378,
+            0.0029199761873205388
+          ]
+        },
+        "is_comment": {
+          "mean": -0.0005478438507997563,
+          "std": 0.0009748023270629807,
+          "drops": [
+            -0.0010479485948950984,
+            -0.0011710961280855248,
+            0.0005755131705813543
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_follow_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0003078973752333088,
+      "overall_std": 6.631569050957257e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004302759565996128,
+          "std": 9.682890444863258e-05,
+          "drops": [
+            0.0004705532314909222,
+            0.0005004652914671892,
+            0.00031980934684072704
+          ]
+        },
+        "is_like": {
+          "mean": 0.0001855187938670048,
+          "std": 3.580247657051256e-05,
+          "drops": [
+            0.00017441072042800876,
+            0.000225558702431905,
+            0.00015658695874110062
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0020597846450786106,
+          "std": 0.00022442028245724493,
+          "drops": [
+            0.002249431774714261,
+            0.002117898772946103,
+            0.0018120233875754677
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00036685721094117013,
+          "std": 0.0010067334745357199,
+          "drops": [
+            -0.0007491040892406708,
+            0.00120676882975157,
+            0.0006429068923126113
+          ]
+        }
+      }
+    },
+    {
+      "feature": "share_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0008371060297662953,
+      "overall_std": 0.00024941787521354344,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.000612407100215188,
+          "std": 8.312938973573762e-05,
+          "drops": [
+            0.0007070513370860398,
+            0.000551216068405358,
+            0.0005789538951541662
+          ]
+        },
+        "is_like": {
+          "mean": 0.0010618049593174028,
+          "std": 0.00041570636069134925,
+          "drops": [
+            0.0015001929815250392,
+            0.0006732777417598479,
+            0.0010119441546673213
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0007841033979721542,
+          "std": 0.0010772079358069113,
+          "drops": [
+            -0.0016378796311414812,
+            0.00042615981696692007,
+            -0.0011405903797419015
+          ]
+        },
+        "is_comment": {
+          "mean": -0.00037565508086449356,
+          "std": 0.0014374792074672604,
+          "drops": [
+            0.0010782033033071015,
+            -0.00040899338418287634,
+            -0.0017961751617177057
+          ]
+        }
+      }
+    },
+    {
+      "feature": "share_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.001339931929745112,
+      "overall_std": 0.0001418731438093183,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0008551606994303684,
+          "std": 0.00011562402101426765,
+          "drops": [
+            0.0009791729565925555,
+            0.0008359872019926273,
+            0.0007503219397059224
+          ]
+        },
+        "is_like": {
+          "mean": 0.0018247031600598558,
+          "std": 0.00016812226660436897,
+          "drops": [
+            0.0019013529189298994,
+            0.0016319156399084989,
+            0.0019408409213411693
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0012220658503703612,
+          "std": 0.0006846041909197225,
+          "drops": [
+            -0.0018953945280223428,
+            -0.0005267174345163772,
+            -0.0012440855885723634
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0047426142580236546,
+          "std": 0.002966901315978218,
+          "drops": [
+            0.0037666489214650545,
+            0.002386634520586184,
+            0.008074559332019726
+          ]
+        }
+      }
+    },
+    {
+      "feature": "download_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0005770123585780069,
+      "overall_std": 0.00010051313340042885,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00016346002144892088,
+          "std": 4.624615860667893e-05,
+          "drops": [
+            0.0002018552824939457,
+            0.00011212113810643576,
+            0.00017640364374638118
+          ]
+        },
+        "is_like": {
+          "mean": 0.000990564695707093,
+          "std": 0.00015478010819417877,
+          "drops": [
+            0.001106089202776217,
+            0.0008147031276426464,
+            0.001050901756702416
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0012502500001689842,
+          "std": 0.0008137548890296681,
+          "drops": [
+            -0.002105008915119111,
+            -0.0011608608049865632,
+            -0.0004848802804012786
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0002581784183564399,
+          "std": 0.0002559373304292798,
+          "drops": [
+            0.0001299355937044444,
+            0.0005528844150570755,
+            9.17152463077997e-05
+          ]
+        }
+      }
+    },
+    {
+      "feature": "download_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0005520848274639759,
+      "overall_std": 0.00011540355232017604,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00020057432182825816,
+          "std": 0.00011039941496924175,
+          "drops": [
+            9.255600984969803e-05,
+            0.0001959569988722043,
+            0.0003132099567628721
+          ]
+        },
+        "is_like": {
+          "mean": 0.0009035953330996938,
+          "std": 0.00012040768967111033,
+          "drops": [
+            0.0008415627113621538,
+            0.0008268527598233044,
+            0.001042370528113623
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0008448589187114441,
+          "std": 0.00018079282254899323,
+          "drops": [
+            -0.0008444895418718845,
+            -0.0010258361466780608,
+            -0.0006642510675843871
+          ]
+        },
+        "is_comment": {
+          "mean": 0.003259661759606717,
+          "std": 0.0017747973021516458,
+          "drops": [
+            0.003096720000101527,
+            0.005110311248483268,
+            0.0015719540302353563
+          ]
+        }
+      }
+    },
+    {
+      "feature": "report_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.00023706540209768775,
+      "overall_std": 7.53384363941883e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0004076625593361083,
+          "std": 0.00013056258359815166,
+          "drops": [
+            0.000453569884847127,
+            0.0005090711751627452,
+            0.0002603466179984526
+          ]
+        },
+        "is_like": {
+          "mean": -9.989999406119962e-06,
+          "std": 8.295737374961815e-05,
+          "drops": [
+            -4.490134607315621e-05,
+            8.471736817972086e-05,
+            -6.978602032492454e-05
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0010161626551052905,
+          "std": 0.0009241901688727286,
+          "drops": [
+            0.001941936009811518,
+            9.356385040726334e-05,
+            0.0010129881050970901
+          ]
+        },
+        "is_comment": {
+          "mean": 0.00044366401186146653,
+          "std": 0.00015757769946098138,
+          "drops": [
+            0.00032798957281454655,
+            0.00037986530132805285,
+            0.0006231371614418002
+          ]
+        }
+      }
+    },
+    {
+      "feature": "report_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.00034598333886737276,
+      "overall_std": 0.000101239429249443,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0005148290247699953,
+          "std": 0.0001093220372992316,
+          "drops": [
+            0.00039027890789977704,
+            0.000559306354980249,
+            0.0005949018114299598
+          ]
+        },
+        "is_like": {
+          "mean": 0.00017713765296475023,
+          "std": 9.315682119965438e-05,
+          "drops": [
+            8.979997562741371e-05,
+            0.0002751874710656965,
+            0.00016642551220114044
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00023616770330185202,
+          "std": 0.0005287401156700911,
+          "drops": [
+            0.0004500473474898792,
+            -0.00036600714710732785,
+            0.0006244629095230048
+          ]
+        },
+        "is_comment": {
+          "mean": -0.00011683692035802107,
+          "std": 0.000688613519249997,
+          "drops": [
+            0.0003821185524408577,
+            0.00016984871015313097,
+            -0.0009024780236680519
+          ]
+        }
+      }
+    },
+    {
+      "feature": "reduce_similar_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0009165312926976976,
+      "overall_std": 0.00026802312906687583,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0005545364397763208,
+          "std": 8.785207758361142e-05,
+          "drops": [
+            0.0005713946648111534,
+            0.00045947686078051664,
+            0.0006327377937372924
+          ]
+        },
+        "is_like": {
+          "mean": 0.0012785261456190744,
+          "std": 0.0004481941805501403,
+          "drops": [
+            0.0015438440496303718,
+            0.0015306825140429803,
+            0.0007610518731838711
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0006897694317011075,
+          "std": 0.0017781855104584989,
+          "drops": [
+            0.0009235640630429476,
+            -0.0025963498055262546,
+            -0.00039652255262001557
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0021364066440549,
+          "std": 5.9713219278306175e-05,
+          "drops": [
+            0.0021951647903314386,
+            0.002138273030445781,
+            0.002075782111387481
+          ]
+        }
+      }
+    },
+    {
+      "feature": "reduce_similar_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.002836803881166916,
+      "overall_std": 0.0002346177589886616,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0014599738367322794,
+          "std": 4.9751166286911865e-05,
+          "drops": [
+            0.0014959579532108913,
+            0.0014031998746221186,
+            0.0014807636823638282
+          ]
+        },
+        "is_like": {
+          "mean": 0.0042136339256015525,
+          "std": 0.00041948435169041136,
+          "drops": [
+            0.003912601264365878,
+            0.004692786261497495,
+            0.004035514250941286
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00016433436206175767,
+          "std": 0.000442850015263932,
+          "drops": [
+            -0.00031235690349940004,
+            0.0005629616657299996,
+            0.00024239832395467342
+          ]
+        },
+        "is_comment": {
+          "mean": 0.001217638784869579,
+          "std": 0.00024474238130165995,
+          "drops": [
+            0.0014814276852685992,
+            0.0009979354784828143,
+            0.0011735531908573238
+          ]
+        }
+      }
+    },
+    {
+      "feature": "collect_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0013931808643602994,
+      "overall_std": 0.0002481412327594537,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0003193867244461653,
+          "std": 7.617462026386544e-05,
+          "drops": [
+            0.0002406979775319007,
+            0.00039276980534264094,
+            0.00032469239046395426
+          ]
+        },
+        "is_like": {
+          "mean": 0.0024669750042744334,
+          "std": 0.0004201078452550419,
+          "drops": [
+            0.0029023807411391322,
+            0.0024344935840434623,
+            0.002064050687640706
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0011459986142235608,
+          "std": 0.001497011012118022,
+          "drops": [
+            0.00011992899350532493,
+            0.0028637856067686984,
+            0.0004542812423966591
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0016115368963115124,
+          "std": 0.0005087179059177675,
+          "drops": [
+            0.0021509376604451624,
+            0.0011403941663126194,
+            0.0015432788621767557
+          ]
+        }
+      }
+    },
+    {
+      "feature": "collect_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0019762558680356994,
+      "overall_std": 0.0002174395757263044,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.001359237151269177,
+          "std": 0.00013130050792740534,
+          "drops": [
+            0.0014615450362523985,
+            0.0014049833939409062,
+            0.0012111830236142263
+          ]
+        },
+        "is_like": {
+          "mean": 0.0025932745848022223,
+          "std": 0.0003035786435252035,
+          "drops": [
+            0.0023454094112287383,
+            0.0025025396738124206,
+            0.0029318746693655084
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0001369098740653015,
+          "std": 0.0005756056528123176,
+          "drops": [
+            0.00010535603177708186,
+            0.00027796304117100323,
+            -0.0007940486951439896
+          ]
+        },
+        "is_comment": {
+          "mean": -6.167378527939989e-05,
+          "std": 0.000992255518631377,
+          "drops": [
+            -0.00012145476413816247,
+            0.0009591206804158148,
+            -0.001022687272115852
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_collect_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0008640034158555003,
+      "overall_std": 2.3103646904748037e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0011579439165826377,
+          "std": 1.2315112965735493e-05,
+          "drops": [
+            0.001143993269804855,
+            0.0011673059947180375,
+            0.0011625324852250207
+          ]
+        },
+        "is_like": {
+          "mean": 0.0005700629151283628,
+          "std": 3.389218084376058e-05,
+          "drops": [
+            0.000544423048535525,
+            0.0005572776174519456,
+            0.0006084880793976177
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0016836475123797785,
+          "std": 7.51193412654648e-05,
+          "drops": [
+            0.001764206510283528,
+            0.0016155183935971928,
+            0.0016712176332586148
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0014315523304399373,
+          "std": 0.001588059917323005,
+          "drops": [
+            0.0007442182708727874,
+            0.00324750099731852,
+            0.00030293772312850464
+          ]
+        }
+      }
+    },
+    {
+      "feature": "cancel_collect_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.001522996432905636,
+      "overall_std": 0.00032421477137616636,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0013915701850924316,
+          "std": 0.00012235442654328033,
+          "drops": [
+            0.0015198181837308145,
+            0.0013787778897063063,
+            0.0012761144818401737
+          ]
+        },
+        "is_like": {
+          "mean": 0.0016544226807188405,
+          "std": 0.0005260751162090525,
+          "drops": [
+            0.002226609913871802,
+            0.001191675857104002,
+            0.001544982271180717
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0018323042668816718,
+          "std": 0.0010719688856830317,
+          "drops": [
+            0.002976940368423331,
+            0.0016679977823171876,
+            0.0008519746499044967
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0015491554316624152,
+          "std": 0.0009258273374494504,
+          "drops": [
+            0.0020553669769316496,
+            0.0021115057659678582,
+            0.000480593552087738
+          ]
+        }
+      }
+    },
+    {
+      "feature": "direct_comment_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0004748966114037819,
+      "overall_std": 0.00022300149278432484,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0003495905270099649,
+          "std": 0.0001137301206863762,
+          "drops": [
+            0.00023271970074556503,
+            0.00045989546710689666,
+            0.0003561564131774331
+          ]
+        },
+        "is_like": {
+          "mean": 0.0006002026957975989,
+          "std": 0.0003322728648822735,
+          "drops": [
+            0.0006636619428751489,
+            0.00024077664306354496,
+            0.0008961695014541027
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0030384764590877986,
+          "std": 0.004037546053409562,
+          "drops": [
+            0.002302935661461225,
+            0.0073932272860789405,
+            -0.0005807335702767702
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0009856029860009958,
+          "std": 0.0019230957865393064,
+          "drops": [
+            -0.0011400601416498013,
+            0.002604729979445053,
+            0.001492139120207736
+          ]
+        }
+      }
+    },
+    {
+      "feature": "reply_comment_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0005424996639198006,
+      "overall_std": 7.96033155945225e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00026120899067586895,
+          "std": 1.0465883267279445e-05,
+          "drops": [
+            0.00027290634820154036,
+            0.00025273094264421925,
+            0.0002579896811818472
+          ]
+        },
+        "is_like": {
+          "mean": 0.0008237903371637323,
+          "std": 0.00014874074792176555,
+          "drops": [
+            0.0006521337144645978,
+            0.000914549470449999,
+            0.0009046878265766001
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0010289444876301346,
+          "std": 0.0018596814032614077,
+          "drops": [
+            -0.0006197063115412904,
+            -0.0030591615621052837,
+            0.0005920344107561704
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0008047125905363087,
+          "std": 0.0012232582456635657,
+          "drops": [
+            0.0018479489844021035,
+            -0.0005415898523170037,
+            0.0011077786395238265
+          ]
+        }
+      }
+    },
+    {
+      "feature": "share_all_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0004057338287177433,
+      "overall_std": 0.00011980496239048029,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.00037834243845003,
+          "std": 3.3142650746780655e-05,
+          "drops": [
+            0.0003400792125192176,
+            0.00039809005023749844,
+            0.00039685805259337403
+          ]
+        },
+        "is_like": {
+          "mean": 0.0004331252189854566,
+          "std": 0.00020646727403417992,
+          "drops": [
+            0.00048268335811985086,
+            0.0006103033933617663,
+            0.00020638890547475253
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0013121554676731595,
+          "std": 0.00028799567167564765,
+          "drops": [
+            0.0012241496932955398,
+            0.0016338861796492132,
+            0.0010784305300747254
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0033084765389533124,
+          "std": 0.0006215895838064627,
+          "drops": [
+            0.003766665905770017,
+            0.0035578382159361377,
+            0.002600925495153783
+          ]
+        }
+      }
+    },
+    {
+      "feature": "share_all_user_num",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0008426834086066777,
+      "overall_std": 7.345307317517511e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0007218120192889291,
+          "std": 6.021219530059287e-05,
+          "drops": [
+            0.0006573573912072028,
+            0.0007766160725108939,
+            0.0007314625941486907
+          ]
+        },
+        "is_like": {
+          "mean": 0.0009635547979244263,
+          "std": 8.669395104975736e-05,
+          "drops": [
+            0.0010512216268397934,
+            0.0008778676323856205,
+            0.0009615751345478651
+          ]
+        },
+        "is_follow": {
+          "mean": -0.0011179433978500224,
+          "std": 0.001580712660119286,
+          "drops": [
+            -0.0015776642369127458,
+            -0.0024178362513859186,
+            0.0006416702947485975
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0005315238209632941,
+          "std": 0.0007923206730671074,
+          "drops": [
+            0.0012811997151348509,
+            -0.00029747443839456267,
+            0.000610846186149594
+          ]
+        }
+      }
+    },
+    {
+      "feature": "outsite_share_all_cnt",
+      "kind": "numeric",
+      "is_shadow": false,
+      "overall_mean": 0.0018518187060900433,
+      "overall_std": 0.0001277692605468762,
+      "decision": "通过",
+      "per_task": {
+        "is_click": {
+          "mean": 0.0024448614931232107,
+          "std": 5.88406024033218e-05,
+          "drops": [
+            0.002464177606822493,
+            0.0024916160439499846,
+            0.002378790828597155
+          ]
+        },
+        "is_like": {
+          "mean": 0.001258775919056876,
+          "std": 0.00019669791869043058,
+          "drops": [
+            0.001040149773656851,
+            0.0014213996626192271,
+            0.0013147783208945496
+          ]
+        },
+        "is_follow": {
+          "mean": 0.0025695072602864855,
+          "std": 0.0006945177129556614,
+          "drops": [
+            0.0033688631339842123,
+            0.002225753325421298,
+            0.002113905321453946
+          ]
+        },
+        "is_comment": {
+          "mean": 0.001202719016612212,
+          "std": 0.0016592939275868767,
+          "drops": [
+            0.0007091003898329618,
+            0.0030528099105731066,
+            -0.0001537532505694328
+          ]
+        }
+      }
+    },
+    {
+      "feature": "shadow_0",
+      "kind": "numeric",
+      "is_shadow": true,
+      "overall_mean": 9.506367714886185e-05,
+      "overall_std": 6.205665312407033e-05,
+      "decision": "不通过",
+      "per_task": {
+        "is_click": {
+          "mean": 6.780294688516857e-05,
+          "std": 6.311926989293038e-05,
+          "drops": [
+            2.7183829415244887e-06,
+            0.00012875371146370274,
+            7.193674625027846e-05
+          ]
+        },
+        "is_like": {
+          "mean": -7.495827290660007e-05,
+          "std": 0.00013318051444726953,
+          "drops": [
+            7.104920175893259e-05,
+            -0.00010614798825170357,
+            -0.0001897760322270292
+          ]
+        },
+        "is_follow": {
+          "mean": 0.00034501539161927813,
+          "std": 0.0004968796928069327,
+          "drops": [
+            0.00019955757993572742,
+            -6.290208803361175e-05,
+            0.0008983906829557187
+          ]
+        },
+        "is_comment": {
+          "mean": 0.0002006620134805681,
+          "std": 0.0008787300647060478,
+          "drops": [
+            -0.0007918422617332332,
+            0.0005142451214736887,
+            0.0008795831807012489
+          ]
+        }
+      }
+    }
+  ],
+  "run_meta": {
+    "model": "KuaiRand-Pure\\saved\\runs\\fi-shadow_20260910_010531\\model.keras",
+    "split": "val",
+    "rows": 190802,
+    "shadow_cols": [
+      "shadow_0"
+    ],
+    "candidate_cols": null
+  },
+  "report_order": [
+    "tab",
+    "onehot_feat3",
+    "valid_play_user_num",
+    "valid_play_cnt",
+    "onehot_feat8",
+    "follow_user_num",
+    "short_time_play_user_num",
+    "double_click_cnt",
+    "short_time_play_cnt",
+    "onehot_feat1",
+    "follow_user_num_range",
+    "play_progress",
+    "like_user_num",
+    "like_cnt",
+    "play_user_num",
+    "user_active_degree",
+    "long_time_play_cnt",
+    "long_time_play_user_num",
+    "show_user_num",
+    "friend_user_num",
+    "video_duration",
+    "click_like_cnt",
+    "friend_user_num_range",
+    "onehot_feat7",
+    "tag",
+    "reduce_similar_user_num",
+    "onehot_feat0",
+    "register_days_range",
+    "cancel_like_user_num",
+    "fans_user_num_range",
+    "register_days",
+    "play_cnt",
+    "onehot_feat4",
+    "onehot_feat2",
+    "play_duration",
+    "collect_user_num",
+    "is_live_streamer",
+    "outsite_share_all_cnt",
+    "onehot_feat10",
+    "counts",
+    "cancel_like_cnt",
+    "cancel_collect_user_num",
+    "onehot_feat9",
+    "collect_cnt",
+    "onehot_feat11",
+    "reply_comment_cnt",
+    "onehot_feat12",
+    "onehot_feat6",
+    "share_user_num",
+    "show_cnt",
+    "upload_type",
+    "hourmin",
+    "cancel_follow_cnt",
+    "reduce_similar_cnt",
+    "comment_like_user_num",
+    "cancel_collect_cnt",
+    "share_all_user_num",
+    "share_cnt",
+    "is_video_author",
+    "follow_user_num1",
+    "follow_cnt",
+    "server_width",
+    "comment_cnt",
+    "comment_like_cnt",
+    "complete_play_cnt",
+    "complete_play_user_num",
+    "download_cnt",
+    "download_user_num",
+    "reply_comment_user_num",
+    "server_height",
+    "onehot_feat16",
+    "date",
+    "comment_user_num",
+    "delete_comment_user_num",
+    "direct_comment_user_num",
+    "comment_stay_duration",
+    "onehot_feat14",
+    "share_all_cnt",
+    "report_user_num",
+    "cancel_follow_user_num",
+    "direct_comment_cnt",
+    "upload_dt",
+    "delete_comment_cnt",
+    "fans_user_num",
+    "report_cnt",
+    "onehot_feat15",
+    "onehot_feat13",
+    "music_type",
+    "shadow_0",
+    "onehot_feat17",
+    "video_type",
+    "onehot_feat5",
+    "is_lowactive_period",
+    "visible_status"
+  ]
+}

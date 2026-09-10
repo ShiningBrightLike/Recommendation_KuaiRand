@@ -22,8 +22,10 @@ from tensorflow.keras.layers import (
     Layer,
 )
 from tensorflow.keras.models import Model
+from tensorflow.keras.saving import register_keras_serializable
 
 
+@register_keras_serializable()
 class MMoE(Layer):
     """MMoE block: shared experts + one softmax gate per task."""
 
