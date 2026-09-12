@@ -1,0 +1,73 @@
+{
+  "config": {
+    "seed": 2025,
+    "epochs": 30,
+    "batch_size": 1024,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "monitor": "val_auc_mean",
+    "rows": [
+      950310,
+      190802,
+      295497
+    ],
+    "shadow_cols": [
+      "shadow_0"
+    ],
+    "dropped_features": [],
+    "features": {
+      "categorical": 35,
+      "numeric": 59
+    }
+  },
+  "models": {
+    "logistic": {
+      "tasks": {
+        "is_click": 0.7073630690574646,
+        "is_like": 0.7771243453025818,
+        "is_follow": 0.6542337536811829,
+        "is_comment": 0.6015505194664001
+      },
+      "best_epoch": 13,
+      "params": 2765,
+      "train_seconds": 48.5
+    },
+    "shared_bottom": {
+      "tasks": {
+        "is_click": 0.7182455658912659,
+        "is_like": 0.8015413284301758,
+        "is_follow": 0.7199410200119019,
+        "is_comment": 0.6403499841690063
+      },
+      "best_epoch": 6,
+      "params": 49292,
+      "train_seconds": 47.0
+    },
+    "single_task": {
+      "tasks": {
+        "is_click": 0.7226594090461731,
+        "is_like": 0.8143346905708313,
+        "is_follow": 0.6955099105834961,
+        "is_comment": 0.642012357711792
+      },
+      "best_epochs": {
+        "is_click": 15,
+        "is_like": 11,
+        "is_follow": 2,
+        "is_comment": 6
+      },
+      "params": 171812,
+      "train_seconds": 187.7
+    },
+    "mmoe_existing_run": {
+      "tasks": {
+        "is_click": 0.7186574339866638,
+        "is_like": 0.8007774949073792,
+        "is_follow": 0.7265809178352356,
+        "is_comment": 0.6414563059806824
+      },
+      "best_epoch": 4,
+      "params": null
+    }
+  }
+}

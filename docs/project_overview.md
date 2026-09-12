@@ -15,7 +15,7 @@
 - 已切换到 **train/val/test 时间切分协议**：验证集（4/16–4/21）从训练日志内切出，测试集（4/22–5/08）仅在训练结束后评估一次；
 - 新增单一配置源 `config.py` 与动态 `cat_vocab_size`（写于 `pipeline_meta.json`），特征清单不再三处重复；
 - 每次运行的产物（`model.keras` / `metrics.json` / `curves.png` / `training.log`）统一保存到 `KuaiRand-Pure/saved/runs/<run>/`；`KuaiRand-Pure/saved/` 根目录下为旧协议历史产物。
-- 新增**特征优选模块**：`feature_importance.py` 用置换重要度（AUC 下降）评估特征，支持影子特征噪声对照与报告产物；筛选纪律与术语见 `docs/adr/0001-0002`、`CONTEXT.md`。
+- 新增**特征优选模块**：`feature_importance.py` 用置换重要度（AUC 下降）评估特征，支持影子特征噪声对照与报告产物；筛选纪律与术语见 `docs/adr/0001-feature-decision-set-discipline.md`、`docs/adr/0002-permutation-importance-and-two-stage-gate.md` 与 `CONTEXT.md`。
 
 ---
 
@@ -68,7 +68,7 @@
 | 评估指标 | 每任务 AUC |
 | Batch size | 1024 |
 | Epochs | 30（早停生效时提前结束） |
-| 早停 | `monitor=val_loss`，`patience=5`，`restore_best_weights=True` |
+| 早停 | `monitor=val_auc_mean`（门控任务平均验证 AUC，见 ADR-0003），`patience=5`，`restore_best_weights=True` |
 | 随机种子 | 2025（可通过 `--seed` 覆盖） |
 | 验证集 | 训练日志尾部按时间切分（4/16–4/21，约 19.1 万行，行数见 `pipeline_meta.json`） |
 | 测试集 | 仅最终评估一次（4/22–5/08，29.5 万行） |
@@ -206,7 +206,7 @@ python main.py
 python MMoE_model.py
 ```
 
-正式训练产物自动写入 `KuaiRand-Pure/saved/runs/<tag>_<时间戳>/`：`model.keras`、`metrics.json`（含种子、超参、正样本占比、逐 epoch history 与测试集指标）、`curves.png`、`training.log`。常用覆盖参数：`--seed`、`--epochs`、`--batch-size`、`--patience`、`--tag`。
+正式训练产物自动写入 `KuaiRand-Pure/saved/runs/<tag>_<时间戳>/`：`model.keras`、`metrics.json`（含种子、超参、正样本占比、逐 epoch history 与测试集指标）、`curves.png`、`training.log`。常用覆盖参数：`--seed`、`--epochs`、`--batch-size`、`--patience`、`--tag`、`--monitor`（默认 `val_auc_mean`，见 ADR-0003）；`--drop-features` / `--drop-stat-features` 用于特征子集对照。
 
 ---
 
@@ -256,9 +256,24 @@ Top 5 特征：`tab`（0.0612）、`onehot_feat3`（0.0316）、`valid_play_user
 
 存档报告：`docs/assets/feature_importance_report.md`、`docs/assets/feature_importance.{json,csv}`、`docs/assets/feature_importance_top.png`（README 已展示）。
 
+### 7.4 对照模型与统计特征泄漏审计（2026-09-13）
+
+同一协议（seed=2025、`val_auc_mean` 早停）下的测试集对照：
+
+| 模型 | 点击 | 点赞 | 关注 | 评论 | 四任务均值 |
+| --- | --- | --- | --- | --- | --- |
+| Logistic | 0.7074 | 0.7771 | 0.6542 | 0.6016 | 0.6851 |
+| Shared-Bottom | 0.7182 | 0.8015 | 0.7199 | 0.6403 | 0.7200 |
+| 单任务 | 0.7227 | 0.8143 | 0.6955 | 0.6420 | 0.7186 |
+| MMoE | 0.7187 | 0.8008 | 0.7266 | 0.6415 | 0.7219 |
+
+结论：Shared-Bottom ≈ MMoE，MMoE 的增益集中在关注任务；单任务在点击/点赞更强、关注更弱。统计特征审计显示去掉 51 列全期统计特征后四任务均值下降 0.0317，point-in-time 重算列为后续必做项。结果与审计报告见 `docs/assets/baselines_v1.md`、`docs/leakage_audit.md`。
+
 ---
 
 ## 8. 后续计划与建议
+
+精排范围的完整路线图（含 P0/P1/P2 里程碑、验收标准与 issue 清单）见仓库根目录 `ROADMAP.md`。
 
 1. **多任务结构升级**：尝试 PLE/CGC（渐进式分层抽取）替代基础 MMoE，或按任务相关性分组专家；
 2. **特征工程与优选**：加入序列特征（用户观看历史）、时间衰减、视频画像聚合特征；新特征先用置换重要度门控（批量过滤 + 同种子重训确认，见 ADR-0002），避免“全量加入”；
