@@ -23,25 +23,25 @@
   "models": {
     "logistic": {
       "tasks": {
-        "is_click": 0.7073630690574646,
-        "is_like": 0.7771243453025818,
-        "is_follow": 0.6542337536811829,
-        "is_comment": 0.6015505194664001
+        "is_click": 0.7077085971832275,
+        "is_like": 0.7779738306999207,
+        "is_follow": 0.6671501398086548,
+        "is_comment": 0.606522798538208
       },
-      "best_epoch": 13,
+      "best_epoch": 29,
       "params": 2765,
-      "train_seconds": 48.5
+      "train_seconds": 79.9
     },
     "shared_bottom": {
       "tasks": {
-        "is_click": 0.7182455658912659,
-        "is_like": 0.8015413284301758,
-        "is_follow": 0.7199410200119019,
-        "is_comment": 0.6403499841690063
+        "is_click": 0.7220621109008789,
+        "is_like": 0.8107812404632568,
+        "is_follow": 0.6699211001396179,
+        "is_comment": 0.6172468066215515
       },
-      "best_epoch": 6,
+      "best_epoch": 30,
       "params": 49292,
-      "train_seconds": 47.0
+      "train_seconds": 119.8
     },
     "single_task": {
       "tasks": {
@@ -57,16 +57,16 @@
         "is_comment": 6
       },
       "params": 171812,
-      "train_seconds": 187.7
+      "train_seconds": 189.6
     },
     "mmoe_existing_run": {
       "tasks": {
-        "is_click": 0.7186574339866638,
-        "is_like": 0.8007774949073792,
-        "is_follow": 0.7265809178352356,
-        "is_comment": 0.6414563059806824
+        "is_click": 0.7224706411361694,
+        "is_like": 0.8104204535484314,
+        "is_follow": 0.6869493126869202,
+        "is_comment": 0.6375473737716675
       },
-      "best_epoch": 4,
+      "best_epoch": 13,
       "params": null
     }
   }

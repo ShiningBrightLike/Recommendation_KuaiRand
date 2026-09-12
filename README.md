@@ -101,14 +101,14 @@ training.log     # 训练日志
 
 | 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) |
 | --- | --- | --- | --- | --- | --- | --- |
-| Logistic | 0.7074 | 0.7771 | 0.6542 | 0.6016 | 0.6851 | 0.7422 |
-| Shared-Bottom | 0.7182 | 0.8015 | 0.7199 | 0.6403 | 0.7200 | 0.7599 |
+| Logistic | 0.7077 | 0.7780 | 0.6672 | 0.6065 | 0.6898 | 0.7428 |
+| Shared-Bottom | 0.7221 | 0.8108 | 0.6699 | 0.6172 | 0.7050 | 0.7664 |
 | 单任务（每任务独立） | 0.7227 | 0.8143 | 0.6955 | 0.6420 | 0.7186 | 0.7685 |
-| MMoE | 0.7187 | 0.8008 | 0.7266 | 0.6415 | 0.7219 | 0.7597 |
+| MMoE | 0.7225 | 0.8104 | 0.6869 | 0.6375 | 0.7143 | 0.7664 |
 
-观察：Shared-Bottom 与 MMoE 基本打平，MMoE 的净增益主要体现在关注任务（0.7266 vs 0.7199）；单任务在点击/点赞最强但在关注上最弱，说明多任务结构对关注任务确有价值；Logistic 明显落后，证明 Embedding + 非线性表征有效。完整结果见 [baselines_v1.md](docs/assets/baselines_v1.md) 与 [baselines_v1.json](docs/assets/baselines_v1.json)。
+观察：在修正后的门控任务早停口径下，**单任务（0.7186）领先**，MMoE（0.7143）优于 Shared-Bottom（0.7050）但未超过单任务；MMoE 相对 Shared-Bottom 的增益出现在点击/关注/评论，点赞略低——多任务结构的价值需要 PLE-CGC 等进一步对照。Logistic 明显落后，证明 Embedding + 非线性表征有效。完整结果见 [baselines_v1.md](docs/assets/baselines_v1.md) 与 [baselines_v1.json](docs/assets/baselines_v1.json)。
 
-**统计特征泄漏审计**：去掉全部 51 列全期视频统计特征后，四任务平均测试 AUC 从 0.7219 降到 0.6902（−0.0317），关注/评论各 −0.0562，门控均值 −0.0072。结论是这批特征贡献可观且存在 point-in-time 风险，需按训练窗口重算后再决定保留策略，详见 [leakage_audit.md](docs/leakage_audit.md)。
+**统计特征泄漏审计**：去掉全部 51 列全期视频统计特征后，四任务平均测试 AUC 从 0.7143 降到 0.6929（−0.0214），门控均值 −0.0072，评论 −0.0505、关注 −0.0210。结论是这批特征贡献可观且存在 point-in-time 风险，需按训练窗口重算后再决定保留策略，详见 [leakage_audit.md](docs/leakage_audit.md)。
 
 ```powershell
 python baselines.py --seed 2025 --mmoe-run <已有的 MMoE run 目录>

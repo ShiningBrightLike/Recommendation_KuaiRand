@@ -1,22 +1,22 @@
 # 视频统计特征泄漏审计
 
-- 生成时间：2026-09-13 02:07:42
+- 生成时间：2026-09-13 02:18:31
 - seed=2025；epochs=30；早停监控=val_auc_mean
-- 变体 A（全量特征）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit_all_20260913_015323`
-- 变体 B（去掉全部视频统计特征，共 51 列）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit_nostats_20260913_015506`
+- 变体 A（全量特征）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit2_all_20260913_021208`
+- 变体 B（去掉全部视频统计特征，共 51 列）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit2_nostats_20260913_021525`
 
 ## 结论
 
 统计特征带来的测试集增益可观，泄漏风险需要严肃对待，建议以‘仅训练期重算’版本复核后再决定是否保留。
-门控任务（点击/点赞）平均测试 AUC 差值：**+0.0072**；四任务平均差值：**+0.0317**。
+门控任务（点击/点赞）平均测试 AUC 差值：**+0.0072**；四任务平均差值：**+0.0214**。
 
 ## 主对照结果（测试集 AUC）
 
 | 变体 | is_click | is_like | is_follow | is_comment | 四任务均值 |
 | --- | --- | --- | --- | --- | --- |
-| A 全量特征 | 0.7187 | 0.8008 | 0.7266 | 0.6415 | 0.7219 |
-| B 去统计特征 | 0.7072 | 0.7978 | 0.6704 | 0.5852 | 0.6902 |
-| 差值 (A-B) | 0.0114 | 0.0030 | 0.0562 | 0.0562 | 0.0317 |
+| A 全量特征 | 0.7225 | 0.8104 | 0.6869 | 0.6375 | 0.7143 |
+| B 去统计特征 | 0.7140 | 0.8046 | 0.6660 | 0.5871 | 0.6929 |
+| 差值 (A-B) | 0.0085 | 0.0058 | 0.0210 | 0.0505 | 0.0214 |
 
 ## 单特征 AUC（验证集，仅作关联证据）
 
@@ -37,4 +37,4 @@
 - 审计方式是“去掉全部全期统计特征”的上界对照，不是严格的 point-in-time 重算；
 - 单特征 AUC 只说明关联强度，不能单独证明泄漏；
 - 严格修复需要对每个统计列按训练窗口重算并重新训练对照（ROADMAP RANK-P0-4 的后续项）。
-- 报告脚本耗时：1s（两个变体的训练耗时另计，见各 run 目录）。
+- 报告脚本耗时：387s（两个变体的训练耗时另计，见各 run 目录）。
