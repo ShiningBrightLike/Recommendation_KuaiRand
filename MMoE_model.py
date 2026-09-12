@@ -47,6 +47,21 @@ class MMoE(Layer):
         return outputs
 
 
+def _shared_inputs(categorical_cols, numeric_cols, cat_vocab_size, embed_dim):
+    """Build the shared input branch used by all ranking models/baselines."""
+    categorical_inputs = [
+        Input(shape=(1,), name=col, dtype="int32") for col in categorical_cols
+    ]
+    numeric_input = Input(shape=(len(numeric_cols),), name="numeric_input", dtype="float32")
+    shared_embedding = Embedding(
+        input_dim=cat_vocab_size, output_dim=embed_dim, name="shared_embedding"
+    )
+    embedded = [Flatten()(shared_embedding(inp)) for inp in categorical_inputs]
+    cat_concat = Concatenate()(embedded)
+    all_features = Concatenate()([cat_concat, numeric_input])
+    return categorical_inputs + [numeric_input], all_features
+
+
 def build_mmoe_model(
     categorical_cols,
     numeric_cols,
@@ -68,18 +83,9 @@ def build_mmoe_model(
         units: expert hidden size.
         tower_units: task-tower hidden size.
     """
-    categorical_inputs = [
-        Input(shape=(1,), name=col, dtype="int32") for col in categorical_cols
-    ]
-    numeric_input = Input(shape=(len(numeric_cols),), name="numeric_input", dtype="float32")
-
-    # All categorical features share one embedding table.
-    shared_embedding = Embedding(
-        input_dim=cat_vocab_size, output_dim=embed_dim, name="shared_embedding"
+    inputs, all_features = _shared_inputs(
+        categorical_cols, numeric_cols, cat_vocab_size, embed_dim
     )
-    embedded = [Flatten()(shared_embedding(inp)) for inp in categorical_inputs]
-    cat_concat = Concatenate()(embedded)
-    all_features = Concatenate()([cat_concat, numeric_input])
 
     mmoe_outputs = MMoE(
         units=units, num_experts=num_experts, num_tasks=num_tasks
@@ -91,7 +97,67 @@ def build_mmoe_model(
         final_out = Dense(1, activation="sigmoid", name=f"output_{i + 1}")(tower)
         task_outputs.append(final_out)
 
-    return Model(inputs=categorical_inputs + [numeric_input], outputs=task_outputs)
+    return Model(inputs=inputs, outputs=task_outputs)
+
+
+def build_shared_bottom_model(
+    categorical_cols,
+    numeric_cols,
+    cat_vocab_size=2500,
+    embed_dim=8,
+    num_tasks=2,
+    bottom_units=64,
+    tower_units=32,
+):
+    """Shared-Bottom multi-task baseline: one trunk, one tower per task."""
+    inputs, all_features = _shared_inputs(
+        categorical_cols, numeric_cols, cat_vocab_size, embed_dim
+    )
+    shared = Dense(bottom_units, activation="relu", name="shared_bottom")(all_features)
+    outputs = []
+    for i in range(num_tasks):
+        tower = Dense(tower_units, activation="relu", name=f"tower_{i + 1}")(shared)
+        outputs.append(Dense(1, activation="sigmoid", name=f"output_{i + 1}")(tower))
+    return Model(inputs=inputs, outputs=outputs)
+
+
+def build_single_task_model(
+    categorical_cols,
+    numeric_cols,
+    cat_vocab_size=2500,
+    embed_dim=8,
+    units=64,
+    tower_units=32,
+):
+    """Single-task MLP baseline using the same embedding branch (output_1)."""
+    inputs, all_features = _shared_inputs(
+        categorical_cols, numeric_cols, cat_vocab_size, embed_dim
+    )
+    hidden = Dense(units, activation="relu", name="hidden")(all_features)
+    tower = Dense(tower_units, activation="relu", name="tower_1")(hidden)
+    out = Dense(1, activation="sigmoid", name="output_1")(tower)
+    return Model(inputs=inputs, outputs=out)
+
+
+def build_logistic_model(
+    categorical_cols,
+    numeric_cols,
+    cat_vocab_size=2500,
+    num_tasks=2,
+):
+    """Logistic-regression baseline: one weight per one-hot/numeric feature.
+
+    Categorical ids are embedded with dim=1, so the concatenated features are
+    exactly a one-hot vector, and each task is a single Dense(1) layer.
+    """
+    inputs, all_features = _shared_inputs(
+        categorical_cols, numeric_cols, cat_vocab_size, embed_dim=1
+    )
+    outputs = [
+        Dense(1, activation="sigmoid", name=f"output_{i + 1}")(all_features)
+        for i in range(num_tasks)
+    ]
+    return Model(inputs=inputs, outputs=outputs)
 
 
 if __name__ == "__main__":

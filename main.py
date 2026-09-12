@@ -29,7 +29,14 @@ from tensorflow.keras.callbacks import Callback, EarlyStopping
 from tensorflow.keras.metrics import AUC
 
 import config as C
-from data_loading import load_cat_vocab_size, load_feature_schema, load_split
+from data_loading import (
+    filter_features,
+    load_cat_vocab_size,
+    load_feature_schema,
+    load_split,
+    parse_name_list,
+    video_statistic_cols,
+)
 from MMoE_model import build_mmoe_model
 
 
@@ -53,6 +60,23 @@ def parse_args():
         help="shortcut: max_rows=2048, 1 epoch, no plot window",
     )
     parser.add_argument("--show", action="store_true", help="display the plots at the end")
+    parser.add_argument(
+        "--monitor",
+        default="val_auc_mean",
+        choices=["val_auc_mean", "val_loss"]
+        + [f"val_output_{i}_auc" for i in range(1, len(C.LABEL_COLS) + 1)],
+        help="metric watched by early stopping (default: mean val AUC over tasks)",
+    )
+    parser.add_argument(
+        "--drop-features",
+        default=None,
+        help="comma-separated feature names to exclude from model inputs",
+    )
+    parser.add_argument(
+        "--drop-stat-features",
+        action="store_true",
+        help="exclude all post-exposure video statistic features (leakage audit)",
+    )
     return parser.parse_args()
 
 
@@ -62,6 +86,19 @@ def set_seed(seed):
     np.random.seed(seed)
     tf.random.set_seed(seed)
     tf.keras.utils.set_random_seed(seed)
+
+
+def mean_val_auc(logs, num_tasks):
+    """Mean of the available per-task validation AUCs (NaN values skipped)."""
+    values = []
+    for i in range(1, num_tasks + 1):
+        value = logs.get(f"val_output_{i}_auc")
+        if value is None:
+            continue
+        value = float(value)
+        if value == value:  # not NaN
+            values.append(value)
+    return sum(values) / len(values) if values else None
 
 
 def setup_logging(run_dir):
@@ -96,6 +133,27 @@ class TrainingLogger(Callback):
                 f"train_auc={logs.get(f'{out}_auc', float('nan')):.4f} "
                 f"val_auc={logs.get(f'val_{out}_auc', float('nan')):.4f}"
             )
+        mean_auc = logs.get("val_auc_mean")
+        if mean_auc is not None:
+            self.logger.info(f"Epoch {epoch + 1}: val_auc_mean={mean_auc:.4f}")
+
+
+class MeanValAUC(Callback):
+    """Expose the per-task mean validation AUC as `val_auc_mean` in logs.
+
+    Registered before EarlyStopping so model selection can use this metric
+    instead of the click-dominated weighted `val_loss`.
+    """
+
+    def __init__(self, num_tasks):
+        super().__init__()
+        self.num_tasks = num_tasks
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs if logs is not None else {}
+        value = mean_val_auc(logs, self.num_tasks)
+        if value is not None:
+            logs["val_auc_mean"] = value
 
 
 def plot_history(history, save_path, show=False):
@@ -141,6 +199,12 @@ def main():
 
     logger.info("Loading processed data...")
     cat_cols, num_cols, shadow_cols = load_feature_schema()
+    drop_names = set(parse_name_list(args.drop_features) or [])
+    if args.drop_stat_features:
+        drop_names |= set(video_statistic_cols())
+    cat_cols, num_cols, dropped = filter_features(cat_cols, num_cols, drop_names)
+    if dropped:
+        logger.info(f"Dropped {len(dropped)} features from model inputs: {dropped}")
     if shadow_cols:
         logger.info(f"Schema includes shadow features: {shadow_cols}")
     x_train, y_train, n_train, ratios_train = load_split(
@@ -184,14 +248,17 @@ def main():
     )
 
     early_stopping = EarlyStopping(
-        monitor="val_loss",
+        monitor=args.monitor,
+        mode="min" if args.monitor == "val_loss" else "max",
         patience=args.patience,
         restore_best_weights=True,
         verbose=1,
     )
+    mean_val_auc_callback = MeanValAUC(num_tasks=len(C.LABEL_COLS))
     logger.info(
         f"Training: train={n_train:,}, val={n_val:,}, test={n_test:,}, "
-        f"epochs={args.epochs}, batch_size={args.batch_size}, seed={args.seed}"
+        f"epochs={args.epochs}, batch_size={args.batch_size}, seed={args.seed}, "
+        f"monitor={args.monitor}"
     )
     history = model.fit(
         x_train,
@@ -200,7 +267,7 @@ def main():
         batch_size=args.batch_size,
         epochs=args.epochs,
         verbose=0,
-        callbacks=[early_stopping, TrainingLogger(logger)],
+        callbacks=[mean_val_auc_callback, early_stopping, TrainingLogger(logger)],
     )
 
     best_epoch = getattr(early_stopping, "best_epoch", None)
@@ -229,6 +296,7 @@ def main():
         "config": vars(args),
         "cat_vocab_size": cat_vocab_size,
         "shadow_cols": shadow_cols,
+        "dropped_features": dropped,
         "row_counts": {"train": n_train, "val": n_val, "test": n_test},
         "positive_ratios": {
             "train": ratios_train,

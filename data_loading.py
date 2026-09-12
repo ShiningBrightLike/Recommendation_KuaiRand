@@ -7,10 +7,48 @@ features keep every downstream script in sync automatically.
 """
 
 import json
+from functools import lru_cache
 
 import pandas as pd
 
 import config as C
+
+
+def parse_name_list(value):
+    """Parse a comma-separated feature-name string into a list (None if empty)."""
+    if value is None:
+        return None
+    names = [part.strip() for part in value.split(",") if part.strip()]
+    return names or None
+
+
+def filter_features(categorical_cols, numeric_cols, drop_features):
+    """Return (categorical, numeric, dropped) with `drop_features` removed.
+
+    Raises when a dropped name does not exist or when every categorical
+    feature would be removed (the model needs at least one).
+    """
+    drop = set(drop_features or [])
+    known = set(categorical_cols) | set(numeric_cols)
+    unknown = sorted(drop - known)
+    if unknown:
+        raise ValueError(f"unknown features to drop: {unknown}")
+    categorical = [c for c in categorical_cols if c not in drop]
+    numeric = [c for c in numeric_cols if c not in drop]
+    if not categorical:
+        raise ValueError("at least one categorical feature must remain")
+    if not numeric:
+        raise ValueError("at least one numeric feature must remain")
+    return categorical, numeric, sorted(drop)
+
+
+@lru_cache(maxsize=1)
+def video_statistic_cols():
+    """Column names of the video statistic file (post-exposure aggregates)."""
+    if not C.VIDEO_FEATURES_STATISTIC_FILE.exists():
+        return []
+    header = pd.read_csv(C.VIDEO_FEATURES_STATISTIC_FILE, nrows=0)
+    return [col for col in header.columns if col != "video_id"]
 
 
 def read_pipeline_meta():

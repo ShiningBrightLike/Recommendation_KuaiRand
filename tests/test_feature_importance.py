@@ -18,6 +18,7 @@ from feature_importance import (
     analyze,
     build_column_descriptors,
     decide,
+    parse_candidate_cols,
     shuffled_inputs,
 )
 
@@ -56,6 +57,17 @@ class DecisionTest(unittest.TestCase):
         self.assertEqual(decide(0.003, 0.0005, cutoff=0.001), DECISION_PASS)
         self.assertEqual(decide(0.0012, 0.0006, cutoff=0.001), "待确认")
         self.assertEqual(decide(0.0008, 0.0002, cutoff=0.001), DECISION_REJECT)
+
+
+class CandidateColsTest(unittest.TestCase):
+    def test_parse_comma_separated_names(self):
+        self.assertEqual(parse_candidate_cols("shadow_0,new_feat_a"), ["shadow_0", "new_feat_a"])
+        self.assertEqual(parse_candidate_cols(" a , b ,, c "), ["a", "b", "c"])
+
+    def test_parse_empty_returns_none(self):
+        self.assertIsNone(parse_candidate_cols(None))
+        self.assertIsNone(parse_candidate_cols("   "))
+        self.assertIsNone(parse_candidate_cols(",,"))
 
 
 class AnalyzeTest(unittest.TestCase):

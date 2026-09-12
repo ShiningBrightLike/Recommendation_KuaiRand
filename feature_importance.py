@@ -41,7 +41,7 @@ from sklearn.metrics import roc_auc_score
 import tensorflow as tf
 
 import config as C
-from data_loading import load_feature_schema, load_split
+from data_loading import load_feature_schema, load_split, parse_name_list
 from MMoE_model import MMoE
 
 SHADOW_PREFIX = "shadow_"
@@ -49,6 +49,14 @@ SHADOW_PREFIX = "shadow_"
 DECISION_PASS = "通过"
 DECISION_REVIEW = "待确认"
 DECISION_REJECT = "不通过"
+
+
+def parse_candidate_cols(value):
+    """Parse `--candidate-cols` (comma-separated string) into a name list.
+
+    Returns None when no candidate names were supplied.
+    """
+    return parse_name_list(value)
 
 
 class FeatureSpec(NamedTuple):
@@ -488,7 +496,7 @@ def main():
     specs = build_column_descriptors(cat_cols, num_cols)
 
     if args.candidate_cols:
-        wanted = set(args.candidate_cols)
+        wanted = set(parse_candidate_cols(args.candidate_cols) or [])
         specs = [s for s in specs if s.name in wanted]
         missing = wanted - {s.name for s in specs}
         if missing:
@@ -535,7 +543,7 @@ def main():
         "split": args.split,
         "rows": n_rows,
         "shadow_cols": shadow_cols,
-        "candidate_cols": args.candidate_cols,
+        "candidate_cols": parse_candidate_cols(args.candidate_cols),
     }
     paths = write_reports(result, task_names, out_dir, top=args.top, run_meta=run_meta)
     print(f"Reports written to {out_dir}:")
