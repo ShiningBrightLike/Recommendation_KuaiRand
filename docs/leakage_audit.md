@@ -1,6 +1,6 @@
 # 视频统计特征泄漏审计
 
-- 生成时间：2026-09-13 01:57:34
+- 生成时间：2026-09-13 02:07:42
 - seed=2025；epochs=30；早停监控=val_auc_mean
 - 变体 A（全量特征）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit_all_20260913_015323`
 - 变体 B（去掉全部视频统计特征，共 51 列）：`C:\Users\11605\Desktop\pythonCode\SGT\Recommendation_KuaiRand\KuaiRand-Pure\saved\runs\audit_nostats_20260913_015506`
@@ -37,4 +37,4 @@
 - 审计方式是“去掉全部全期统计特征”的上界对照，不是严格的 point-in-time 重算；
 - 单特征 AUC 只说明关联强度，不能单独证明泄漏；
 - 严格修复需要对每个统计列按训练窗口重算并重新训练对照（ROADMAP RANK-P0-4 的后续项）。
-- 总耗时：1s。
+- 报告脚本耗时：1s（两个变体的训练耗时另计，见各 run 目录）。

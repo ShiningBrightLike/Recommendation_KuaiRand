@@ -216,7 +216,7 @@ def main():
         "- 审计方式是“去掉全部全期统计特征”的上界对照，不是严格的 point-in-time 重算；",
         "- 单特征 AUC 只说明关联强度，不能单独证明泄漏；",
         "- 严格修复需要对每个统计列按训练窗口重算并重新训练对照（ROADMAP RANK-P0-4 的后续项）。",
-        f"- 总耗时：{time.time() - started:.0f}s。",
+        f"- 报告脚本耗时：{time.time() - started:.0f}s（两个变体的训练耗时另计，见各 run 目录）。",
     ]
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text("\n".join(lines) + "\n", encoding="utf-8")
