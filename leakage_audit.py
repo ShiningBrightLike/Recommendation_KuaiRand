@@ -102,6 +102,11 @@ def _metrics(run_dir):
         for i in range(1, len(C.LABEL_COLS) + 1)
         if f"val_output_{i}_auc" in history
     ]
+    val_gate_aucs = [
+        history[f"val_output_{i}_auc"][best]
+        for i, task in enumerate(C.LABEL_COLS, 1)
+        if task in C.GATE_TASKS and f"val_output_{i}_auc" in history
+    ]
     test_aucs = {
         task: float(payload["test_metrics"][f"output_{i + 1}_auc"])
         for i, task in enumerate(C.LABEL_COLS)
@@ -109,7 +114,8 @@ def _metrics(run_dir):
     return {
         "run_dir": str(run_dir),
         "best_epoch": payload.get("best_epoch"),
-        "val_mean_auc": float(np.mean(val_aucs)) if val_aucs else None,
+        "val_mean_auc_all_tasks": float(np.mean(val_aucs)) if val_aucs else None,
+        "val_gate_mean_auc": float(np.mean(val_gate_aucs)) if val_gate_aucs else None,
         "test_aucs": test_aucs,
         "test_mean_auc": float(np.mean(list(test_aucs.values()))),
         "test_gate_mean_auc": float(np.mean([test_aucs[t] for t in C.GATE_TASKS])),

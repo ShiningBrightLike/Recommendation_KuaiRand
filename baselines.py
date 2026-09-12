@@ -79,8 +79,8 @@ def _load_data(args, cat_cols, num_cols):
     )
 
 
-def _compile_and_fit(model, train, val, args, monitor, num_tasks, task_names, single_output=False):
-    output_names = [f"output_{i + 1}" for i in range(num_tasks)]
+def _compile_and_fit(model, train, val, args, monitor, task_names, single_output=False):
+    output_names = [f"output_{i + 1}" for i in range(len(task_names))]
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate)
     if single_output:
         # Keras flattens metric names for single-output models: val_auc, not
@@ -107,6 +107,9 @@ def _compile_and_fit(model, train, val, args, monitor, num_tasks, task_names, si
         restore_best_weights=True,
         verbose=0,
     )
+    gate_indices = [
+        task_names.index(task) + 1 for task in C.GATE_TASKS if task in task_names
+    ]
     model.fit(
         train[0],
         train[1],
@@ -114,7 +117,7 @@ def _compile_and_fit(model, train, val, args, monitor, num_tasks, task_names, si
         batch_size=args.batch_size,
         epochs=args.epochs,
         verbose=0,
-        callbacks=[MeanValAUC(num_tasks), early_stopping],
+        callbacks=[MeanValAUC(gate_indices), early_stopping],
     )
     best_epoch = getattr(early_stopping, "best_epoch", None)
     return None if best_epoch is None else int(best_epoch) + 1
@@ -134,7 +137,7 @@ def _test_auc(model, test, task_names, single_output=False):
 
 def train_multi_output(model, train, val, test, args, task_names):
     best_epoch = _compile_and_fit(
-        model, train, val, args, args.monitor, len(task_names), task_names
+        model, train, val, args, args.monitor, task_names
     )
     return {
         "tasks": _test_auc(model, test, task_names),
@@ -155,7 +158,7 @@ def train_single_task(cat_cols, num_cols, vocab, data, args, task_names):
         val_i = (val[0], [val[1][i]])
         test_i = (test[0], [test[1][i]])
         best_epoch = _compile_and_fit(
-            model, train_i, val_i, args, "val_auc", 1, [task], single_output=True
+            model, train_i, val_i, args, "val_auc", [task], single_output=True
         )
         auc = _test_auc(model, test_i, [task], single_output=True)
         per_task.update(auc)

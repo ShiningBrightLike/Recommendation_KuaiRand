@@ -10,21 +10,22 @@ from main import mean_val_auc
 
 
 class MeanValAUCTest(unittest.TestCase):
-    def test_mean_of_available_tasks(self):
+    def test_mean_of_selected_tasks(self):
         logs = {
             "val_output_1_auc": 0.70,
             "val_output_2_auc": 0.80,
-            "val_output_3_auc": float("nan"),
+            "val_output_3_auc": 0.90,
         }
-        self.assertAlmostEqual(mean_val_auc(logs, 4), 0.75)
+        # Gate tasks are indices [1, 2]; task 3 must not leak into the mean.
+        self.assertAlmostEqual(mean_val_auc(logs, [1, 2]), 0.75)
 
     def test_returns_none_when_no_metric(self):
-        self.assertIsNone(mean_val_auc({}, 4))
-        self.assertIsNone(mean_val_auc({"val_output_1_auc": float("nan")}, 4))
+        self.assertIsNone(mean_val_auc({}, [1, 2]))
+        self.assertIsNone(mean_val_auc({"val_output_1_auc": float("nan")}, [1, 2]))
 
     def test_ignores_non_numeric(self):
         logs = {"val_output_1_auc": 0.6, "val_output_2_auc": None}
-        self.assertAlmostEqual(mean_val_auc(logs, 2), 0.6)
+        self.assertAlmostEqual(mean_val_auc(logs, [1, 2]), 0.6)
 
 
 if __name__ == "__main__":

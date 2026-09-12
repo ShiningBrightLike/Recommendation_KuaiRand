@@ -88,10 +88,10 @@ def set_seed(seed):
     tf.keras.utils.set_random_seed(seed)
 
 
-def mean_val_auc(logs, num_tasks):
-    """Mean of the available per-task validation AUCs (NaN values skipped)."""
+def mean_val_auc(logs, task_indices):
+    """Mean validation AUC over the given 1-based task indices (NaN skipped)."""
     values = []
-    for i in range(1, num_tasks + 1):
+    for i in task_indices:
         value = logs.get(f"val_output_{i}_auc")
         if value is None:
             continue
@@ -139,19 +139,19 @@ class TrainingLogger(Callback):
 
 
 class MeanValAUC(Callback):
-    """Expose the per-task mean validation AUC as `val_auc_mean` in logs.
+    """Expose the gate-task mean validation AUC as `val_auc_mean` in logs.
 
     Registered before EarlyStopping so model selection can use this metric
     instead of the click-dominated weighted `val_loss`.
     """
 
-    def __init__(self, num_tasks):
+    def __init__(self, task_indices):
         super().__init__()
-        self.num_tasks = num_tasks
+        self.task_indices = task_indices
 
     def on_epoch_end(self, epoch, logs=None):
         logs = logs if logs is not None else {}
-        value = mean_val_auc(logs, self.num_tasks)
+        value = mean_val_auc(logs, self.task_indices)
         if value is not None:
             logs["val_auc_mean"] = value
 
@@ -254,7 +254,8 @@ def main():
         restore_best_weights=True,
         verbose=1,
     )
-    mean_val_auc_callback = MeanValAUC(num_tasks=len(C.LABEL_COLS))
+    gate_task_indices = [C.LABEL_COLS.index(task) + 1 for task in C.GATE_TASKS]
+    mean_val_auc_callback = MeanValAUC(task_indices=gate_task_indices)
     logger.info(
         f"Training: train={n_train:,}, val={n_val:,}, test={n_test:,}, "
         f"epochs={args.epochs}, batch_size={args.batch_size}, seed={args.seed}, "
