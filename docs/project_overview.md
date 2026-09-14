@@ -325,7 +325,7 @@ ADR-0005 落地后默认模型变为「特征编码器 `mlp` → MMoE」，本�
 - 所有非 logistic 模型的差异都在种子噪声量级内，多任务结构之间没有明显赢家；`senet` 是最有希望的方向，`dcn` 是性价比最低的方向。
 - 与 v1（单 seed、旧默认模型）**不可直接比较**；v1 的「单任务领先」结论在多种子下被弱化为「无显著差异」。
 
-完整数据：[baselines_v2.md](assets/baselines_v2.md)、[baselines_v2.json](assets/baselines_v2.json)（含每个 seed 的逐任务 AUC、best epoch 与耗时）。
+完整数据见 `docs/assets/baselines_v2.md`、`docs/assets/baselines_v2.json`（含每个 seed 的逐任务 AUC、best epoch 与耗时）。
 
 ---
 
