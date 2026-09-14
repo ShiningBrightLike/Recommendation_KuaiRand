@@ -3,10 +3,12 @@
 from models.encoders.base import FeatureEncoder
 from models.encoders.dcn import DCNEncoder
 from models.encoders.mlp import MLPEncoder
+from models.encoders.senet import SENetEncoder
 
 ENCODERS = {
     "dcn": DCNEncoder,
     "mlp": MLPEncoder,
+    "senet": SENetEncoder,
 }
 
 #: The encoder every model uses unless the caller picks another one.
@@ -47,6 +49,7 @@ __all__ = [
     "ENCODERS",
     "FeatureEncoder",
     "MLPEncoder",
+    "SENetEncoder",
     "available_encoders",
     "create_encoder",
     "encoder_hyperparams",

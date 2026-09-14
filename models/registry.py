@@ -6,7 +6,7 @@ own map in `models.encoders`; this module covers everything downstream of them.
 
 import inspect
 
-from models.encoders import DCNEncoder, MLPEncoder
+from models.encoders import DCNEncoder, MLPEncoder, SENetEncoder
 from models.encoders.dcn import LowRankCrossLayer
 from models.mtl.logistic import build_logistic_model
 from models.mtl.mmoe import MMoE, build_mmoe_structure
@@ -36,6 +36,7 @@ CUSTOM_LAYERS = {
     "LowRankCrossLayer": LowRankCrossLayer,
     "MMoE": MMoE,
     "MLPEncoder": MLPEncoder,
+    "SENetEncoder": SENetEncoder,
 }
 
 

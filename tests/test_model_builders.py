@@ -14,6 +14,7 @@ import numpy as np
 import tensorflow as tf
 
 from models import (
+    available_encoders,
     available_models,
     build_model,
     build_logistic_model,
@@ -207,6 +208,47 @@ class FeatureEncoderAxisTest(unittest.TestCase):
         self.assertEqual(axes["encoder"]["params"], 306 + 608)
         self.assertEqual(axes["encoder"]["output_dim"], 18 + 32)
 
+    def test_senet_encoder_reweights_each_field(self):
+        """SENet keeps the input width and gates each field, not each dimension.
+
+        Four fields (2 categorical, 2 numeric) at reduction 2 give a bottleneck
+        of 2 units: 2 x 4 x 2 excitation weights + 2 + 4 bias terms = 22.
+        """
+        model, axes = build_model(
+            encoder="senet",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+        )
+
+        assert_multi_output(self, model, 4)
+        self.assertEqual(axes["encoder"]["name"], "senet")
+        self.assertEqual(axes["encoder"]["hyperparams"], {"reduction": 2})
+        self.assertEqual(axes["encoder"]["output_dim"], 18)
+        self.assertEqual(axes["encoder"]["params"], 22)
+
+    def test_senet_field_count_follows_the_schema(self):
+        """One extra numeric feature means one more field, and a wider gate."""
+        _, axes = build_model(
+            encoder="senet",
+            structure="shared_bottom",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS + ["extra_num"],
+            cat_vocab_size=VOCAB,
+            num_tasks=2,
+            bottom_units=8,
+            tower_units=4,
+        )
+
+        self.assertEqual(axes["encoder"]["output_dim"], 2 * 8 + 3)
+        # 5 fields at reduction 2 -> bottleneck 2: 2 x 5 x 2 + 2 + 5 = 27
+        self.assertEqual(axes["encoder"]["params"], 27)
+
 
 class RegistryTest(unittest.TestCase):
     def test_registry_lists_the_documented_models(self):
@@ -258,20 +300,21 @@ class SerializationTest(unittest.TestCase):
     def test_saved_model_reloads_and_predicts_identically(self):
         self.assert_reloads_identically(build_small_mmoe_model())
 
-    def test_dcn_encoder_model_reloads_and_predicts_identically(self):
-        model, _ = build_model(
-            encoder="dcn",
-            structure="mmoe",
-            categorical_cols=CAT_COLS,
-            numeric_cols=NUM_COLS,
-            cat_vocab_size=VOCAB,
-            num_tasks=2,
-            num_experts=2,
-            units=8,
-            tower_units=4,
-            encoder_overrides={"num_cross_layers": 1, "rank": 4, "deep_units": 8},
-        )
-        self.assert_reloads_identically(model)
+    def test_every_encoder_model_reloads_and_predicts_identically(self):
+        for encoder in available_encoders():
+            with self.subTest(encoder=encoder):
+                model, _ = build_model(
+                    encoder=encoder,
+                    structure="mmoe",
+                    categorical_cols=CAT_COLS,
+                    numeric_cols=NUM_COLS,
+                    cat_vocab_size=VOCAB,
+                    num_tasks=2,
+                    num_experts=2,
+                    units=8,
+                    tower_units=4,
+                )
+                self.assert_reloads_identically(model)
 
     def test_saved_model_reloads_and_predicts_in_a_fresh_process(self):
         model = build_small_mmoe_model()
