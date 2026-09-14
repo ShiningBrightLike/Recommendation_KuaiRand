@@ -15,9 +15,8 @@ import tensorflow as tf
 
 from models import (
     available_models,
+    build_model,
     build_logistic_model,
-    build_mmoe_model,
-    build_shared_bottom_model,
     build_single_task_model,
     create_model,
     custom_objects,
@@ -53,23 +52,51 @@ def make_inputs():
     return cat + [num]
 
 
+def build_small_mmoe_model(num_tasks=2):
+    """A tiny MMoE model at the default encoder, for shape/serialization tests."""
+    model, _ = build_model(
+        encoder="mlp",
+        structure="mmoe",
+        categorical_cols=CAT_COLS,
+        numeric_cols=NUM_COLS,
+        cat_vocab_size=VOCAB,
+        num_tasks=num_tasks,
+        num_experts=2,
+        units=8,
+        tower_units=4,
+    )
+    return model
+
+
 class BuilderShapeTest(unittest.TestCase):
     def _assert_multi_output(self, model, expected_outputs):
-        self.assertEqual(len(model.outputs), expected_outputs)
-        preds = model.predict(make_inputs(), verbose=0)
-        if expected_outputs == 1:
-            preds = [preds]
-        self.assertEqual(len(preds), expected_outputs)
-        for pred in preds:
-            self.assertEqual(pred.shape, (BATCH, 1))
-            self.assertTrue(np.all(pred >= 0) and np.all(pred <= 1))
+        assert_multi_output(self, model, expected_outputs)
 
     def test_mmoe_outputs(self):
-        model = build_mmoe_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=4)
+        model, _ = build_model(
+            encoder="mlp",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+        )
         self._assert_multi_output(model, 4)
 
     def test_shared_bottom_outputs(self):
-        model = build_shared_bottom_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=4)
+        model, _ = build_model(
+            encoder="mlp",
+            structure="shared_bottom",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            bottom_units=8,
+            tower_units=4,
+        )
         self._assert_multi_output(model, 4)
 
     def test_single_task_output(self):
@@ -90,6 +117,45 @@ REGISTRY_KWARGS = {
     "logistic": {"num_tasks": 4},
 }
 REGISTRY_OUTPUTS = {"mmoe": 4, "shared_bottom": 4, "single_task": 1, "logistic": 4}
+
+
+def assert_multi_output(test_case, model, expected_outputs):
+    """Shared shape/probability assertions for a built ranking model."""
+    test_case.assertEqual(len(model.outputs), expected_outputs)
+    preds = model.predict(make_inputs(), verbose=0)
+    if expected_outputs == 1:
+        preds = [preds]
+    test_case.assertEqual(len(preds), expected_outputs)
+    for pred in preds:
+        test_case.assertEqual(pred.shape, (BATCH, 1))
+        test_case.assertTrue(np.all(pred >= 0) and np.all(pred <= 1))
+
+
+class FeatureEncoderAxisTest(unittest.TestCase):
+    """The encoder axis is selectable and carries its own run metadata."""
+
+    def test_default_encoder_builds_the_mmoe_model_with_run_metadata(self):
+        model, axes = build_model(
+            encoder="mlp",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+        )
+
+        assert_multi_output(self, model, 4)
+        self.assertEqual(axes["encoder"]["name"], "mlp")
+        self.assertEqual(axes["encoder"]["hyperparams"]["hidden"], [64])
+        self.assertEqual(axes["encoder"]["output_dim"], 64)
+        # Dense(64) over (2 categorical x 8 embedding dims + 2 numeric) = 18 dims
+        self.assertEqual(axes["encoder"]["params"], 18 * 64 + 64)
+        self.assertEqual(axes["structure"]["name"], "mmoe")
+        self.assertEqual(axes["structure"]["hyperparams"]["num_experts"], 2)
+        self.assertEqual(axes["total_params"], model.count_params())
 
 
 class RegistryTest(unittest.TestCase):
@@ -124,7 +190,7 @@ class SerializationTest(unittest.TestCase):
     """A saved run must reload through the package's own load entry point."""
 
     def test_saved_model_reloads_and_predicts_identically(self):
-        model = build_mmoe_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=2)
+        model = build_small_mmoe_model()
         inputs = make_inputs()
         expected = model.predict(inputs, verbose=0)
 
@@ -141,7 +207,7 @@ class SerializationTest(unittest.TestCase):
             np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
 
     def test_saved_model_reloads_and_predicts_in_a_fresh_process(self):
-        model = build_mmoe_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=2)
+        model = build_small_mmoe_model()
         inputs = make_inputs()
         expected = model.predict(inputs, verbose=0)
 

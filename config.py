@@ -88,6 +88,22 @@ NUM_EXPERTS = 8
 EXPERT_UNITS = 64
 TOWER_UNITS = 32
 
+# Two-axis model selection (ADR-0005): the feature encoder and the multi-task
+# structure are chosen independently and recorded in every run's metadata. The
+# default names live beside the models themselves (models.DEFAULT_ENCODER /
+# models.DEFAULT_STRUCTURE); only their hyper-parameters live here.
+STRUCTURE_PARAMS = {
+    "mmoe": {
+        "num_experts": NUM_EXPERTS,
+        "units": EXPERT_UNITS,
+        "tower_units": TOWER_UNITS,
+    },
+    "shared_bottom": {
+        "bottom_units": EXPERT_UNITS,
+        "tower_units": TOWER_UNITS,
+    },
+}
+
 # ---------------------------------------------------------------------------
 # Training defaults
 # ---------------------------------------------------------------------------

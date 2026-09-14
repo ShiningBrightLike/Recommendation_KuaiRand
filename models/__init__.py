@@ -1,5 +1,11 @@
 """Ranking models for the multi-task KuaiRand feedback prediction project.
 
+A model is assembled from two independent axes (ADR-0005):
+    - a **feature encoder** that turns the concatenated feature vector into a
+      dense representation (`models.encoders`), and
+    - a **multi-task structure** that decides how tasks share and differ
+      (`models.mtl`).
+
 Input convention (shared by every model here):
     - one int32 Input per categorical feature (Embedding indices)
     - one float32 Input with all numeric features
@@ -12,19 +18,40 @@ The preprocessing pipeline computes it dynamically and records it in
 `data_processed/pipeline_meta.json`; pass that value in when building a model.
 """
 
+from models.builders import build_model, create_model
+from models.encoders import (
+    DEFAULT_ENCODER,
+    FeatureEncoder,
+    MLPEncoder,
+    available_encoders,
+    create_encoder,
+)
+from models.inputs import FeatureLayout, build_shared_inputs
 from models.mtl.logistic import build_logistic_model
-from models.mtl.mmoe import MMoE, build_mmoe_model
-from models.mtl.shared_bottom import build_shared_bottom_model
+from models.mtl.mmoe import MMoE
 from models.mtl.single_task import build_single_task_model
-from models.registry import available_models, create_model, custom_objects
+from models.registry import (
+    DEFAULT_STRUCTURE,
+    available_models,
+    available_structures,
+    custom_objects,
+)
 
 __all__ = [
+    "DEFAULT_ENCODER",
+    "DEFAULT_STRUCTURE",
+    "FeatureEncoder",
+    "FeatureLayout",
+    "MLPEncoder",
     "MMoE",
+    "available_encoders",
     "available_models",
+    "available_structures",
     "build_logistic_model",
-    "build_mmoe_model",
-    "build_shared_bottom_model",
+    "build_model",
+    "build_shared_inputs",
     "build_single_task_model",
+    "create_encoder",
     "create_model",
     "custom_objects",
 ]

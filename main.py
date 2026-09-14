@@ -37,7 +37,13 @@ from data_loading import (
     parse_name_list,
     video_statistic_cols,
 )
-from models import build_mmoe_model
+from models import (
+    DEFAULT_ENCODER,
+    DEFAULT_STRUCTURE,
+    available_encoders,
+    available_structures,
+    build_model,
+)
 
 
 def parse_args():
@@ -47,7 +53,23 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=C.EARLY_STOP_PATIENCE)
     parser.add_argument("--learning-rate", type=float, default=C.LEARNING_RATE)
     parser.add_argument("--seed", type=int, default=C.RANDOM_SEED)
-    parser.add_argument("--tag", default="mmoe", help="prefix for the run directory")
+    parser.add_argument(
+        "--encoder",
+        default=DEFAULT_ENCODER,
+        choices=available_encoders(),
+        help="feature encoder (see ADR-0005)",
+    )
+    parser.add_argument(
+        "--mtl",
+        default=DEFAULT_STRUCTURE,
+        choices=available_structures(),
+        help="multi-task structure (see ADR-0005)",
+    )
+    parser.add_argument(
+        "--tag",
+        default=None,
+        help="prefix for the run directory (default: <mtl>_<encoder>)",
+    )
     parser.add_argument(
         "--max-rows",
         type=int,
@@ -186,6 +208,8 @@ def plot_history(history, save_path, show=False):
 
 def main():
     args = parse_args()
+    if args.tag is None:
+        args.tag = f"{args.mtl}_{args.encoder}"
     if args.smoke:
         args.max_rows = args.max_rows or 2048
         args.epochs = 1
@@ -225,16 +249,26 @@ def main():
         logger.info(f"positive ratios ({split}): {ratios}")
 
     cat_vocab_size = load_cat_vocab_size()
-    logger.info(f"Building MMoE model (cat_vocab_size={cat_vocab_size})...")
-    model = build_mmoe_model(
+    logger.info(
+        f"Building {args.mtl} + {args.encoder} model "
+        f"(cat_vocab_size={cat_vocab_size})..."
+    )
+    model, model_axes = build_model(
+        encoder=args.encoder,
+        structure=args.mtl,
         categorical_cols=cat_cols,
         numeric_cols=num_cols,
         cat_vocab_size=cat_vocab_size,
         embed_dim=C.EMBED_DIM,
-        num_experts=C.NUM_EXPERTS,
         num_tasks=len(C.LABEL_COLS),
-        units=C.EXPERT_UNITS,
-        tower_units=C.TOWER_UNITS,
+        **C.STRUCTURE_PARAMS[args.mtl],
+    )
+    logger.info(
+        f"Model axes: encoder={model_axes['encoder']['name']} "
+        f"(output_dim={model_axes['encoder']['output_dim']}, "
+        f"params={model_axes['encoder']['params']:,}), "
+        f"structure={model_axes['structure']['name']}, "
+        f"total_params={model_axes['total_params']:,}"
     )
 
     output_names = [f"output_{i + 1}" for i in range(len(C.LABEL_COLS))]
@@ -295,6 +329,7 @@ def main():
         "run_name": run_name,
         "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "config": vars(args),
+        "model": model_axes,
         "cat_vocab_size": cat_vocab_size,
         "shadow_cols": shadow_cols,
         "dropped_features": dropped,

@@ -34,10 +34,12 @@ from data_loading import (
 )
 from main import MeanValAUC, set_seed
 from models import (
+    DEFAULT_ENCODER,
+    available_encoders,
     available_models,
+    available_structures,
     build_logistic_model,
-    build_mmoe_model,
-    build_shared_bottom_model,
+    build_model,
     build_single_task_model,
 )
 
@@ -49,7 +51,10 @@ def parse_args():
     parser.add_argument(
         "--models",
         default="logistic,shared_bottom,single_task",
-        help=f"comma-separated subset of {ALL_MODELS}",
+        help=(
+            f"comma-separated subset of {ALL_MODELS}, each optionally with a "
+            "feature encoder, e.g. `mmoe+dcn` (the logistic baseline takes no encoder)"
+        ),
     )
     parser.add_argument("--epochs", type=int, default=C.EPOCHS)
     parser.add_argument("--batch-size", type=int, default=C.BATCH_SIZE)
@@ -147,13 +152,14 @@ def train_multi_output(model, train, val, test, args, task_names):
     }
 
 
-def train_single_task(cat_cols, num_cols, vocab, data, args, task_names):
+def train_single_task(cat_cols, num_cols, vocab, encoder, data, args, task_names):
     train, val, test = data
     per_task, best_epochs, params = {}, {}, 0
     for i, task in enumerate(task_names):
         model = build_single_task_model(
             cat_cols, num_cols, vocab, embed_dim=C.EMBED_DIM,
             units=C.EXPERT_UNITS, tower_units=C.TOWER_UNITS,
+            encoder=encoder,
         )
         train_i = (train[0], [train[1][i]])
         val_i = (val[0], [val[1][i]])
@@ -168,22 +174,49 @@ def train_single_task(cat_cols, num_cols, vocab, data, args, task_names):
     return {"tasks": per_task, "best_epochs": best_epochs, "params": params}
 
 
-def build_baseline(name, cat_cols, num_cols, vocab, num_tasks):
-    if name == "logistic":
-        return build_logistic_model(cat_cols, num_cols, vocab, num_tasks=num_tasks)
-    if name == "shared_bottom":
-        return build_shared_bottom_model(
-            cat_cols, num_cols, vocab, embed_dim=C.EMBED_DIM,
-            num_tasks=num_tasks, bottom_units=C.EXPERT_UNITS,
-            tower_units=C.TOWER_UNITS,
+def parse_model_spec(value):
+    """Parse `structure` or `structure+encoder` into a (structure, encoder) pair.
+
+    A bare structure name uses the default encoder. The logistic baseline has
+    no feature encoder by definition, so giving it one is an error rather than
+    a silently ignored option.
+    """
+    structure, _, encoder = value.partition("+")
+    structure = structure.strip()
+    encoder = encoder.strip() or None
+    if structure not in ALL_MODELS:
+        raise ValueError(f"unknown model {structure!r}; available: {ALL_MODELS}")
+    if encoder is None:
+        return structure, None if structure == "logistic" else DEFAULT_ENCODER
+    if structure == "logistic":
+        raise ValueError(
+            "the logistic baseline has no feature encoder; use `logistic` alone"
         )
-    if name == "mmoe":
-        return build_mmoe_model(
-            cat_cols, num_cols, vocab, embed_dim=C.EMBED_DIM,
-            num_experts=C.NUM_EXPERTS, num_tasks=num_tasks,
-            units=C.EXPERT_UNITS, tower_units=C.TOWER_UNITS,
+    if encoder not in available_encoders():
+        raise ValueError(
+            f"unknown encoder {encoder!r}; available: {available_encoders()}"
         )
-    raise ValueError(f"unknown baseline: {name}")
+    return structure, encoder
+
+
+def format_model_spec(spec):
+    """A (structure, encoder) pair back as the label used in reports."""
+    structure, encoder = spec
+    return structure if encoder is None else f"{structure}+{encoder}"
+
+
+def build_multi_task_model(structure, encoder, cat_cols, num_cols, vocab, num_tasks):
+    """Build one encoder-fed structure, plus its two-axis run metadata."""
+    return build_model(
+        encoder=encoder,
+        structure=structure,
+        categorical_cols=cat_cols,
+        numeric_cols=num_cols,
+        cat_vocab_size=vocab,
+        embed_dim=C.EMBED_DIM,
+        num_tasks=num_tasks,
+        **C.STRUCTURE_PARAMS[structure],
+    )
 
 
 def _existing_mmoe_row(run_dir, task_names):
@@ -234,10 +267,7 @@ def write_reports(results, out_dir):
 
 def main():
     args = parse_args()
-    selected = parse_name_list(args.models) or []
-    unknown = sorted(set(selected) - set(ALL_MODELS))
-    if unknown:
-        raise ValueError(f"unknown models: {unknown}")
+    selected = [parse_model_spec(name) for name in (parse_name_list(args.models) or [])]
 
     set_seed(args.seed)
     cat_cols, num_cols, shadow_cols = load_feature_schema()
@@ -270,14 +300,24 @@ def main():
         "models": {},
     }
 
-    for name in selected:
+    for spec in selected:
+        structure, encoder = spec
+        name = format_model_spec(spec)
         started = time.time()
         print(f"Training {name}...")
-        if name == "single_task":
-            result = train_single_task(cat_cols, num_cols, vocab, (train, val, test), args, task_names)
-        else:
-            model = build_baseline(name, cat_cols, num_cols, vocab, len(task_names))
+        if structure == "single_task":
+            result = train_single_task(
+                cat_cols, num_cols, vocab, encoder, (train, val, test), args, task_names
+            )
+        elif structure == "logistic":
+            model = build_logistic_model(cat_cols, num_cols, vocab, num_tasks=len(task_names))
             result = train_multi_output(model, train, val, test, args, task_names)
+        else:
+            model, axes = build_multi_task_model(
+                structure, encoder, cat_cols, num_cols, vocab, len(task_names)
+            )
+            result = train_multi_output(model, train, val, test, args, task_names)
+            result["model"] = axes
         result["train_seconds"] = round(time.time() - started, 1)
         results["models"][name] = result
         print(f"  {name}: {result['tasks']} ({result['train_seconds']}s)")

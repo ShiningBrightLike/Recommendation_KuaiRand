@@ -1,11 +1,8 @@
-"""MMoE (Multi-gate Mixture-of-Experts) multi-task model."""
+"""MMoE (Multi-gate Mixture-of-Experts) multi-task structure."""
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Layer
-from tensorflow.keras.models import Model
 from tensorflow.keras.saving import register_keras_serializable
-
-from models.inputs import build_shared_inputs
 
 
 @register_keras_serializable()
@@ -29,41 +26,30 @@ class MMoE(Layer):
             outputs.append(weighted_output)
         return outputs
 
+    def build(self, input_shape):
+        for expert in self.experts:
+            expert.build(input_shape)
+        for gate in self.gates:
+            gate.build(input_shape)
+        super().build(input_shape)
 
-def build_mmoe_model(
-    categorical_cols,
-    numeric_cols,
-    cat_vocab_size=2500,
-    embed_dim=8,
-    num_experts=8,
-    num_tasks=2,
-    units=64,
-    tower_units=32,
-):
-    """Build the MMoE model with a shared embedding table for categorical inputs.
+
+def build_mmoe_structure(features, num_tasks=2, num_experts=8, units=64, tower_units=32):
+    """MMoE over encoded features: shared experts, one gate and tower per task.
 
     Args:
-        categorical_cols: names of the categorical features (one Input each).
-        numeric_cols: names of the numeric features (one concatenated Input).
-        cat_vocab_size: total vocabulary size across all categorical columns.
-            Pass the value from `pipeline_meta.json` rather than hard-coding it.
+        features: encoded feature representation, `[batch, encoder_output_dim]`.
         num_tasks: number of tasks/outputs.
+        num_experts: number of shared experts.
         units: expert hidden size.
         tower_units: task-tower hidden size.
     """
-    inputs, all_features = build_shared_inputs(
-        categorical_cols, numeric_cols, cat_vocab_size, embed_dim
+    mmoe_outputs = MMoE(units=units, num_experts=num_experts, num_tasks=num_tasks)(
+        features
     )
-
-    mmoe_outputs = MMoE(
-        units=units, num_experts=num_experts, num_tasks=num_tasks
-    )(all_features)
 
     task_outputs = []
     for i, out in enumerate(mmoe_outputs):
         tower = Dense(tower_units, activation="relu")(out)
-        final_out = Dense(1, activation="sigmoid", name=f"output_{i + 1}")(tower)
-        task_outputs.append(final_out)
-
-    return Model(inputs=inputs, outputs=task_outputs)
-
+        task_outputs.append(Dense(1, activation="sigmoid", name=f"output_{i + 1}")(tower))
+    return task_outputs
