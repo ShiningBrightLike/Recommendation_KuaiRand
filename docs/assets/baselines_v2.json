@@ -1,0 +1,754 @@
+{
+  "config": {
+    "seeds": [
+      2025,
+      2026,
+      2027
+    ],
+    "epochs": 30,
+    "batch_size": 1024,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "monitor": "val_auc_mean",
+    "rows": [
+      950310,
+      190802,
+      295497
+    ],
+    "shadow_cols": [
+      "shadow_0"
+    ],
+    "dropped_features": [],
+    "features": {
+      "categorical": 35,
+      "numeric": 59
+    }
+  },
+  "models": {
+    "logistic": {
+      "tasks_mean": {
+        "is_click": 0.7074966828028361,
+        "is_like": 0.7789992491404215,
+        "is_follow": 0.6644274195035299,
+        "is_comment": 0.6234420935312907
+      },
+      "tasks_std": {
+        "is_click": 0.0002495092886024194,
+        "is_like": 0.0015513638721132929,
+        "is_follow": 0.004749378366926819,
+        "is_comment": 0.01466229481775724
+      },
+      "summary": {
+        "mean_all_tasks": 0.6935913612445196,
+        "std_all_tasks": 0.0033086219157148445,
+        "mean_gate_tasks": 0.7432479659716288,
+        "std_gate_tasks": 0.0006544044970684461
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7077085971832275,
+            "is_like": 0.7779738306999207,
+            "is_follow": 0.6671501398086548,
+            "is_comment": 0.606522798538208
+          },
+          "best_epoch": 29,
+          "params": 2765,
+          "seed": 2025,
+          "train_seconds": 83.2
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7075597643852234,
+            "is_like": 0.778239905834198,
+            "is_follow": 0.6671887636184692,
+            "is_comment": 0.6313669681549072
+          },
+          "best_epoch": 22,
+          "params": 2765,
+          "seed": 2026,
+          "train_seconds": 79.4
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7072216868400574,
+            "is_like": 0.780784010887146,
+            "is_follow": 0.6589433550834656,
+            "is_comment": 0.6324365139007568
+          },
+          "best_epoch": 30,
+          "params": 2765,
+          "seed": 2027,
+          "train_seconds": 81.1
+        }
+      },
+      "params": 2765,
+      "model": null,
+      "train_seconds": 243.8
+    },
+    "shared_bottom+mlp": {
+      "tasks_mean": {
+        "is_click": 0.7209481795628866,
+        "is_like": 0.8130437533060709,
+        "is_follow": 0.6788302461306254,
+        "is_comment": 0.6229043404261271
+      },
+      "tasks_std": {
+        "is_click": 0.001079957755595658,
+        "is_like": 0.004533580772939997,
+        "is_follow": 0.011297747265712534,
+        "is_comment": 0.019457098584205915
+      },
+      "summary": {
+        "mean_all_tasks": 0.7089316298564275,
+        "std_all_tasks": 0.007376082119316938,
+        "mean_gate_tasks": 0.7669959664344788,
+        "std_gate_tasks": 0.001747569045703799
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7221803665161133,
+            "is_like": 0.8082175254821777,
+            "is_follow": 0.6793740391731262,
+            "is_comment": 0.6177577972412109
+          },
+          "best_epoch": 12,
+          "params": 53452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "shared_bottom",
+              "hyperparams": {
+                "num_tasks": 4,
+                "bottom_units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 53452
+          },
+          "seed": 2025,
+          "train_seconds": 77.1
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7204982042312622,
+            "is_like": 0.8137007355690002,
+            "is_follow": 0.6898462772369385,
+            "is_comment": 0.6444173455238342
+          },
+          "best_epoch": 15,
+          "params": 53452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "shared_bottom",
+              "hyperparams": {
+                "num_tasks": 4,
+                "bottom_units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 53452
+          },
+          "seed": 2026,
+          "train_seconds": 103.8
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7201659679412842,
+            "is_like": 0.8172129988670349,
+            "is_follow": 0.6672704219818115,
+            "is_comment": 0.6065378785133362
+          },
+          "best_epoch": 16,
+          "params": 53452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "shared_bottom",
+              "hyperparams": {
+                "num_tasks": 4,
+                "bottom_units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 53452
+          },
+          "seed": 2027,
+          "train_seconds": 123.4
+        }
+      },
+      "params": 53452,
+      "model": {
+        "encoder": {
+          "name": "mlp",
+          "output_dim": 64,
+          "params": 21760,
+          "hyperparams": {
+            "hidden": [
+              64
+            ],
+            "activation": "relu"
+          }
+        },
+        "structure": {
+          "name": "shared_bottom",
+          "hyperparams": {
+            "num_tasks": 4,
+            "bottom_units": 64,
+            "tower_units": 32
+          }
+        },
+        "total_params": 53452
+      },
+      "train_seconds": 304.3
+    },
+    "single_task+mlp": {
+      "tasks_mean": {
+        "is_click": 0.7204081217447916,
+        "is_like": 0.812729279200236,
+        "is_follow": 0.685051163037618,
+        "is_comment": 0.6385584274927775
+      },
+      "tasks_std": {
+        "is_click": 0.0012600520719894418,
+        "is_like": 0.0034735620499683146,
+        "is_follow": 0.0312317304649677,
+        "is_comment": 0.01075597840180336
+      },
+      "summary": {
+        "mean_all_tasks": 0.7141867478688558,
+        "std_all_tasks": 0.00947074488925195,
+        "mean_gate_tasks": 0.7665687004725138,
+        "std_gate_tasks": 0.0014825369705873676
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7217633724212646,
+            "is_like": 0.8094407320022583,
+            "is_follow": 0.7109423875808716,
+            "is_comment": 0.6336930990219116
+          },
+          "best_epochs": {
+            "is_click": 11,
+            "is_like": 11,
+            "is_follow": 1,
+            "is_comment": 1
+          },
+          "params": 188452,
+          "seed": 2025,
+          "train_seconds": 224.4
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7201889753341675,
+            "is_like": 0.816362202167511,
+            "is_follow": 0.6938461661338806,
+            "is_comment": 0.6508874297142029
+          },
+          "best_epochs": {
+            "is_click": 16,
+            "is_like": 11,
+            "is_follow": 1,
+            "is_comment": 1
+          },
+          "params": 188452,
+          "seed": 2026,
+          "train_seconds": 248.2
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7192720174789429,
+            "is_like": 0.8123849034309387,
+            "is_follow": 0.6503649353981018,
+            "is_comment": 0.631094753742218
+          },
+          "best_epochs": {
+            "is_click": 9,
+            "is_like": 14,
+            "is_follow": 2,
+            "is_comment": 2
+          },
+          "params": 188452,
+          "seed": 2027,
+          "train_seconds": 192.9
+        }
+      },
+      "params": 188452,
+      "model": null,
+      "train_seconds": 665.5
+    },
+    "mmoe+mlp": {
+      "tasks_mean": {
+        "is_click": 0.720534086227417,
+        "is_like": 0.8092761437098185,
+        "is_follow": 0.6855368812878927,
+        "is_comment": 0.6374818881352743
+      },
+      "tasks_std": {
+        "is_click": 0.002194266351541414,
+        "is_like": 0.004179645384293904,
+        "is_follow": 0.02470988156013085,
+        "is_comment": 0.02293857155556877
+      },
+      "summary": {
+        "mean_all_tasks": 0.7132072498401006,
+        "std_all_tasks": 0.0063807341083842485,
+        "mean_gate_tasks": 0.7649051149686178,
+        "std_gate_tasks": 0.0014378161326464914
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7224003076553345,
+            "is_like": 0.8044540882110596,
+            "is_follow": 0.7136760950088501,
+            "is_comment": 0.622096836566925
+          },
+          "best_epoch": 10,
+          "params": 84652,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 84652
+          },
+          "seed": 2025,
+          "train_seconds": 143.9
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7210851311683655,
+            "is_like": 0.8115131855010986,
+            "is_follow": 0.6755558848381042,
+            "is_comment": 0.6638466715812683
+          },
+          "best_epoch": 19,
+          "params": 84652,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 84652
+          },
+          "seed": 2026,
+          "train_seconds": 230.9
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.718116819858551,
+            "is_like": 0.8118611574172974,
+            "is_follow": 0.6673786640167236,
+            "is_comment": 0.6265021562576294
+          },
+          "best_epoch": 14,
+          "params": 84652,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 84652
+          },
+          "seed": 2027,
+          "train_seconds": 185.1
+        }
+      },
+      "params": 84652,
+      "model": {
+        "encoder": {
+          "name": "mlp",
+          "output_dim": 64,
+          "params": 21760,
+          "hyperparams": {
+            "hidden": [
+              64
+            ],
+            "activation": "relu"
+          }
+        },
+        "structure": {
+          "name": "mmoe",
+          "hyperparams": {
+            "num_tasks": 4,
+            "num_experts": 8,
+            "units": 64,
+            "tower_units": 32
+          }
+        },
+        "total_params": 84652
+      },
+      "train_seconds": 559.9
+    },
+    "mmoe+dcn": {
+      "tasks_mean": {
+        "is_click": 0.7228575348854065,
+        "is_like": 0.8099614580472311,
+        "is_follow": 0.670657734076182,
+        "is_comment": 0.6270797252655029
+      },
+      "tasks_std": {
+        "is_click": 0.0016596450514940954,
+        "is_like": 0.005901225247993753,
+        "is_follow": 0.03956220464024144,
+        "is_comment": 0.01710460851836975
+      },
+      "summary": {
+        "mean_all_tasks": 0.7076391130685806,
+        "std_all_tasks": 0.014235257394063073,
+        "mean_gate_tasks": 0.7664094964663187,
+        "std_gate_tasks": 0.002325829386532379
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7247737646102905,
+            "is_like": 0.8044681549072266,
+            "is_follow": 0.6868318319320679,
+            "is_comment": 0.6207758784294128
+          },
+          "best_epoch": 8,
+          "params": 356530,
+          "model": {
+            "encoder": {
+              "name": "dcn",
+              "output_dim": 403,
+              "params": 109222,
+              "hyperparams": {
+                "num_cross_layers": 2,
+                "rank": 64,
+                "deep_units": 64
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 356530
+          },
+          "seed": 2025,
+          "train_seconds": 207.9
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7218777537345886,
+            "is_like": 0.8161998391151428,
+            "is_follow": 0.6995702385902405,
+            "is_comment": 0.646441638469696
+          },
+          "best_epoch": 6,
+          "params": 356530,
+          "model": {
+            "encoder": {
+              "name": "dcn",
+              "output_dim": 403,
+              "params": 109222,
+              "hyperparams": {
+                "num_cross_layers": 2,
+                "rank": 64,
+                "deep_units": 64
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 356530
+          },
+          "seed": 2026,
+          "train_seconds": 179.8
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7219210863113403,
+            "is_like": 0.8092163801193237,
+            "is_follow": 0.6255711317062378,
+            "is_comment": 0.6140216588973999
+          },
+          "best_epoch": 8,
+          "params": 356530,
+          "model": {
+            "encoder": {
+              "name": "dcn",
+              "output_dim": 403,
+              "params": 109222,
+              "hyperparams": {
+                "num_cross_layers": 2,
+                "rank": 64,
+                "deep_units": 64
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 356530
+          },
+          "seed": 2027,
+          "train_seconds": 214.1
+        }
+      },
+      "params": 356530,
+      "model": {
+        "encoder": {
+          "name": "dcn",
+          "output_dim": 403,
+          "params": 109222,
+          "hyperparams": {
+            "num_cross_layers": 2,
+            "rank": 64,
+            "deep_units": 64
+          }
+        },
+        "structure": {
+          "name": "mmoe",
+          "hyperparams": {
+            "num_tasks": 4,
+            "num_experts": 8,
+            "units": 64,
+            "tower_units": 32
+          }
+        },
+        "total_params": 356530
+      },
+      "train_seconds": 601.8
+    },
+    "mmoe+senet": {
+      "tasks_mean": {
+        "is_click": 0.7242260972658793,
+        "is_like": 0.8148057063420614,
+        "is_follow": 0.6804559628168741,
+        "is_comment": 0.64851047595342
+      },
+      "tasks_std": {
+        "is_click": 0.0021898227598913305,
+        "is_like": 0.005680839001971617,
+        "is_follow": 0.013169259698375298,
+        "is_comment": 0.014331311261906746
+      },
+      "summary": {
+        "mean_all_tasks": 0.7169995605945587,
+        "std_all_tasks": 0.0076682368956450045,
+        "mean_gate_tasks": 0.7695159018039703,
+        "std_gate_tasks": 0.002482151041073105
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7264761924743652,
+            "is_like": 0.8092981576919556,
+            "is_follow": 0.6756091117858887,
+            "is_comment": 0.6341807842254639
+          },
+          "best_epoch": 14,
+          "params": 221469,
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2025,
+          "train_seconds": 379.6
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7241001129150391,
+            "is_like": 0.820645272731781,
+            "is_follow": 0.6953617930412292,
+            "is_comment": 0.6628434062004089
+          },
+          "best_epoch": 12,
+          "params": 221469,
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2026,
+          "train_seconds": 341.8
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7221019864082336,
+            "is_like": 0.8144736886024475,
+            "is_follow": 0.6703969836235046,
+            "is_comment": 0.6485072374343872
+          },
+          "best_epoch": 14,
+          "params": 221469,
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2027,
+          "train_seconds": 391.8
+        }
+      },
+      "params": 221469,
+      "model": {
+        "encoder": {
+          "name": "senet",
+          "output_dim": 339,
+          "params": 8977,
+          "hyperparams": {
+            "reduction": 2
+          }
+        },
+        "structure": {
+          "name": "mmoe",
+          "hyperparams": {
+            "num_tasks": 4,
+            "num_experts": 8,
+            "units": 64,
+            "tower_units": 32
+          }
+        },
+        "total_params": 221469
+      },
+      "train_seconds": 1113.3
+    }
+  }
+}

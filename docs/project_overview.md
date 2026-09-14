@@ -52,12 +52,43 @@
 输出：is_click / is_like / is_follow / is_comment
 ```
 
-核心实现位于 `models/` 包（输入分支与各多任务结构分文件存放）：
+自 ADR-0005 起，模型被拆成两条**正交的轴**：先过特征编码器，再进多任务结构。核心实现位于 `models/` 包：
 
-- 自 ADR-0005 起，共享输入之后先经过**可插拔的特征编码器**（默认 `mlp`，一层 `Dense(64, ReLU)`；`dcn`，DCN-v2 低秩交叉 2 层 + 深层分支；`senet`，按特征域 squeeze-excite 重加权），再进入多任务结构；两轴通过 `--encoder` / `--mtl` 选择，并写入每个 run 的指标产物；
-- `MMoE` 自定义 Layer：`num_experts=8`，每个任务独立 gate（softmax 加权组合专家输出）；
-- `build_model()`：所有类别特征共享同一个 Embedding 层，数值特征直接拼接后交给特征编码器；
-- 每任务 tower：`Dense(32, ReLU) → Dense(1, sigmoid)`。
+```
+models/
+├── builders.py           # build_model()：组装两条轴，并产出 run 元数据
+├── registry.py           # 结构/基线的名称表 + 需要 custom_objects 的自定义层
+├── inputs.py             # 共享输入分支 + FeatureLayout（拼接向量的字段划分）
+├── encoders/             # 特征编码器轴
+│   ├── base.py           #   FeatureEncoder：稠密张量进出、声明 output_dim、配置序列化
+│   ├── mlp.py            #   Dense(64, ReLU)，默认编码器
+│   ├── dcn.py            #   DCN-v2：低秩交叉 2 层（rank 64）∥ 深层分支（64）
+│   └── senet.py          #   按特征域 squeeze-excite（reduction 2）
+└── mtl/                  # 多任务结构轴
+    ├── mmoe.py           #   MMoE：8 个专家 + 每任务 softmax gate
+    ├── shared_bottom.py  #   共享底层：一个主干 + 每任务塔
+    ├── single_task.py    #   单任务：每任务各自一份编码器与塔
+    └── logistic.py       #   逻辑回归：每个特征一个权重，按定义不接受编码器
+```
+
+两条轴的取值（两轴都可写进 `metrics.json` 的 `model` 块，可追溯到具体组合）：
+
+| 轴 | 取值 | 说明 |
+| --- | --- | --- |
+| 特征编码器 `--encoder` | `mlp`（默认）、`dcn`、`senet` | 把拼接后的特征向量（35 个类别域 × 8 + 58 个数值域 = 338 维）变换成多任务结构的输入 |
+| 多任务结构 `--mtl` | `mmoe`（默认）、`shared_bottom` | 决定任务之间如何共享与分化；`single_task`、`logistic` 是只在 `baselines.py` 出现的对照基线 |
+
+编码器规格与参数量（默认 schema：35 类别 + 58 数值，无影子特征）：
+
+| 编码器 | 形态 | 输出宽度 | 编码器参数 |
+| --- | --- | --- | --- |
+| `mlp` | 一层 `Dense(64, ReLU)` | 64 | 21,696 |
+| `senet` | 按 93 个特征域 squeeze-excite，输出保持输入宽度 | 338 | 8,695 |
+| `dcn` | DCN-v2 低秩矩阵交叉 2 层（rank 64）∥ 深层分支 `Dense(64)` | 402 | 108,900 |
+
+- 每个编码器都是自定义 Layer：统一「稠密张量进、稠密张量出」，自带默认超参（模块级 `DEFAULTS`，可用 `encoder_overrides` 覆盖），实现 `get_config`/`build` 并注册；`models.custom_objects()` 是保存后重新加载的唯一入口。
+- 低秩交叉层 `x' = x0 ⊙ (x V Uᵀ + b) + x`，`U`、`V` 各为 `dim × rank`，从不物化 `dim × dim` 矩阵，因此开销随 rank 而非输入宽度增长。
+- 所有类别特征共享同一个 Embedding 层（`embed_dim=8`），数值特征直接拼接后交给编码器；`MMoE` 层为 `num_experts=8`，每任务一个 softmax gate，塔为 `Dense(32, ReLU) → Dense(1, sigmoid)`。
 
 ### 2.3 训练配置（`main.py`）
 
@@ -70,10 +101,10 @@
 | Batch size | 1024 |
 | Epochs | 30（早停生效时提前结束） |
 | 早停 | `monitor=val_auc_mean`（门控任务平均验证 AUC，见 ADR-0003），`patience=5`，`restore_best_weights=True` |
-| 随机种子 | 2025（可通过 `--seed` 覆盖） |
+| 随机种子 | 2025（`main.py --seed` 覆盖；`baselines.py --seeds 2025,2026,2027` 可多值重跑并汇总 mean±std） |
 | 验证集 | 训练日志尾部按时间切分（4/16–4/21，约 19.1 万行，行数见 `pipeline_meta.json`） |
 | 测试集 | 仅最终评估一次（4/22–5/08，29.5 万行） |
-| 运行产物 | `saved/runs/<tag>_<时间戳>/`：`model.keras` + `metrics.json` + `curves.png` + `training.log` |
+| 运行产物 | `saved/runs/<tag>_<时间戳>/`：`model.keras` + `metrics.json` + `curves.png` + `training.log`；`metrics.json` 的 `model` 块记录两轴名称、生效超参与编码器参数量 |
 
 损失权重体现了对标签稀疏度的先验调整：点击/点赞样本充足给满权重，关注、评论更稀疏给低权重。
 
@@ -227,6 +258,8 @@ python -m models
 
 完整逐 epoch 历史与配置见 `docs/assets/baseline_v1_metrics.json`；训练曲线图见 `docs/assets/baseline_v1_curves.png`（已在 README 展示）。
 
+> ⚠️ 本节与 7.4 的数字都来自**旧默认模型**（共享输入直接进 MMoE，没有特征编码器）。ADR-0005 把默认模型改成「特征编码器 → 多任务结构」之后，这些数字不再是可复现基线；新结果见 7.5。
+
 ### 7.2 旧协议历史结果（仅参考）
 
 > ⚠️ 旧协议直接使用 4/22–5/08 测试集做早停，成绩偏乐观；下表仅作历史记录。
@@ -269,6 +302,30 @@ Top 5 特征：`tab`（0.0612）、`onehot_feat3`（0.0316）、`valid_play_user
 | MMoE | 0.7225 | 0.8104 | 0.6869 | 0.6375 | 0.7143 |
 
 结论（门控任务早停口径）：单任务领先，MMoE 优于 Shared-Bottom 但未超过单任务，多任务结构价值待 PLE-CGC 对照。统计特征审计显示去掉 51 列全期统计特征后四任务均值下降 0.0214，point-in-time 重算列为后续必做项。结果与审计报告见 `docs/assets/baselines_v1.md`、`docs/leakage_audit.md`。
+
+### 7.5 对照模型 v2（新默认模型 × 3 seed，2026-09-15）
+
+ADR-0005 落地后默认模型变为「特征编码器 `mlp` → MMoE」，本节在同一协议下重刷：seeds 2025/2026/2027、`val_auc_mean` 早停、测试集每配置只评估一次，数字为 3 个 seed 的 mean±样本标准差（ddof=1）。
+
+| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) |
+| --- | --- | --- | --- | --- | --- | --- |
+| logistic | 0.7075±0.0002 | 0.7790±0.0016 | 0.6644±0.0047 | 0.6234±0.0147 | 0.6936±0.0033 | 0.7432±0.0007 |
+| shared_bottom+mlp | 0.7209±0.0011 | 0.8130±0.0045 | 0.6788±0.0113 | 0.6229±0.0195 | 0.7089±0.0074 | 0.7670±0.0017 |
+| single_task+mlp | 0.7204±0.0013 | 0.8127±0.0035 | 0.6851±0.0312 | 0.6386±0.0108 | 0.7142±0.0095 | 0.7666±0.0015 |
+| mmoe+mlp（默认） | 0.7205±0.0022 | 0.8093±0.0042 | 0.6855±0.0247 | 0.6375±0.0229 | 0.7132±0.0064 | 0.7649±0.0014 |
+| mmoe+dcn | 0.7229±0.0017 | 0.8100±0.0059 | 0.6707±0.0396 | 0.6271±0.0171 | 0.7076±0.0142 | 0.7664±0.0023 |
+| mmoe+senet | 0.7242±0.0022 | 0.8148±0.0057 | 0.6805±0.0132 | 0.6485±0.0143 | 0.7170±0.0077 | 0.7695±0.0025 |
+
+![对照模型 v2](assets/baselines_v2.png)
+
+结论（以门控任务口径为准，信号任务为点击/点赞）：
+
+- `mmoe+senet` 在两个口径上都最好，但相对默认 `mmoe+mlp` 的领先（+0.0038 四任务均值 / +0.0046 门控均值）**尚未超出种子噪声**（±0.0064～±0.0077），需要更多 seed 才能定论。
+- `mmoe+dcn` 在三种 MMoE 编码器里最差且方差最大（0.7076±0.0142），而编码器参数是 `mlp` 的 5 倍——低秩交叉在这份特征集上没有换来收益。
+- 所有非 logistic 模型的差异都在种子噪声量级内，多任务结构之间没有明显赢家；`senet` 是最有希望的方向，`dcn` 是性价比最低的方向。
+- 与 v1（单 seed、旧默认模型）**不可直接比较**；v1 的「单任务领先」结论在多种子下被弱化为「无显著差异」。
+
+完整数据：[baselines_v2.md](assets/baselines_v2.md)、[baselines_v2.json](assets/baselines_v2.json)（含每个 seed 的逐任务 AUC、best epoch 与耗时）。
 
 ---
 
