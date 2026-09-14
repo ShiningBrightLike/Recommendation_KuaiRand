@@ -16,7 +16,7 @@ from models.mtl.logistic import build_logistic_model
 from models.mtl.mmoe import MMoE, build_mmoe_model
 from models.mtl.shared_bottom import build_shared_bottom_model
 from models.mtl.single_task import build_single_task_model
-from models.registry import available_models, create_model
+from models.registry import available_models, create_model, custom_objects
 
 __all__ = [
     "MMoE",
@@ -26,4 +26,5 @@ __all__ = [
     "build_shared_bottom_model",
     "build_single_task_model",
     "create_model",
+    "custom_objects",
 ]

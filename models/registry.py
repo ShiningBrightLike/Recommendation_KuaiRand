@@ -6,7 +6,7 @@ arguments that the selected model needs.
 """
 
 from models.mtl.logistic import build_logistic_model
-from models.mtl.mmoe import build_mmoe_model
+from models.mtl.mmoe import MMoE, build_mmoe_model
 from models.mtl.shared_bottom import build_shared_bottom_model
 from models.mtl.single_task import build_single_task_model
 
@@ -17,10 +17,21 @@ BUILDERS = {
     "logistic": build_logistic_model,
 }
 
+# Custom layers that `keras.models.load_model` must be told about when a saved
+# run is reloaded outside this package.
+CUSTOM_LAYERS = {
+    "MMoE": MMoE,
+}
+
 
 def available_models():
     """Registered model names, sorted."""
     return sorted(BUILDERS)
+
+
+def custom_objects():
+    """Objects to pass to `load_model` when reloading a saved run."""
+    return dict(CUSTOM_LAYERS)
 
 
 def create_model(name, **kwargs):
@@ -32,4 +43,3 @@ def create_model(name, **kwargs):
             f"unknown model {name!r}; available: {available_models()}"
         ) from None
     return builder(**kwargs)
-

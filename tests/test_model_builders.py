@@ -5,8 +5,11 @@ Run from the repo root inside env_tf:
 """
 
 import unittest
+import tempfile
+from pathlib import Path
 
 import numpy as np
+import tensorflow as tf
 
 from models import (
     available_models,
@@ -15,6 +18,7 @@ from models import (
     build_shared_bottom_model,
     build_single_task_model,
     create_model,
+    custom_objects,
 )
 
 CAT_COLS = ["cat_a", "cat_b"]
@@ -95,6 +99,27 @@ class RegistryTest(unittest.TestCase):
                 numeric_cols=NUM_COLS,
                 cat_vocab_size=VOCAB,
             )
+
+
+class SerializationTest(unittest.TestCase):
+    """A saved run must reload through the package's own load entry point."""
+
+    def test_saved_model_reloads_and_predicts_identically(self):
+        model = build_mmoe_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=2)
+        inputs = make_inputs()
+        expected = model.predict(inputs, verbose=0)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            model_path = Path(tmp_dir) / "model.keras"
+            model.save(model_path)
+            restored = tf.keras.models.load_model(
+                str(model_path), custom_objects=custom_objects()
+            )
+
+        actual = restored.predict(inputs, verbose=0)
+        self.assertEqual(len(actual), len(expected))
+        for restored_pred, original_pred in zip(actual, expected):
+            np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
 
 
 if __name__ == "__main__":

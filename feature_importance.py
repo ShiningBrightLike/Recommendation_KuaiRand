@@ -42,7 +42,7 @@ import tensorflow as tf
 
 import config as C
 from data_loading import load_feature_schema, load_split, parse_name_list
-from models import MMoE
+from models import custom_objects
 
 SHADOW_PREFIX = "shadow_"
 
@@ -511,7 +511,7 @@ def main():
     print(f"Loaded {n_rows:,} rows; analyzing {len(specs)} features × {args.repeats} repeats")
 
     model = tf.keras.models.load_model(
-        str(args.model), custom_objects={"MMoE": MMoE}
+        str(args.model), custom_objects=custom_objects()
     )
     if len(model.inputs) != len(cat_cols) + 1:
         raise ValueError(
