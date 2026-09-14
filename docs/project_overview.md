@@ -52,7 +52,7 @@
 输出：is_click / is_like / is_follow / is_comment
 ```
 
-核心实现位于 `MMoE_model.py`：
+核心实现位于 `models/` 包（输入分支与各多任务结构分文件存放）：
 
 - `MMoE` 自定义 Layer：`num_experts=8`，每个任务独立 gate（softmax 加权组合专家输出）；
 - `build_mmoe_model()`：所有类别特征共享同一个 Embedding 层，数值特征直接拼接；
@@ -150,7 +150,7 @@ Recommendation_KuaiRand/
 ├── data_loading.py                    # 共享数据加载与 pipeline schema 解析
 ├── data_process.py                    # 数据预处理脚本
 ├── feature_importance.py              # 置换重要度（特征优选）模块
-├── MMoE_model.py                      # MMoE 网络模型定义
+├── models/                            # 模型定义（输入分支 + 多任务结构按文件拆分）
 ├── main.py                            # 模型训练与评估
 ├── requirements.txt                   # 锁版本依赖（env_tf）
 ├── tests/                             # 单元测试（env_tf 下 unittest 运行）
@@ -203,7 +203,7 @@ python main.py --smoke
 python main.py
 
 # 4. 模型结构轻量自检（随机输入，不需要数据文件）
-python MMoE_model.py
+python -m models
 ```
 
 正式训练产物自动写入 `KuaiRand-Pure/saved/runs/<tag>_<时间戳>/`：`model.keras`、`metrics.json`（含种子、超参、正样本占比、逐 epoch history 与测试集指标）、`curves.png`、`training.log`。常用覆盖参数：`--seed`、`--epochs`、`--batch-size`、`--patience`、`--tag`、`--monitor`（默认 `val_auc_mean`，见 ADR-0003）；`--drop-features` / `--drop-stat-features` 用于特征子集对照。

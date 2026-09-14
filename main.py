@@ -37,7 +37,7 @@ from data_loading import (
     parse_name_list,
     video_statistic_cols,
 )
-from MMoE_model import build_mmoe_model
+from models import build_mmoe_model
 
 
 def parse_args():

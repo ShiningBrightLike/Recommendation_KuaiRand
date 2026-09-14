@@ -22,7 +22,7 @@ Recommendation\_KuaiRand/
 │       └── runs/                              # 每次训练一个子目录
 ├── data_process.py                        # 数据预处理脚本
 ├── main.py                                # 模型训练评估
-├── MMoE_model.py                          # MMoE网络模型
+├── models/                                # 模型定义（共享输入分支 + 多任务结构）
 ├── config.py                              # 特征清单与超参数唯一配置源
 ├── requirements.txt                       # 锁版本依赖清单
 └── README.md

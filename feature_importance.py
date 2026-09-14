@@ -42,7 +42,7 @@ import tensorflow as tf
 
 import config as C
 from data_loading import load_feature_schema, load_split, parse_name_list
-from MMoE_model import MMoE
+from models import MMoE
 
 SHADOW_PREFIX = "shadow_"
 

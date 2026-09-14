@@ -8,11 +8,13 @@ import unittest
 
 import numpy as np
 
-from MMoE_model import (
+from models import (
+    available_models,
     build_logistic_model,
     build_mmoe_model,
     build_shared_bottom_model,
     build_single_task_model,
+    create_model,
 )
 
 CAT_COLS = ["cat_a", "cat_b"]
@@ -56,6 +58,43 @@ class BuilderShapeTest(unittest.TestCase):
         self._assert_multi_output(model, 4)
         # Embedding(VOCAB, 1) + 4 tasks x (4 weights + 1 bias)
         self.assertEqual(model.count_params(), VOCAB + 4 * (len(CAT_COLS) + len(NUM_COLS) + 1))
+
+
+REGISTRY_KWARGS = {
+    "mmoe": {"num_tasks": 4, "num_experts": 2, "units": 8, "tower_units": 4},
+    "shared_bottom": {"num_tasks": 4, "bottom_units": 8, "tower_units": 4},
+    "single_task": {"units": 8, "tower_units": 4},
+    "logistic": {"num_tasks": 4},
+}
+REGISTRY_OUTPUTS = {"mmoe": 4, "shared_bottom": 4, "single_task": 1, "logistic": 4}
+
+
+class RegistryTest(unittest.TestCase):
+    def test_registry_lists_the_documented_models(self):
+        self.assertEqual(
+            available_models(), ["logistic", "mmoe", "shared_bottom", "single_task"]
+        )
+
+    def test_create_model_dispatches_by_name(self):
+        for name, expected_outputs in REGISTRY_OUTPUTS.items():
+            with self.subTest(model=name):
+                model = create_model(
+                    name,
+                    categorical_cols=CAT_COLS,
+                    numeric_cols=NUM_COLS,
+                    cat_vocab_size=VOCAB,
+                    **REGISTRY_KWARGS[name],
+                )
+                self.assertEqual(len(model.outputs), expected_outputs)
+
+    def test_create_model_rejects_unknown_names(self):
+        with self.assertRaises(ValueError):
+            create_model(
+                "no_such_model",
+                categorical_cols=CAT_COLS,
+                numeric_cols=NUM_COLS,
+                cat_vocab_size=VOCAB,
+            )
 
 
 if __name__ == "__main__":

@@ -33,14 +33,15 @@ from data_loading import (
     video_statistic_cols,
 )
 from main import MeanValAUC, set_seed
-from MMoE_model import (
+from models import (
+    available_models,
     build_logistic_model,
     build_mmoe_model,
     build_shared_bottom_model,
     build_single_task_model,
 )
 
-ALL_MODELS = ("logistic", "shared_bottom", "single_task", "mmoe")
+ALL_MODELS = tuple(available_models())
 
 
 def parse_args():
