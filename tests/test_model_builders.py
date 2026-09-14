@@ -4,8 +4,8 @@ Run from the repo root inside env_tf:
     python -m unittest discover -s tests
 """
 
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
 
 import numpy as np

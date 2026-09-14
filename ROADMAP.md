@@ -18,7 +18,7 @@
 
 | 维度 | 现状 | 缺口 |
 | --- | --- | --- |
-| 精排模型 | MMoE 四任务基线（`MMoE_model.py`） | 缺对照模型（Shared-Bottom / PLE-CGC / DCN-v2 / FM）、缺序列建模（DIN） |
+| 精排模型 | MMoE 四任务基线（`models/`） | 缺对照模型（PLE-CGC / DCN-v2 / FM 可插拔编码器）、缺序列建模（DIN） |
 | 训练协议 | train/val/test 时间切分、固定 seed、早停只看 val | 缺多种子重复与方差报告、缺超参搜索、缺损失/采样策略实验 |
 | 特征迭代 | 置换重要度 + 影子特征噪声对照（`feature_importance.py`） | ADR-0002 的“确认阶段（同种子重训对比）”未实现；特征无版本指纹 |
 | 评估指标 | 每任务 AUC | 缺排序指标（GAUC / NDCG@K / Recall@K / MAP）、缺概率校准（ECE）、缺分片评估 |
