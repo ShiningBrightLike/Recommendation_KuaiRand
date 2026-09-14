@@ -157,6 +157,56 @@ class FeatureEncoderAxisTest(unittest.TestCase):
         self.assertEqual(axes["structure"]["hyperparams"]["num_experts"], 2)
         self.assertEqual(axes["total_params"], model.count_params())
 
+    def test_dcn_encoder_concatenates_low_rank_cross_and_deep(self):
+        """DCN-v2: `num_cross_layers` low-rank crosses in parallel with a deep branch.
+
+        Input width is 2 categorical x 8 embedding dims + 2 numeric = 18.
+        Parameters: cross layers 2 x (2 x 18 x 64 for U,V + 18 for the bias)
+        = 4644, deep branch 18 x 64 + 64 = 1216, so 5860 in total; the output is
+        the cross output (18) concatenated with the deep branch (64).
+        """
+        model, axes = build_model(
+            encoder="dcn",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+        )
+
+        assert_multi_output(self, model, 4)
+        self.assertEqual(axes["encoder"]["name"], "dcn")
+        self.assertEqual(
+            axes["encoder"]["hyperparams"],
+            {"num_cross_layers": 2, "rank": 64, "deep_units": 64},
+        )
+        self.assertEqual(axes["encoder"]["output_dim"], 18 + 64)
+        self.assertEqual(axes["encoder"]["params"], 5860)
+
+    def test_encoder_overrides_replace_the_module_defaults(self):
+        model, axes = build_model(
+            encoder="dcn",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=4,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+            encoder_overrides={"num_cross_layers": 1, "rank": 8, "deep_units": 32},
+        )
+
+        assert_multi_output(self, model, 4)
+        self.assertEqual(axes["encoder"]["hyperparams"]["num_cross_layers"], 1)
+        self.assertEqual(axes["encoder"]["hyperparams"]["rank"], 8)
+        # 1 x (2 x 18 x 8 + 18) cross layer + (18 x 32 + 32) deep branch
+        self.assertEqual(axes["encoder"]["params"], 306 + 608)
+        self.assertEqual(axes["encoder"]["output_dim"], 18 + 32)
+
 
 class RegistryTest(unittest.TestCase):
     def test_registry_lists_the_documented_models(self):
@@ -189,8 +239,7 @@ class RegistryTest(unittest.TestCase):
 class SerializationTest(unittest.TestCase):
     """A saved run must reload through the package's own load entry point."""
 
-    def test_saved_model_reloads_and_predicts_identically(self):
-        model = build_small_mmoe_model()
+    def assert_reloads_identically(self, model):
         inputs = make_inputs()
         expected = model.predict(inputs, verbose=0)
 
@@ -205,6 +254,24 @@ class SerializationTest(unittest.TestCase):
         self.assertEqual(len(actual), len(expected))
         for restored_pred, original_pred in zip(actual, expected):
             np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
+
+    def test_saved_model_reloads_and_predicts_identically(self):
+        self.assert_reloads_identically(build_small_mmoe_model())
+
+    def test_dcn_encoder_model_reloads_and_predicts_identically(self):
+        model, _ = build_model(
+            encoder="dcn",
+            structure="mmoe",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=2,
+            num_experts=2,
+            units=8,
+            tower_units=4,
+            encoder_overrides={"num_cross_layers": 1, "rank": 4, "deep_units": 8},
+        )
+        self.assert_reloads_identically(model)
 
     def test_saved_model_reloads_and_predicts_in_a_fresh_process(self):
         model = build_small_mmoe_model()

@@ -73,6 +73,14 @@ training.log     # 训练日志
 
 快速自检可运行 `python main.py --smoke`（每份数据最多取 2048 行、只跑 1 个 epoch）。
 
+模型由两条独立的轴组成（ADR-0005）：特征编码器 `--encoder`（默认 `mlp`，可选 `dcn`）与多任务结构 `--mtl`（默认 `mmoe`，可选 `shared_bottom`）。两者都会写进每个 run 的 `metrics.json`：
+
+```bash
+python main.py --encoder dcn                        # DCN-v2 编码器 + MMoE（默认结构）
+python main.py --mtl shared_bottom --encoder mlp    # 共享底层结构
+python baselines.py --models "mmoe+mlp,mmoe+dcn"    # 对照表：同一结构下的两种编码器
+```
+
 ---
 
 ## 📈 运行效果（Baseline v1，2026-09-07）

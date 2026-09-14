@@ -1,9 +1,11 @@
 """Feature encoders — the swappable feature-representation axis."""
 
 from models.encoders.base import FeatureEncoder
+from models.encoders.dcn import DCNEncoder
 from models.encoders.mlp import MLPEncoder
 
 ENCODERS = {
+    "dcn": DCNEncoder,
     "mlp": MLPEncoder,
 }
 
@@ -40,6 +42,7 @@ def encoder_hyperparams(encoder):
 
 
 __all__ = [
+    "DCNEncoder",
     "DEFAULT_ENCODER",
     "ENCODERS",
     "FeatureEncoder",

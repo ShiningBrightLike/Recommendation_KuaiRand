@@ -54,7 +54,7 @@
 
 核心实现位于 `models/` 包（输入分支与各多任务结构分文件存放）：
 
-- 自 ADR-0005 起，共享输入之后先经过**可插拔的特征编码器**（默认 `mlp`，一层 `Dense(64, ReLU)`），再进入多任务结构；两轴通过 `--encoder` / `--mtl` 选择，并写入每个 run 的指标产物；
+- 自 ADR-0005 起，共享输入之后先经过**可插拔的特征编码器**（默认 `mlp`，一层 `Dense(64, ReLU)`；可选 `dcn`，DCN-v2 低秩交叉 2 层 + 深层分支），再进入多任务结构；两轴通过 `--encoder` / `--mtl` 选择，并写入每个 run 的指标产物；
 - `MMoE` 自定义 Layer：`num_experts=8`，每个任务独立 gate（softmax 加权组合专家输出）；
 - `build_model()`：所有类别特征共享同一个 Embedding 层，数值特征直接拼接后交给特征编码器；
 - 每任务 tower：`Dense(32, ReLU) → Dense(1, sigmoid)`。

@@ -8,7 +8,7 @@ import unittest
 
 import config as C
 from baselines import format_model_spec, parse_model_spec
-from models import available_structures
+from models import available_encoders, available_structures
 
 
 class ParseModelSpecTest(unittest.TestCase):
@@ -42,6 +42,11 @@ class ParseModelSpecTest(unittest.TestCase):
             format_model_spec(parse_model_spec("shared_bottom+mlp")), "shared_bottom+mlp"
         )
         self.assertEqual(format_model_spec(parse_model_spec("logistic")), "logistic")
+
+    def test_every_registered_encoder_can_be_compared(self):
+        for encoder in available_encoders():
+            with self.subTest(encoder=encoder):
+                self.assertEqual(parse_model_spec(f"mmoe+{encoder}"), ("mmoe", encoder))
 
 
 class StructureParamsCoverageTest(unittest.TestCase):

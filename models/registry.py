@@ -6,7 +6,8 @@ own map in `models.encoders`; this module covers everything downstream of them.
 
 import inspect
 
-from models.encoders import MLPEncoder
+from models.encoders import DCNEncoder, MLPEncoder
+from models.encoders.dcn import LowRankCrossLayer
 from models.mtl.logistic import build_logistic_model
 from models.mtl.mmoe import MMoE, build_mmoe_structure
 from models.mtl.shared_bottom import build_shared_bottom_structure
@@ -31,6 +32,8 @@ BASELINES = {
 # Custom layers `keras.models.load_model` must be told about when a saved run
 # is reloaded outside this package.
 CUSTOM_LAYERS = {
+    "DCNEncoder": DCNEncoder,
+    "LowRankCrossLayer": LowRankCrossLayer,
     "MMoE": MMoE,
     "MLPEncoder": MLPEncoder,
 }
