@@ -6,7 +6,9 @@ Run from the repo root inside env_tf:
 
 import unittest
 
+import config as C
 from baselines import format_model_spec, parse_model_spec
+from models import available_structures
 
 
 class ParseModelSpecTest(unittest.TestCase):
@@ -40,6 +42,14 @@ class ParseModelSpecTest(unittest.TestCase):
             format_model_spec(parse_model_spec("shared_bottom+mlp")), "shared_bottom+mlp"
         )
         self.assertEqual(format_model_spec(parse_model_spec("logistic")), "logistic")
+
+
+class StructureParamsCoverageTest(unittest.TestCase):
+    """Every structure must have hyper-parameters in config, or runs break late."""
+
+    def test_every_structure_has_config_params(self):
+        missing = [name for name in available_structures() if name not in C.STRUCTURE_PARAMS]
+        self.assertEqual(missing, [], f"structures missing config.STRUCTURE_PARAMS: {missing}")
 
 
 if __name__ == "__main__":
