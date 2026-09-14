@@ -4,6 +4,8 @@ Run from the repo root inside env_tf:
     python -m unittest discover -s tests
 """
 
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -25,6 +27,23 @@ CAT_COLS = ["cat_a", "cat_b"]
 NUM_COLS = ["num_a", "num_b"]
 VOCAB = 20
 BATCH = 4
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+# Runs in a fresh interpreter: reloads the saved run and re-predicts, so the
+# test covers what a new process (a scoring job, feature importance, ...) does.
+RELOAD_IN_CHILD = """
+import sys
+import numpy as np
+import tensorflow as tf
+from models import custom_objects
+
+model_path, inputs_path, output_path = sys.argv[1:4]
+model = tf.keras.models.load_model(model_path, custom_objects=custom_objects())
+with np.load(inputs_path) as data:
+    inputs = [data[f"arr_{i}"] for i in range(int(data["n"]))]
+predictions = model.predict(inputs, verbose=0)
+np.savez(output_path, *[np.asarray(pred) for pred in predictions])
+"""
 
 
 def make_inputs():
@@ -118,6 +137,43 @@ class SerializationTest(unittest.TestCase):
 
         actual = restored.predict(inputs, verbose=0)
         self.assertEqual(len(actual), len(expected))
+        for restored_pred, original_pred in zip(actual, expected):
+            np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
+
+    def test_saved_model_reloads_and_predicts_in_a_fresh_process(self):
+        model = build_mmoe_model(CAT_COLS, NUM_COLS, VOCAB, num_tasks=2)
+        inputs = make_inputs()
+        expected = model.predict(inputs, verbose=0)
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp = Path(tmp_dir)
+            model_path = tmp / "model.keras"
+            inputs_path = tmp / "inputs.npz"
+            output_path = tmp / "predictions.npz"
+            model.save(model_path)
+            np.savez(
+                inputs_path,
+                n=len(inputs),
+                **{f"arr_{i}": np.asarray(arr) for i, arr in enumerate(inputs)},
+            )
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    RELOAD_IN_CHILD,
+                    str(model_path),
+                    str(inputs_path),
+                    str(output_path),
+                ],
+                cwd=str(REPO_ROOT),
+                check=True,
+                capture_output=True,
+            )
+
+            with np.load(output_path) as data:
+                actual = [data[f"arr_{i}"] for i in range(len(expected))]
+
         for restored_pred, original_pred in zip(actual, expected):
             np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
 
