@@ -2,7 +2,7 @@
 
 > 范围：本项目定位为**个人离线研究仓库**，数据为离线下载的 KuaiRand 数据集，不追公司级全链路，不实现召回/粗排/重排与线上服务。目标是把**精排（Fine Ranking）**这一环做成一个自洽、完整、可复现的离线研究模块。
 
-相关文档：[README](README.md) · [project_overview](docs/project_overview.md) · [CONTEXT](CONTEXT.md) · [ADR-0001 特征决策集纪律](docs/adr/0001-feature-decision-set-discipline.md) · [ADR-0002 置换重要度与两阶段门控](docs/adr/0002-permutation-importance-and-two-stage-gate.md)
+相关文档：[README](README.md) · [project_overview](docs/project_overview.md) · [实验台账](docs/experiments.md) · [CONTEXT](CONTEXT.md) · [ADR-0001 特征决策集纪律](docs/adr/0001-feature-decision-set-discipline.md) · [ADR-0002 置换重要度与两阶段门控](docs/adr/0002-permutation-importance-and-two-stage-gate.md) · [ADR-0005 两轴分层](docs/adr/0005-pluggable-encoder-and-multi-task-structure.md)
 
 ---
 
@@ -108,9 +108,28 @@
 - 在线服务、实时特征、A/B 实验平台、监控告警；
 - 自动获取新数据、流式训练与线上闭环。
 
-## 8. 立即可执行的 Issue 清单
+## 8. Issue 清单
 
-> 状态说明：本清单仅作文档记录，尚未创建到 GitHub。需要时可按现有 issue tracker 配置批量创建。
+### 8.1 已完成：可插拔特征编码器 × 多任务结构（GitHub issues #1–#8，全部关闭）
+
+2026-09-14/15 的工作以 spec + ticket 形式在 GitHub 上执行（`ready-for-agent` 标签，原生 blocked-by 依赖）：
+
+| Issue | 标题 | 状态 |
+| --- | --- | --- |
+| #1 | [Spec] 可插拔特征编码器 × 多任务结构（特征表征对比框架） | 保持 open（父 spec） |
+| #2 | 预重构：排序模型搬进 `models` 包（零行为变化） | 已关闭 |
+| #3 | 模型产物走统一加载路径（注册表 + 往返可重载） | 已关闭 |
+| #4 | 两轴 API 与默认 MLP 特征编码器 | 已关闭 |
+| #5 | DCN-v2 特征编码器（低秩交叉 + 深度分支） | 已关闭 |
+| #6 | SENet 特征编码器（按特征域 squeeze-excite） | 已关闭 |
+| #7 | 发布 baseline v2 对照表（多 seed mean±std） | 已关闭 |
+| #8 | 用新默认模型重跑置换重要度并重判特征门控 | 已关闭 |
+
+结论见 §9 的 2026-09-14/15 记录，结果产物见 `docs/assets/baselines_v2.*` 与 `docs/assets/feature_importance_v2*`。
+
+### 8.2 待创建：精排路线图剩余项
+
+> 状态说明：本清单仅作文档记录，尚未创建到 GitHub。需要时可按现有 issue tracker 配置批量创建（标签沿用 `ready-for-agent` / `ready-for-human`）。
 
 | Issue 标题 | 对应任务 | 建议标签 | 优先级 |
 | --- | --- | --- | --- |

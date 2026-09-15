@@ -69,3 +69,19 @@
 - [ADR-0001 特征决策集纪律](../adr/0001-feature-decision-set-discipline.md)
 - [ADR-0002 置换重要度与两阶段门控](../adr/0002-permutation-importance-and-two-stage-gate.md)
 - [CONTEXT.md](../../CONTEXT.md)
+
+---
+
+## 后续跟进（2026-09-15 补记）
+
+本次审查列出的架构级问题，除注明者外已在「可插拔特征编码器 × 多任务结构」工作流（GitHub issues #1–#8）中处理，本审查文档保留当时的快照不作改写：
+
+| 审查条目 | 现状 |
+| --- | --- |
+| §5 表征能力受限（单一 8 维共享 Embedding、无特征交叉） | **已处理**：新增特征编码器轴，`dcn`（DCN-v2 低秩交叉）与 `senet`（按特征域重加权）可替换默认 `mlp`；对照与结论见 `docs/experiments.md` E6 |
+| §6 MMoE 层序列化脆弱 | **已处理**：自定义层统一实现 `get_config`/`build` 并注册，`models.custom_objects()` 成为唯一加载入口，保存→新进程加载有回归测试（含旧产物） |
+| §7 缺对照模型（无法证明 MMoE 的增量价值） | **已处理**：新增 `logistic` / `shared_bottom` / `single_task` 对照与两轴对照表，3 seed mean±std（`docs/assets/baselines_v2.*`） |
+| §5.3 特征门控批量阶段结论 | **已重跑**：新默认模型下的判定为 通过 50 / 待确认 4 / 不通过 40，旧判定作废（`docs/assets/feature_importance_v2*`） |
+| §5.2 两阶段门控的「确认阶段」 | **仍未实现**（RANK-P2-1）：这是当前特征采纳流程的主要缺口 |
+| §5.1 统计特征 point-in-time 泄漏 | **仍未完成**（RANK-P0-4）：ADR-0004 保持「默认保留全量特征、结论受限于此」 |
+| §5.4 排序指标（GAUC/NDCG）与概率校准 | **仍未实现**（RANK-P0-2 / P0-3） |

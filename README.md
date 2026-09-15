@@ -289,13 +289,17 @@ Top 10 特征（总体重要度 = 门控任务平均绝对 AUC 下降；分任�
 
 ## 📌 后续计划
 
-完整的精排范围路线图（完整性定义、P0/P1/P2 里程碑、验收标准与 issue 清单）见 [ROADMAP.md](ROADMAP.md)。
+完整的精排范围路线图（完整性定义、P0/P1/P2 里程碑、验收标准与 issue 清单）见 [ROADMAP.md](ROADMAP.md)，已完成实验的台账见 [docs/experiments.md](docs/experiments.md)。
 
 * ~~模块化数据处理与建模流程~~ 已完成（里程碑 1：train/val/test 协议 + 单一配置源 + run 产物归档）
 * ~~支持多反馈目标的多任务学习~~ 已完成（MMoE 四任务可复现基线）
+* ~~精排模型两轴可插拔（特征编码器 × 多任务结构）~~ 已完成（ADR-0005：`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom`，含 3 seed 对照与置换重要度重跑）
+* 多任务结构升级（PLE/CGC）——接口已就位，需要先做一轮设计拷问（分层专家、任务共享/独享、门控结构）
+* 特征门控的确认阶段（ADR-0002 同种子重训对比，RANK-P2-1）
+* 排序指标套件（GAUC / NDCG@K / Recall@K / MAP）与概率校准（ECE）
 * 引入深度模型（如 Transformer）进行序列建模
 * 支持线上推理与实验评估
-* 多任务结构升级（PLE/CGC）、稀疏任务 focal loss、随机曝光日志去偏等模型实验
+* 稀疏任务 focal loss、随机曝光日志去偏等模型实验
 
 ---
 
