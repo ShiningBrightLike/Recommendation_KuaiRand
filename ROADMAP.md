@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | 精排模型 | 两轴可插拔：特征编码器（`mlp`/`dcn`/`senet`）× 多任务结构（`mmoe`/`shared_bottom`），另有 `single_task`/`logistic` 对照（ADR-0005） | 缺 PLE-CGC 结构、缺 FM/PNN 等编码器、缺序列建模（DIN） |
 | 训练协议 | train/val/test 时间切分、固定 seed、早停只看 val；`baselines.py --seeds` 支持多种子重跑并汇总 mean±std | 缺超参搜索、缺损失/采样策略实验 |
-| 特征迭代 | 置换重要度 + 影子特征噪声对照（`feature_importance.py`） | ADR-0002 的“确认阶段（同种子重训对比）”未实现；特征无版本指纹 |
+| 特征迭代 | 置换重要度 + 影子特征噪声对照（`feature_importance.py`），已在新默认模型上重跑（v2 判定：通过 50 / 待确认 4 / 不通过 40） | ADR-0002 的“确认阶段（同种子重训对比）”未实现；特征无版本指纹 |
 | 评估指标 | 每任务 AUC | 缺排序指标（GAUC / NDCG@K / Recall@K / MAP）、缺概率校准（ECE）、缺分片评估 |
 | 评估单元 | 仅特征 + 标签 parquet | **缺 group/id 列**（`user_id` / `video_id` / `date`），无法按用户组成候选列表 |
 | 数据正确性 | 离线静态 CSV | 视频统计特征是**全期聚合**，相对训练期可能含未来信息（潜在泄漏） |
@@ -167,3 +167,13 @@
   - `senet` 在两口径上都最好但未超出种子噪声（相对默认 +0.0038 / +0.0046，标准差 ±0.0064～±0.0077）；`dcn` 参数最多（编码器 108,900）却最差且方差最大，性价比最低。
   - v1 的「单任务领先」在多种子下弱化为「各结构无显著差异」；v1/v2 数字不可直接比较（v1 为单 seed 且无编码器）。
   - 产物：`docs/assets/baselines_v2.md`、`baselines_v2.json`、`baselines_v2.png`（图由 `baselines.py` 的 `plot_comparison()` 生成，可随下一次 `--seeds` 运行自动产出）。
+
+### 2026-09-15
+
+- **置换重要度重跑（T7 / issue #8）**：用新默认模型 `mmoe+mlp`（seed 2025，run `fi-v2-base_20260915_090053`）在**特征决策集**（验证集 190,802 行，不使用最终确认集）上重跑 94 特征 × 3 次置换，耗时 213 秒。
+  - 判定分布：**通过 50 / 待确认 4 / 不通过 40**（旧默认模型为 通过 50 / 不通过 44）。
+  - 影子特征 `shadow_0` 总体重要度 0.000082 ± 0.000050，仍远低于 `cutoff=0.001`，噪声下限识别正常，阈值口径不变。
+  - **13 个特征判定变化**：`onehot_feat6`/`onehot_feat11`/`onehot_feat12` 通过→待确认；`is_live_streamer`/`register_days_range`/`share_user_num` 通过→不通过；`complete_play_user_num`/`direct_comment_cnt`/`download_cnt`/`follow_cnt`/`follow_user_num1`/`reduce_similar_cnt` 不通过→通过；`comment_like_user_num` 不通过→待确认。变化集中在 0.0005–0.002 的弱信号边界区。
+  - Top 10 头部稳定（`tab` 0.0632 居首），第 10 位由 `onehot_feat1` 换成 `like_cnt`。
+  - 结论：**基于旧默认模型的特征门控判定全部作废**，以 v2 报告为准；批量阶段之外仍需 ADR-0002 的确认阶段（同种子重训对比），该阶段仍属 RANK-P2-1 未实现项。
+  - 产物：`docs/assets/feature_importance_v2_report.md`、`feature_importance_v2.{csv,json}`、`feature_importance_v2_top.png`。
