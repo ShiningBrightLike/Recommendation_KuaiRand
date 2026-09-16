@@ -72,6 +72,30 @@ def structure_hyperparams(name, **kwargs):
     }
 
 
+def baseline_hyperparams(name, **kwargs):
+    """Effective non-input hyper-parameters for a baseline model."""
+    try:
+        builder = BASELINES[name]
+    except KeyError:
+        raise ValueError(
+            f"unknown baseline {name!r}; available: {sorted(BASELINES)}"
+        ) from None
+    bound = inspect.signature(builder).bind_partial(**kwargs)
+    bound.apply_defaults()
+    input_args = {
+        "categorical_cols",
+        "numeric_cols",
+        "cat_vocab_size",
+        "encoder",
+        "encoder_overrides",
+    }
+    return {
+        key: _jsonable(value)
+        for key, value in bound.arguments.items()
+        if key not in input_args
+    }
+
+
 def custom_objects():
     """Objects to pass to `load_model` when reloading a saved run."""
     return dict(CUSTOM_LAYERS)

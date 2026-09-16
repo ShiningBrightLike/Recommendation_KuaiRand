@@ -18,7 +18,12 @@ The preprocessing pipeline computes it dynamically and records it in
 `data_processed/pipeline_meta.json`; pass that value in when building a model.
 """
 
-from models.builders import build_model, create_model
+from models.builders import (
+    aggregate_independent_model_axes,
+    build_model,
+    build_registered_model,
+    create_model,
+)
 from models.encoders import (
     DEFAULT_ENCODER,
     FeatureEncoder,
@@ -34,7 +39,9 @@ from models.registry import (
     DEFAULT_STRUCTURE,
     available_models,
     available_structures,
+    baseline_hyperparams,
     custom_objects,
+    structure_hyperparams,
 )
 
 __all__ = [
@@ -47,11 +54,15 @@ __all__ = [
     "available_encoders",
     "available_models",
     "available_structures",
+    "aggregate_independent_model_axes",
     "build_logistic_model",
     "build_model",
+    "build_registered_model",
     "build_shared_inputs",
     "build_single_task_model",
     "create_encoder",
     "create_model",
     "custom_objects",
+    "baseline_hyperparams",
+    "structure_hyperparams",
 ]

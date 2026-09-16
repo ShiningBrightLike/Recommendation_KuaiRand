@@ -1,13 +1,21 @@
-"""Assemble a ranking model from the two axes: feature encoder + structure."""
+"""Assemble ranking models and their traceable two-axis metadata."""
+
+from copy import deepcopy
 
 from tensorflow.keras.models import Model
 
-from models.encoders import DEFAULT_ENCODER, create_encoder, encoder_hyperparams
+from models.encoders import (
+    DEFAULT_ENCODER,
+    FeatureEncoder,
+    create_encoder,
+    encoder_hyperparams,
+)
 from models.inputs import build_shared_inputs
 from models.registry import (
     BASELINES,
     STRUCTURES,
     available_models,
+    baseline_hyperparams,
     structure_builder,
     structure_hyperparams,
 )
@@ -66,13 +74,67 @@ def create_model(name, encoder=None, **kwargs):
     `encoder=None` keeps the model's own default. Baselines that have no
     feature encoder reject one rather than ignoring it.
     """
-    if name in BASELINES:
-        if encoder is not None:
-            kwargs["encoder"] = encoder
-        return BASELINES[name](**kwargs)
+    model, _ = build_registered_model(name, encoder=encoder, **kwargs)
+    return model
+
+
+def build_registered_model(name, encoder=None, **kwargs):
+    """Build any catalog model and return complete, uniform run metadata.
+
+    Multi-output structures use :func:`build_model`. Baselines keep their
+    defining shape, but expose the same metadata interface so callers never
+    need special cases merely to make a run traceable.
+    """
     if name in STRUCTURES:
-        model, _ = build_model(
+        return build_model(
             encoder=encoder or DEFAULT_ENCODER, structure=name, **kwargs
         )
-        return model
-    raise ValueError(f"unknown model {name!r}; available: {available_models()}")
+    if name not in BASELINES:
+        raise ValueError(f"unknown model {name!r}; available: {available_models()}")
+
+    builder_kwargs = dict(kwargs)
+    if encoder is not None:
+        builder_kwargs["encoder"] = encoder
+    model = BASELINES[name](**builder_kwargs)
+
+    encoder_layer = next(
+        (layer for layer in model.layers if isinstance(layer, FeatureEncoder)), None
+    )
+    encoder_meta = {
+        "name": encoder,
+        "output_dim": None,
+        "params": 0,
+        "hyperparams": {},
+    }
+    if encoder_layer is not None:
+        encoder_meta = {
+            "name": encoder or DEFAULT_ENCODER,
+            "output_dim": encoder_layer.output_dim,
+            "params": int(encoder_layer.count_params()),
+            "hyperparams": encoder_hyperparams(encoder_layer),
+        }
+
+    return model, {
+        "encoder": encoder_meta,
+        "structure": {
+            "name": name,
+            "hyperparams": baseline_hyperparams(name, **builder_kwargs),
+        },
+        "total_params": int(model.count_params()),
+    }
+
+
+def aggregate_independent_model_axes(per_model_axes):
+    """Describe a group of independently trained copies as one comparison row."""
+    if not per_model_axes:
+        raise ValueError("at least one independent model is required")
+    first = per_model_axes[0]
+    for axes in per_model_axes[1:]:
+        if axes["encoder"] != first["encoder"] or axes["structure"] != first["structure"]:
+            raise ValueError("independent models must use the same two-axis configuration")
+
+    grouped = deepcopy(first)
+    grouped["structure"]["hyperparams"]["num_tasks"] = len(per_model_axes)
+    grouped["per_task_params"] = [axes["total_params"] for axes in per_model_axes]
+    grouped["total_params"] = sum(grouped["per_task_params"])
+    return grouped

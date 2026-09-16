@@ -1,4 +1,6 @@
 {
+  "protocol_status": "valid_for_model_selection",
+  "protocol_note": "Candidate models were compared on the validation split; the final confirmation set was not loaded.",
   "config": {
     "seeds": [
       2025,
@@ -10,10 +12,11 @@
     "patience": 5,
     "learning_rate": 0.001,
     "monitor": "val_auc_mean",
+    "evaluation_split": "val",
     "rows": [
       950310,
       190802,
-      295497
+      190802
     ],
     "shadow_cols": [
       "shadow_0"
@@ -27,94 +30,165 @@
   "models": {
     "logistic": {
       "tasks_mean": {
-        "is_click": 0.7074966828028361,
-        "is_like": 0.7789992491404215,
-        "is_follow": 0.6644274195035299,
-        "is_comment": 0.6234420935312907
+        "is_click": 0.7189374367396036,
+        "is_like": 0.7895457148551941,
+        "is_follow": 0.6884705821673075,
+        "is_comment": 0.6235601703325907
       },
       "tasks_std": {
-        "is_click": 0.0002495092886024194,
-        "is_like": 0.0015513638721132929,
-        "is_follow": 0.004749378366926819,
-        "is_comment": 0.01466229481775724
+        "is_click": 0.00026458410732473157,
+        "is_like": 0.0014521971202679663,
+        "is_follow": 0.0057842161414494815,
+        "is_comment": 0.015250184186831169
       },
       "summary": {
-        "mean_all_tasks": 0.6935913612445196,
-        "std_all_tasks": 0.0033086219157148445,
-        "mean_gate_tasks": 0.7432479659716288,
-        "std_gate_tasks": 0.0006544044970684461
+        "mean_all_tasks": 0.705128476023674,
+        "std_all_tasks": 0.00358078068197423,
+        "mean_gate_tasks": 0.7542415757973989,
+        "std_gate_tasks": 0.0005944002338661872
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7077085971832275,
-            "is_like": 0.7779738306999207,
-            "is_follow": 0.6671501398086548,
-            "is_comment": 0.606522798538208
+            "is_click": 0.7191804647445679,
+            "is_like": 0.7883037328720093,
+            "is_follow": 0.6915321350097656,
+            "is_comment": 0.6059640645980835
           },
           "best_epoch": 29,
           "params": 2765,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": null,
+              "output_dim": null,
+              "params": 0,
+              "hyperparams": {}
+            },
+            "structure": {
+              "name": "logistic",
+              "hyperparams": {
+                "num_tasks": 4
+              }
+            },
+            "total_params": 2765
+          },
           "seed": 2025,
-          "train_seconds": 83.2
+          "train_seconds": 78.6
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7075597643852234,
-            "is_like": 0.778239905834198,
-            "is_follow": 0.6671887636184692,
-            "is_comment": 0.6313669681549072
+            "is_click": 0.7189762592315674,
+            "is_like": 0.7891910076141357,
+            "is_follow": 0.692080557346344,
+            "is_comment": 0.6329506039619446
           },
           "best_epoch": 22,
           "params": 2765,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": null,
+              "output_dim": null,
+              "params": 0,
+              "hyperparams": {}
+            },
+            "structure": {
+              "name": "logistic",
+              "hyperparams": {
+                "num_tasks": 4
+              }
+            },
+            "total_params": 2765
+          },
           "seed": 2026,
-          "train_seconds": 79.4
+          "train_seconds": 71.6
         },
         "2027": {
           "tasks": {
-            "is_click": 0.7072216868400574,
-            "is_like": 0.780784010887146,
-            "is_follow": 0.6589433550834656,
-            "is_comment": 0.6324365139007568
+            "is_click": 0.7186555862426758,
+            "is_like": 0.7911424040794373,
+            "is_follow": 0.681799054145813,
+            "is_comment": 0.6317658424377441
           },
           "best_epoch": 30,
           "params": 2765,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": null,
+              "output_dim": null,
+              "params": 0,
+              "hyperparams": {}
+            },
+            "structure": {
+              "name": "logistic",
+              "hyperparams": {
+                "num_tasks": 4
+              }
+            },
+            "total_params": 2765
+          },
           "seed": 2027,
-          "train_seconds": 81.1
+          "train_seconds": 80.7
         }
       },
       "params": 2765,
-      "model": null,
-      "train_seconds": 243.8
+      "model": {
+        "encoder": {
+          "name": null,
+          "output_dim": null,
+          "params": 0,
+          "hyperparams": {}
+        },
+        "structure": {
+          "name": "logistic",
+          "hyperparams": {
+            "num_tasks": 4
+          }
+        },
+        "total_params": 2765
+      },
+      "train_seconds": 230.9
     },
     "shared_bottom+mlp": {
       "tasks_mean": {
-        "is_click": 0.7209481795628866,
-        "is_like": 0.8130437533060709,
-        "is_follow": 0.6788302461306254,
-        "is_comment": 0.6229043404261271
+        "is_click": 0.7352895935376486,
+        "is_like": 0.8274968067804972,
+        "is_follow": 0.6828421950340271,
+        "is_comment": 0.6420083045959473
       },
       "tasks_std": {
-        "is_click": 0.001079957755595658,
-        "is_like": 0.004533580772939997,
-        "is_follow": 0.011297747265712534,
-        "is_comment": 0.019457098584205915
+        "is_click": 0.00020513517030734034,
+        "is_like": 0.002010999138800872,
+        "is_follow": 0.005948269308339292,
+        "is_comment": 0.0264454723254886
       },
       "summary": {
-        "mean_all_tasks": 0.7089316298564275,
-        "std_all_tasks": 0.007376082119316938,
-        "mean_gate_tasks": 0.7669959664344788,
-        "std_gate_tasks": 0.001747569045703799
+        "mean_all_tasks": 0.72190922498703,
+        "std_all_tasks": 0.008237311330424175,
+        "mean_gate_tasks": 0.7813932001590729,
+        "std_gate_tasks": 0.0010825423893978414
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7221803665161133,
-            "is_like": 0.8082175254821777,
-            "is_follow": 0.6793740391731262,
-            "is_comment": 0.6177577972412109
+            "is_click": 0.7350580096244812,
+            "is_like": 0.8255079984664917,
+            "is_follow": 0.6854342818260193,
+            "is_comment": 0.6418722867965698
           },
           "best_epoch": 12,
           "params": 53452,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -138,17 +212,20 @@
             "total_params": 53452
           },
           "seed": 2025,
-          "train_seconds": 77.1
+          "train_seconds": 75.9
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7204982042312622,
-            "is_like": 0.8137007355690002,
-            "is_follow": 0.6898462772369385,
-            "is_comment": 0.6444173455238342
+            "is_click": 0.7353622913360596,
+            "is_like": 0.8295292854309082,
+            "is_follow": 0.6870545744895935,
+            "is_comment": 0.668521523475647
           },
           "best_epoch": 15,
           "params": 53452,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -172,17 +249,20 @@
             "total_params": 53452
           },
           "seed": 2026,
-          "train_seconds": 103.8
+          "train_seconds": 90.5
         },
         "2027": {
           "tasks": {
-            "is_click": 0.7201659679412842,
-            "is_like": 0.8172129988670349,
-            "is_follow": 0.6672704219818115,
-            "is_comment": 0.6065378785133362
+            "is_click": 0.7354484796524048,
+            "is_like": 0.8274531364440918,
+            "is_follow": 0.6760377287864685,
+            "is_comment": 0.615631103515625
           },
           "best_epoch": 16,
           "params": 53452,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -206,7 +286,7 @@
             "total_params": 53452
           },
           "seed": 2027,
-          "train_seconds": 123.4
+          "train_seconds": 92.1
         }
       },
       "params": 53452,
@@ -232,34 +312,34 @@
         },
         "total_params": 53452
       },
-      "train_seconds": 304.3
+      "train_seconds": 258.6
     },
     "single_task+mlp": {
       "tasks_mean": {
-        "is_click": 0.7204081217447916,
-        "is_like": 0.812729279200236,
-        "is_follow": 0.685051163037618,
-        "is_comment": 0.6385584274927775
+        "is_click": 0.7362393736839294,
+        "is_like": 0.8325739701588949,
+        "is_follow": 0.7117519378662109,
+        "is_comment": 0.6557237505912781
       },
       "tasks_std": {
-        "is_click": 0.0012600520719894418,
-        "is_like": 0.0034735620499683146,
-        "is_follow": 0.0312317304649677,
-        "is_comment": 0.01075597840180336
+        "is_click": 0.0006233668700927743,
+        "is_like": 0.0031090377797610125,
+        "is_follow": 0.012403706002109506,
+        "is_comment": 0.009968361703502508
       },
       "summary": {
-        "mean_all_tasks": 0.7141867478688558,
-        "std_all_tasks": 0.00947074488925195,
-        "mean_gate_tasks": 0.7665687004725138,
-        "std_gate_tasks": 0.0014825369705873676
+        "mean_all_tasks": 0.7340722580750784,
+        "std_all_tasks": 0.00544798015553916,
+        "mean_gate_tasks": 0.7844066719214121,
+        "std_gate_tasks": 0.0015872557825672682
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7217633724212646,
-            "is_like": 0.8094407320022583,
-            "is_follow": 0.7109423875808716,
-            "is_comment": 0.6336930990219116
+            "is_click": 0.7368770241737366,
+            "is_like": 0.8309271931648254,
+            "is_follow": 0.724638044834137,
+            "is_comment": 0.6574769616127014
           },
           "best_epochs": {
             "is_click": 11,
@@ -268,15 +348,52 @@
             "is_comment": 1
           },
           "params": 188452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "single_task",
+              "hyperparams": {
+                "embed_dim": 8,
+                "units": 64,
+                "tower_units": 32,
+                "num_tasks": 4
+              }
+            },
+            "total_params": 188452,
+            "per_task_params": [
+              47113,
+              47113,
+              47113,
+              47113
+            ]
+          },
+          "artifacts": {
+            "models": {
+              "is_click": "is_click/model.keras",
+              "is_like": "is_like/model.keras",
+              "is_follow": "is_follow/model.keras",
+              "is_comment": "is_comment/model.keras"
+            }
+          },
           "seed": 2025,
-          "train_seconds": 224.4
+          "train_seconds": 168.9
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7201889753341675,
-            "is_like": 0.816362202167511,
-            "is_follow": 0.6938461661338806,
-            "is_comment": 0.6508874297142029
+            "is_click": 0.7362097501754761,
+            "is_like": 0.8361600041389465,
+            "is_follow": 0.7107230424880981,
+            "is_comment": 0.6646991968154907
           },
           "best_epochs": {
             "is_click": 16,
@@ -285,15 +402,52 @@
             "is_comment": 1
           },
           "params": 188452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "single_task",
+              "hyperparams": {
+                "embed_dim": 8,
+                "units": 64,
+                "tower_units": 32,
+                "num_tasks": 4
+              }
+            },
+            "total_params": 188452,
+            "per_task_params": [
+              47113,
+              47113,
+              47113,
+              47113
+            ]
+          },
+          "artifacts": {
+            "models": {
+              "is_click": "is_click/model.keras",
+              "is_like": "is_like/model.keras",
+              "is_follow": "is_follow/model.keras",
+              "is_comment": "is_comment/model.keras"
+            }
+          },
           "seed": 2026,
-          "train_seconds": 248.2
+          "train_seconds": 188.1
         },
         "2027": {
           "tasks": {
-            "is_click": 0.7192720174789429,
-            "is_like": 0.8123849034309387,
-            "is_follow": 0.6503649353981018,
-            "is_comment": 0.631094753742218
+            "is_click": 0.7356313467025757,
+            "is_like": 0.8306347131729126,
+            "is_follow": 0.6998947262763977,
+            "is_comment": 0.6449950933456421
           },
           "best_epochs": {
             "is_click": 9,
@@ -302,43 +456,111 @@
             "is_comment": 2
           },
           "params": 188452,
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "single_task",
+              "hyperparams": {
+                "embed_dim": 8,
+                "units": 64,
+                "tower_units": 32,
+                "num_tasks": 4
+              }
+            },
+            "total_params": 188452,
+            "per_task_params": [
+              47113,
+              47113,
+              47113,
+              47113
+            ]
+          },
+          "artifacts": {
+            "models": {
+              "is_click": "is_click/model.keras",
+              "is_like": "is_like/model.keras",
+              "is_follow": "is_follow/model.keras",
+              "is_comment": "is_comment/model.keras"
+            }
+          },
           "seed": 2027,
-          "train_seconds": 192.9
+          "train_seconds": 183.4
         }
       },
       "params": 188452,
-      "model": null,
-      "train_seconds": 665.5
+      "model": {
+        "encoder": {
+          "name": "mlp",
+          "output_dim": 64,
+          "params": 21760,
+          "hyperparams": {
+            "hidden": [
+              64
+            ],
+            "activation": "relu"
+          }
+        },
+        "structure": {
+          "name": "single_task",
+          "hyperparams": {
+            "embed_dim": 8,
+            "units": 64,
+            "tower_units": 32,
+            "num_tasks": 4
+          }
+        },
+        "total_params": 188452,
+        "per_task_params": [
+          47113,
+          47113,
+          47113,
+          47113
+        ]
+      },
+      "train_seconds": 540.4
     },
     "mmoe+mlp": {
       "tasks_mean": {
-        "is_click": 0.720534086227417,
-        "is_like": 0.8092761437098185,
-        "is_follow": 0.6855368812878927,
-        "is_comment": 0.6374818881352743
+        "is_click": 0.7356439828872681,
+        "is_like": 0.8269666433334351,
+        "is_follow": 0.7137810190518697,
+        "is_comment": 0.6527557770411173
       },
       "tasks_std": {
-        "is_click": 0.002194266351541414,
-        "is_like": 0.004179645384293904,
-        "is_follow": 0.02470988156013085,
-        "is_comment": 0.02293857155556877
+        "is_click": 0.0005636196016173673,
+        "is_like": 0.00406656218415932,
+        "is_follow": 0.0234620305654326,
+        "is_comment": 0.03202529547153935
       },
       "summary": {
-        "mean_all_tasks": 0.7132072498401006,
-        "std_all_tasks": 0.0063807341083842485,
-        "mean_gate_tasks": 0.7649051149686178,
-        "std_gate_tasks": 0.0014378161326464914
+        "mean_all_tasks": 0.7322868555784225,
+        "std_all_tasks": 0.008582342133981376,
+        "mean_gate_tasks": 0.7813053131103516,
+        "std_gate_tasks": 0.0021658186304846522
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7224003076553345,
-            "is_like": 0.8044540882110596,
-            "is_follow": 0.7136760950088501,
-            "is_comment": 0.622096836566925
+            "is_click": 0.735524594783783,
+            "is_like": 0.8224111199378967,
+            "is_follow": 0.7382165789604187,
+            "is_comment": 0.6260162591934204
           },
           "best_epoch": 10,
           "params": 84652,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -363,17 +585,20 @@
             "total_params": 84652
           },
           "seed": 2025,
-          "train_seconds": 143.9
+          "train_seconds": 129.4
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7210851311683655,
-            "is_like": 0.8115131855010986,
-            "is_follow": 0.6755558848381042,
-            "is_comment": 0.6638466715812683
+            "is_click": 0.7362577319145203,
+            "is_like": 0.8302304744720459,
+            "is_follow": 0.711694598197937,
+            "is_comment": 0.6882472038269043
           },
           "best_epoch": 19,
           "params": 84652,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -398,17 +623,20 @@
             "total_params": 84652
           },
           "seed": 2026,
-          "train_seconds": 230.9
+          "train_seconds": 205.4
         },
         "2027": {
           "tasks": {
-            "is_click": 0.718116819858551,
-            "is_like": 0.8118611574172974,
-            "is_follow": 0.6673786640167236,
-            "is_comment": 0.6265021562576294
+            "is_click": 0.735149621963501,
+            "is_like": 0.8282583355903625,
+            "is_follow": 0.6914318799972534,
+            "is_comment": 0.6440038681030273
           },
           "best_epoch": 14,
           "params": 84652,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "mlp",
@@ -433,7 +661,7 @@
             "total_params": 84652
           },
           "seed": 2027,
-          "train_seconds": 185.1
+          "train_seconds": 169.0
         }
       },
       "params": 84652,
@@ -460,37 +688,40 @@
         },
         "total_params": 84652
       },
-      "train_seconds": 559.9
+      "train_seconds": 503.8
     },
     "mmoe+dcn": {
       "tasks_mean": {
-        "is_click": 0.7228575348854065,
-        "is_like": 0.8099614580472311,
-        "is_follow": 0.670657734076182,
-        "is_comment": 0.6270797252655029
+        "is_click": 0.738834798336029,
+        "is_like": 0.834648589293162,
+        "is_follow": 0.683685302734375,
+        "is_comment": 0.6542092561721802
       },
       "tasks_std": {
-        "is_click": 0.0016596450514940954,
-        "is_like": 0.005901225247993753,
-        "is_follow": 0.03956220464024144,
-        "is_comment": 0.01710460851836975
+        "is_click": 0.002343382505346313,
+        "is_like": 0.0014504388478431371,
+        "is_follow": 0.026622099360495022,
+        "is_comment": 0.011941285280793919
       },
       "summary": {
-        "mean_all_tasks": 0.7076391130685806,
-        "std_all_tasks": 0.014235257394063073,
-        "mean_gate_tasks": 0.7664094964663187,
-        "std_gate_tasks": 0.002325829386532379
+        "mean_all_tasks": 0.7278444866339365,
+        "std_all_tasks": 0.008031409792703849,
+        "mean_gate_tasks": 0.7867416938145956,
+        "std_gate_tasks": 0.0010725255447063663
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7247737646102905,
-            "is_like": 0.8044681549072266,
-            "is_follow": 0.6868318319320679,
-            "is_comment": 0.6207758784294128
+            "is_click": 0.7414361238479614,
+            "is_like": 0.8343534469604492,
+            "is_follow": 0.7099817991256714,
+            "is_comment": 0.6483493447303772
           },
           "best_epoch": 8,
           "params": 356530,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "dcn",
@@ -514,17 +745,20 @@
             "total_params": 356530
           },
           "seed": 2025,
-          "train_seconds": 207.9
+          "train_seconds": 184.6
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7218777537345886,
-            "is_like": 0.8161998391151428,
-            "is_follow": 0.6995702385902405,
-            "is_comment": 0.646441638469696
+            "is_click": 0.7368889451026917,
+            "is_like": 0.8362239003181458,
+            "is_follow": 0.6843249797821045,
+            "is_comment": 0.6679484844207764
           },
           "best_epoch": 6,
           "params": 356530,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "dcn",
@@ -548,17 +782,20 @@
             "total_params": 356530
           },
           "seed": 2026,
-          "train_seconds": 179.8
+          "train_seconds": 161.0
         },
         "2027": {
           "tasks": {
-            "is_click": 0.7219210863113403,
-            "is_like": 0.8092163801193237,
-            "is_follow": 0.6255711317062378,
-            "is_comment": 0.6140216588973999
+            "is_click": 0.7381793260574341,
+            "is_like": 0.8333684206008911,
+            "is_follow": 0.6567491292953491,
+            "is_comment": 0.646329939365387
           },
           "best_epoch": 8,
           "params": 356530,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "dcn",
@@ -582,7 +819,7 @@
             "total_params": 356530
           },
           "seed": 2027,
-          "train_seconds": 214.1
+          "train_seconds": 190.4
         }
       },
       "params": 356530,
@@ -608,37 +845,40 @@
         },
         "total_params": 356530
       },
-      "train_seconds": 601.8
+      "train_seconds": 535.9
     },
     "mmoe+senet": {
       "tasks_mean": {
-        "is_click": 0.7242260972658793,
-        "is_like": 0.8148057063420614,
-        "is_follow": 0.6804559628168741,
-        "is_comment": 0.64851047595342
+        "is_click": 0.7412467996279398,
+        "is_like": 0.8402218023935953,
+        "is_follow": 0.7101563016573588,
+        "is_comment": 0.6735109885533651
       },
       "tasks_std": {
-        "is_click": 0.0021898227598913305,
-        "is_like": 0.005680839001971617,
-        "is_follow": 0.013169259698375298,
-        "is_comment": 0.014331311261906746
+        "is_click": 0.0009150293083638192,
+        "is_like": 0.0041539517554706725,
+        "is_follow": 0.02195109378399134,
+        "is_comment": 0.009281745607160637
       },
       "summary": {
-        "mean_all_tasks": 0.7169995605945587,
-        "std_all_tasks": 0.0076682368956450045,
-        "mean_gate_tasks": 0.7695159018039703,
-        "std_gate_tasks": 0.002482151041073105
+        "mean_all_tasks": 0.7412839730580648,
+        "std_all_tasks": 0.007204222952593705,
+        "mean_gate_tasks": 0.7907343010107676,
+        "std_gate_tasks": 0.0020247916293847793
       },
       "per_seed": {
         "2025": {
           "tasks": {
-            "is_click": 0.7264761924743652,
-            "is_like": 0.8092981576919556,
-            "is_follow": 0.6756091117858887,
-            "is_comment": 0.6341807842254639
+            "is_click": 0.7421284914016724,
+            "is_like": 0.8367534279823303,
+            "is_follow": 0.7249728441238403,
+            "is_comment": 0.6667965650558472
           },
           "best_epoch": 14,
           "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "senet",
@@ -660,17 +900,20 @@
             "total_params": 221469
           },
           "seed": 2025,
-          "train_seconds": 379.6
+          "train_seconds": 358.4
         },
         "2026": {
           "tasks": {
-            "is_click": 0.7241001129150391,
-            "is_like": 0.820645272731781,
-            "is_follow": 0.6953617930412292,
-            "is_comment": 0.6628434062004089
+            "is_click": 0.741310179233551,
+            "is_like": 0.8448253273963928,
+            "is_follow": 0.720558226108551,
+            "is_comment": 0.6841027140617371
           },
           "best_epoch": 12,
           "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "senet",
@@ -692,17 +935,20 @@
             "total_params": 221469
           },
           "seed": 2026,
-          "train_seconds": 341.8
+          "train_seconds": 344.0
         },
         "2027": {
           "tasks": {
-            "is_click": 0.7221019864082336,
-            "is_like": 0.8144736886024475,
-            "is_follow": 0.6703969836235046,
-            "is_comment": 0.6485072374343872
+            "is_click": 0.7403017282485962,
+            "is_like": 0.839086651802063,
+            "is_follow": 0.6849378347396851,
+            "is_comment": 0.669633686542511
           },
           "best_epoch": 14,
           "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
           "model": {
             "encoder": {
               "name": "senet",
@@ -724,7 +970,7 @@
             "total_params": 221469
           },
           "seed": 2027,
-          "train_seconds": 391.8
+          "train_seconds": 399.9
         }
       },
       "params": 221469,
@@ -748,7 +994,7 @@
         },
         "total_params": 221469
       },
-      "train_seconds": 1113.3
+      "train_seconds": 1102.3
     }
   }
 }

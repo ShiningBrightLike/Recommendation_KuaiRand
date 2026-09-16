@@ -1,4 +1,7 @@
-"""Train ranking baselines and compare per-task test AUC.
+"""Train ranking baselines under the repository's evaluation-set discipline.
+
+Comparisons report validation AUC by default. The final confirmation set is
+available only through ``--final-test`` and only for one locked model spec.
 
 Baselines (same data/protocol/seed as main.py):
     - logistic:      one weight per one-hot/numeric feature, no hidden layer
@@ -9,7 +12,7 @@ Baselines (same data/protocol/seed as main.py):
 Usage:
     python baselines.py
     python baselines.py --models logistic,shared_bottom
-    python baselines.py --mmoe-run KuaiRand-Pure/saved/runs/fi-shadow_xxx
+    python baselines.py --models mmoe+mlp --final-test
     python baselines.py --drop-stat-features --tag baselines_nostats
 """
 
@@ -39,12 +42,10 @@ from data_loading import (
 from main import MeanValAUC, set_seed
 from models import (
     DEFAULT_ENCODER,
+    aggregate_independent_model_axes,
     available_encoders,
     available_models,
-    available_structures,
-    build_logistic_model,
-    build_model,
-    build_single_task_model,
+    build_registered_model,
 )
 
 ALL_MODELS = tuple(available_models())
@@ -84,18 +85,54 @@ def parse_args():
     )
     parser.add_argument("--tag", default="baselines")
     parser.add_argument("--out-dir", type=Path, default=None)
-    parser.add_argument("--mmoe-run", type=Path, default=None, help="existing run dir to add as a row")
+    parser.add_argument(
+        "--mmoe-run",
+        type=Path,
+        default=None,
+        help="existing final-test run to publish instead of training a model",
+    )
+    parser.add_argument(
+        "--final-test",
+        action="store_true",
+        help=(
+            "evaluate the final confirmation set; requires exactly one locked "
+            "model spec (comparisons use validation by default)"
+        ),
+    )
     parser.add_argument("--drop-features", default=None)
     parser.add_argument("--drop-stat-features", action="store_true")
     return parser.parse_args()
 
 
-def _load_data(args, cat_cols, num_cols):
-    return (
-        load_split("train", args.max_rows, cat_cols, num_cols),
-        load_split("val", args.max_rows, cat_cols, num_cols),
-        load_split("test", args.max_rows, cat_cols, num_cols),
+def evaluation_split_for(
+    selected, final_test=False, has_existing_test_run=False, num_seeds=1
+):
+    """Choose the report split while protecting the final confirmation set."""
+    total_specs = len(selected) + int(has_existing_test_run)
+    if has_existing_test_run and not final_test:
+        raise ValueError(
+            "an existing run exposes test metrics and is only valid for final confirmation"
+        )
+    if final_test and total_specs != 1:
+        raise ValueError(
+            "final confirmation requires exactly one locked model spec or existing run"
+        )
+    if final_test and num_seeds != 1:
+        raise ValueError("final confirmation requires exactly one seed")
+    if total_specs == 0:
+        raise ValueError("select at least one model spec")
+    return "test" if final_test else "val"
+
+
+def _load_data(args, cat_cols, num_cols, evaluation_split):
+    train = load_split("train", args.max_rows, cat_cols, num_cols)
+    val = load_split("val", args.max_rows, cat_cols, num_cols)
+    evaluation = (
+        load_split("test", args.max_rows, cat_cols, num_cols)
+        if evaluation_split == "test"
+        else val
     )
+    return train, val, evaluation
 
 
 def _compile_and_fit(model, train, val, args, monitor, task_names, single_output=False):
@@ -142,9 +179,9 @@ def _compile_and_fit(model, train, val, args, monitor, task_names, single_output
     return None if best_epoch is None else int(best_epoch) + 1
 
 
-def _test_auc(model, test, task_names, single_output=False):
+def _evaluate_auc(model, evaluation, task_names, single_output=False):
     metrics = model.evaluate(
-        test[0], test[1], batch_size=4096, verbose=0, return_dict=True
+        evaluation[0], evaluation[1], batch_size=4096, verbose=0, return_dict=True
     )
     if single_output:
         return {task_names[0]: float(metrics["auc"])}
@@ -154,37 +191,58 @@ def _test_auc(model, test, task_names, single_output=False):
     }
 
 
-def train_multi_output(model, train, val, test, args, task_names):
+def train_multi_output(model, train, val, evaluation, args, task_names, run_dir):
     best_epoch = _compile_and_fit(
         model, train, val, args, args.monitor, task_names
     )
-    return {
-        "tasks": _test_auc(model, test, task_names),
+    result = {
+        "tasks": _evaluate_auc(model, evaluation, task_names),
         "best_epoch": best_epoch,
         "params": int(model.count_params()),
+        "artifacts": {"model": "model.keras"},
     }
+    run_dir.mkdir(parents=True, exist_ok=True)
+    model.save(run_dir / "model.keras")
+    return result
 
 
-def train_single_task(cat_cols, num_cols, vocab, encoder, data, args, task_names):
-    train, val, test = data
+def train_single_task(
+    cat_cols, num_cols, vocab, encoder, data, args, task_names, run_dir
+):
+    train, val, evaluation = data
     per_task, best_epochs, params = {}, {}, 0
+    axes_per_task, model_paths = [], {}
     for i, task in enumerate(task_names):
-        model = build_single_task_model(
-            cat_cols, num_cols, vocab, embed_dim=C.EMBED_DIM,
-            units=C.EXPERT_UNITS, tower_units=C.TOWER_UNITS,
+        model, axes = build_registered_model(
+            "single_task",
             encoder=encoder,
+            categorical_cols=cat_cols,
+            numeric_cols=num_cols,
+            cat_vocab_size=vocab,
+            embed_dim=C.EMBED_DIM,
         )
         train_i = (train[0], [train[1][i]])
         val_i = (val[0], [val[1][i]])
-        test_i = (test[0], [test[1][i]])
+        evaluation_i = (evaluation[0], [evaluation[1][i]])
         best_epoch = _compile_and_fit(
             model, train_i, val_i, args, "val_auc", [task], single_output=True
         )
-        auc = _test_auc(model, test_i, [task], single_output=True)
+        auc = _evaluate_auc(model, evaluation_i, [task], single_output=True)
         per_task.update(auc)
         best_epochs[task] = best_epoch
         params += int(model.count_params())
-    return {"tasks": per_task, "best_epochs": best_epochs, "params": params}
+        axes_per_task.append(axes)
+        task_dir = run_dir / task
+        task_dir.mkdir(parents=True, exist_ok=True)
+        model.save(task_dir / "model.keras")
+        model_paths[task] = f"{task}/model.keras"
+    return {
+        "tasks": per_task,
+        "best_epochs": best_epochs,
+        "params": params,
+        "model": aggregate_independent_model_axes(axes_per_task),
+        "artifacts": {"models": model_paths},
+    }
 
 
 def parse_model_spec(value):
@@ -220,15 +278,14 @@ def format_model_spec(spec):
 
 def build_multi_task_model(structure, encoder, cat_cols, num_cols, vocab, num_tasks):
     """Build one encoder-fed structure, plus its two-axis run metadata."""
-    return build_model(
+    return build_registered_model(
+        structure,
         encoder=encoder,
-        structure=structure,
         categorical_cols=cat_cols,
         numeric_cols=num_cols,
         cat_vocab_size=vocab,
         embed_dim=C.EMBED_DIM,
         num_tasks=num_tasks,
-        **C.STRUCTURE_PARAMS[structure],
     )
 
 
@@ -238,7 +295,12 @@ def _existing_mmoe_row(run_dir, task_names):
         task: float(metrics["test_metrics"][f"output_{i + 1}_auc"])
         for i, task in enumerate(task_names)
     }
-    return {"tasks": tasks, "best_epoch": metrics.get("best_epoch"), "params": None}
+    return {
+        "tasks": tasks,
+        "best_epoch": metrics.get("best_epoch"),
+        "params": metrics.get("model", {}).get("total_params"),
+        "model": metrics.get("model"),
+    }
 
 
 def _summary(tasks):
@@ -303,7 +365,7 @@ def _format_metric(mean, std):
 
 
 def plot_comparison(results, path):
-    """Per-task test AUC per model, with error bars for the seed spread."""
+    """Per-task AUC per model, with error bars for the seed spread."""
     task_names = list(C.LABEL_COLS)
     model_names = list(results["models"])
     positions = np.arange(len(task_names))
@@ -324,13 +386,14 @@ def plot_comparison(results, path):
         )
 
     seeds = results["config"]["seeds"]
+    split = results["config"]["evaluation_split"]
     ax.set_xticks(positions)
     ax.set_xticklabels(task_names)
-    ax.set_ylabel("Test AUC")
+    ax.set_ylabel(f"{split.title()} AUC")
     # English labels, like main.plot_history: the default matplotlib font has no
     # CJK glyphs, so Chinese would render as empty boxes.
     ax.set_title(
-        "Ranking models — test AUC per task "
+        f"Ranking models — {split} AUC per task "
         f"(seeds={', '.join(map(str, seeds))}, error bars = sample std)"
     )
     ax.legend(fontsize="small")
@@ -347,6 +410,7 @@ def write_reports(results, out_dir):
 
     md_path = out_dir / "baselines.md"
     seeds = results["config"]["seeds"]
+    split = results["config"]["evaluation_split"]
     lines = [
         "# 精排对照模型结果",
         "",
@@ -354,7 +418,8 @@ def write_reports(results, out_dir):
         f"{'（mean±std，样本标准差 ddof=1）' if len(seeds) > 1 else ''}"
         f" | epochs: {results['config']['epochs']} "
         f"| early-stop monitor: {results['config']['monitor']}",
-        f"- rows (train/val/test): {results['config']['rows']}",
+        f"- evaluation split: **{split}**",
+        f"- rows (train/val/evaluation): {results['config']['rows']}",
         f"- dropped features: {results['config']['dropped_features'] or 'none'}",
         "",
         "| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) |",
@@ -376,29 +441,59 @@ def write_reports(results, out_dir):
     return json_path, md_path, chart_path
 
 
-def train_one_seed(spec, data, args, cat_cols, num_cols, vocab, task_names):
+def train_one_seed(
+    spec, data, args, cat_cols, num_cols, vocab, task_names, run_dir
+):
     """Train one model spec at the seed the caller has already set."""
     structure, encoder = spec
-    train, val, test = data
+    train, val, evaluation = data
     if structure == "single_task":
         return train_single_task(
-            cat_cols, num_cols, vocab, encoder, data, args, task_names
+            cat_cols, num_cols, vocab, encoder, data, args, task_names, run_dir
         )
     if structure == "logistic":
-        model = build_logistic_model(cat_cols, num_cols, vocab, num_tasks=len(task_names))
-        return train_multi_output(model, train, val, test, args, task_names)
-    model, axes = build_multi_task_model(
-        structure, encoder, cat_cols, num_cols, vocab, len(task_names)
+        model, axes = build_registered_model(
+            "logistic",
+            categorical_cols=cat_cols,
+            numeric_cols=num_cols,
+            cat_vocab_size=vocab,
+            num_tasks=len(task_names),
+        )
+    else:
+        model, axes = build_multi_task_model(
+            structure, encoder, cat_cols, num_cols, vocab, len(task_names)
+        )
+    result = train_multi_output(
+        model, train, val, evaluation, args, task_names, run_dir
     )
-    result = train_multi_output(model, train, val, test, args, task_names)
     result["model"] = axes
     return result
+
+
+def write_seed_metrics(run_dir, result, batch_config, model_spec, seed):
+    """Persist one independently reproducible seed/config run record."""
+    payload = {
+        "run_name": f"{model_spec}/seed-{seed}",
+        "config": {**batch_config, "model_spec": model_spec, "seed": seed},
+        **result,
+    }
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "metrics.json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return payload
 
 
 def main():
     args = parse_args()
     selected = [parse_model_spec(name) for name in (parse_name_list(args.models) or [])]
     seeds = parse_seeds(args.seeds) or [args.seed]
+    evaluation_split = evaluation_split_for(
+        selected,
+        final_test=args.final_test,
+        has_existing_test_run=args.mmoe_run is not None,
+        num_seeds=len(seeds),
+    )
 
     set_seed(seeds[0])
     cat_cols, num_cols, shadow_cols = load_feature_schema()
@@ -410,12 +505,26 @@ def main():
     task_names = list(C.LABEL_COLS)
 
     print(f"Schema after filtering: {len(cat_cols)} cat + {len(num_cols)} num; dropped={dropped}")
-    train, val, test = _load_data(args, cat_cols, num_cols)
-    rows = (train[2], val[2], test[2])
-    print(f"Rows train/val/test: {rows}")
+    train, val, evaluation = _load_data(
+        args, cat_cols, num_cols, evaluation_split
+    )
+    rows = (train[2], val[2], evaluation[2])
+    print(f"Rows train/val/{evaluation_split}: {rows}")
 
     out_dir = args.out_dir or C.RUNS_DIR / f"{args.tag}_{time.strftime('%Y%m%d_%H%M%S')}"
     results = {
+        "protocol_status": (
+            "valid_for_model_selection"
+            if evaluation_split == "val"
+            else "final_confirmation"
+        ),
+        "protocol_note": (
+            "Candidate models are compared on the validation split; the final "
+            "confirmation set was not loaded."
+            if evaluation_split == "val"
+            else "One locked model configuration was evaluated on the final "
+            "confirmation set."
+        ),
         "config": {
             "seeds": seeds,
             "epochs": args.epochs,
@@ -423,6 +532,7 @@ def main():
             "patience": args.patience,
             "learning_rate": args.learning_rate,
             "monitor": args.monitor,
+            "evaluation_split": evaluation_split,
             "rows": rows,
             "shadow_cols": shadow_cols,
             "dropped_features": dropped,
@@ -439,11 +549,22 @@ def main():
             seed_started = time.time()
             set_seed(seed)
             print(f"Training {name} (seed {seed})...")
+            seed_run_dir = out_dir / "runs" / name / f"seed-{seed}"
             result = train_one_seed(
-                spec, (train, val, test), args, cat_cols, num_cols, vocab, task_names
+                spec,
+                (train, val, evaluation),
+                args,
+                cat_cols,
+                num_cols,
+                vocab,
+                task_names,
+                seed_run_dir,
             )
             result["seed"] = seed
             result["train_seconds"] = round(time.time() - seed_started, 1)
+            write_seed_metrics(
+                seed_run_dir, result, results["config"], name, seed
+            )
             per_seed[str(seed)] = result
             print(f"  seed {seed}: {result['tasks']} ({result['train_seconds']}s)")
 
@@ -471,8 +592,8 @@ def main():
             "tasks_std": {task: 0.0 for task in task_names},
             "summary": {**_summary(existing["tasks"]), "std_all_tasks": 0.0, "std_gate_tasks": 0.0},
             "per_seed": {},
-            "params": None,
-            "model": None,
+            "params": existing["params"],
+            "model": existing["model"],
             "train_seconds": None,
         }
 

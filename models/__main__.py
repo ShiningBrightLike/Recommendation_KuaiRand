@@ -7,7 +7,12 @@ Run from the repo root:
 import numpy as np
 
 import config as C
-from models import available_encoders, available_structures, build_model
+from models import (
+    available_encoders,
+    available_structures,
+    build_model,
+    build_registered_model,
+)
 
 VOCAB_SIZE = 256
 SAMPLES = 4
@@ -24,8 +29,8 @@ def make_inputs(n_samples=SAMPLES):
 
 
 def build_all_models():
-    """Every encoder x structure combination, with its run metadata."""
-    return {
+    """Every registered model and encoder x structure combination."""
+    models = {
         f"{structure}+{encoder}": build_model(
             encoder=encoder,
             structure=structure,
@@ -33,11 +38,30 @@ def build_all_models():
             numeric_cols=C.NUMERIC_COLS,
             cat_vocab_size=VOCAB_SIZE,
             num_tasks=len(C.LABEL_COLS),
-            **C.STRUCTURE_PARAMS[structure],
         )
         for structure in available_structures()
         for encoder in available_encoders()
     }
+    models.update(
+        {
+            f"single_task+{encoder}": build_registered_model(
+                "single_task",
+                encoder=encoder,
+                categorical_cols=C.CATEGORICAL_COLS,
+                numeric_cols=C.NUMERIC_COLS,
+                cat_vocab_size=VOCAB_SIZE,
+            )
+            for encoder in available_encoders()
+        }
+    )
+    models["logistic"] = build_registered_model(
+        "logistic",
+        categorical_cols=C.CATEGORICAL_COLS,
+        numeric_cols=C.NUMERIC_COLS,
+        cat_vocab_size=VOCAB_SIZE,
+        num_tasks=len(C.LABEL_COLS),
+    )
+    return models
 
 
 def main():

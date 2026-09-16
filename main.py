@@ -261,7 +261,6 @@ def main():
         cat_vocab_size=cat_vocab_size,
         embed_dim=C.EMBED_DIM,
         num_tasks=len(C.LABEL_COLS),
-        **C.STRUCTURE_PARAMS[args.mtl],
     )
     logger.info(
         f"Model axes: encoder={model_axes['encoder']['name']} "

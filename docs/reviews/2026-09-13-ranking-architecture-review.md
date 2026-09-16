@@ -80,7 +80,7 @@
 | --- | --- |
 | §5 表征能力受限（单一 8 维共享 Embedding、无特征交叉） | **已处理**：新增特征编码器轴，`dcn`（DCN-v2 低秩交叉）与 `senet`（按特征域重加权）可替换默认 `mlp`；对照与结论见 `docs/experiments.md` E6 |
 | §6 MMoE 层序列化脆弱 | **已处理**：自定义层统一实现 `get_config`/`build` 并注册，`models.custom_objects()` 成为唯一加载入口，保存→新进程加载有回归测试（含旧产物） |
-| §7 缺对照模型（无法证明 MMoE 的增量价值） | **已处理**：新增 `logistic` / `shared_bottom` / `single_task` 对照与两轴对照表，3 seed mean±std（`docs/assets/baselines_v2.*`） |
+| §7 缺对照模型（无法证明 MMoE 的增量价值） | **已处理**：2026-09-16 完成 `logistic` / `shared_bottom` / `single_task` 与三种 MMoE 编码器的验证集 3-seed 合规对照，发布 `docs/assets/baselines_v2.*`；最终确认集未加载 |
 | §5.3 特征门控批量阶段结论 | **已重跑**：新默认模型下的判定为 通过 50 / 待确认 4 / 不通过 40，旧判定作废（`docs/assets/feature_importance_v2*`） |
 | §5.2 两阶段门控的「确认阶段」 | **仍未实现**（RANK-P2-1）：这是当前特征采纳流程的主要缺口 |
 | §5.1 统计特征 point-in-time 泄漏 | **仍未完成**（RANK-P0-4）：ADR-0004 保持「默认保留全量特征、结论受限于此」 |

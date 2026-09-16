@@ -4,6 +4,7 @@ Run from the repo root inside env_tf:
     python -m unittest discover -s tests
 """
 
+import json
 import subprocess
 import sys
 import tempfile
@@ -16,7 +17,9 @@ import tensorflow as tf
 from models import (
     available_encoders,
     available_models,
+    available_structures,
     build_model,
+    build_registered_model,
     build_logistic_model,
     build_single_task_model,
     create_model,
@@ -32,17 +35,24 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # Runs in a fresh interpreter: reloads the saved run and re-predicts, so the
 # test covers what a new process (a scoring job, feature importance, ...) does.
 RELOAD_IN_CHILD = """
+import json
 import sys
 import numpy as np
 import tensorflow as tf
 from models import custom_objects
 
-model_path, inputs_path, output_path = sys.argv[1:4]
-model = tf.keras.models.load_model(model_path, custom_objects=custom_objects())
+manifest_path, inputs_path, output_path = sys.argv[1:4]
 with np.load(inputs_path) as data:
     inputs = [data[f"arr_{i}"] for i in range(int(data["n"]))]
-predictions = model.predict(inputs, verbose=0)
-np.savez(output_path, *[np.asarray(pred) for pred in predictions])
+arrays = {}
+for model_index, model_path in enumerate(json.loads(open(manifest_path).read())):
+    model = tf.keras.models.load_model(model_path, custom_objects=custom_objects())
+    predictions = model.predict(inputs, verbose=0)
+    if not isinstance(predictions, list):
+        predictions = [predictions]
+    for output_index, prediction in enumerate(predictions):
+        arrays[f"m{model_index}_o{output_index}"] = np.asarray(prediction)
+np.savez(output_path, **arrays)
 """
 
 
@@ -99,6 +109,22 @@ class BuilderShapeTest(unittest.TestCase):
             tower_units=4,
         )
         self._assert_multi_output(model, 4)
+
+    def test_every_encoder_structure_combination(self):
+        for structure in available_structures():
+            for encoder in available_encoders():
+                with self.subTest(structure=structure, encoder=encoder):
+                    model, axes = build_model(
+                        encoder=encoder,
+                        structure=structure,
+                        categorical_cols=CAT_COLS,
+                        numeric_cols=NUM_COLS,
+                        cat_vocab_size=VOCAB,
+                        num_tasks=2,
+                    )
+                    self._assert_multi_output(model, 2)
+                    self.assertEqual(axes["encoder"]["name"], encoder)
+                    self.assertEqual(axes["structure"]["name"], structure)
 
     def test_single_task_output(self):
         model = build_single_task_model(CAT_COLS, NUM_COLS, VOCAB)
@@ -277,6 +303,21 @@ class RegistryTest(unittest.TestCase):
                 cat_vocab_size=VOCAB,
             )
 
+    def test_every_registered_model_returns_traceable_metadata(self):
+        for name in available_models():
+            kwargs = {
+                "categorical_cols": CAT_COLS,
+                "numeric_cols": NUM_COLS,
+                "cat_vocab_size": VOCAB,
+                **REGISTRY_KWARGS[name],
+            }
+            encoder = None if name == "logistic" else "mlp"
+            with self.subTest(model=name):
+                model, axes = build_registered_model(name, encoder=encoder, **kwargs)
+                self.assertEqual(axes["structure"]["name"], name)
+                self.assertEqual(axes["encoder"]["name"], encoder)
+                self.assertEqual(axes["total_params"], model.count_params())
+
 
 class SerializationTest(unittest.TestCase):
     """A saved run must reload through the package's own load entry point."""
@@ -316,17 +357,54 @@ class SerializationTest(unittest.TestCase):
                 )
                 self.assert_reloads_identically(model)
 
-    def test_saved_model_reloads_and_predicts_in_a_fresh_process(self):
-        model = build_small_mmoe_model()
+    def test_every_registered_model_reloads_in_one_fresh_process(self):
+        models = []
+        for structure in available_structures():
+            for encoder in available_encoders():
+                model, _ = build_model(
+                    encoder=encoder,
+                    structure=structure,
+                    categorical_cols=CAT_COLS,
+                    numeric_cols=NUM_COLS,
+                    cat_vocab_size=VOCAB,
+                    num_tasks=2,
+                )
+                models.append(model)
+        for encoder in available_encoders():
+            model, _ = build_registered_model(
+                "single_task",
+                encoder=encoder,
+                categorical_cols=CAT_COLS,
+                numeric_cols=NUM_COLS,
+                cat_vocab_size=VOCAB,
+            )
+            models.append(model)
+        logistic, _ = build_registered_model(
+            "logistic",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=2,
+        )
+        models.append(logistic)
+
         inputs = make_inputs()
-        expected = model.predict(inputs, verbose=0)
+        expected = []
+        for model in models:
+            predictions = model.predict(inputs, verbose=0)
+            expected.append(predictions if isinstance(predictions, list) else [predictions])
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp = Path(tmp_dir)
-            model_path = tmp / "model.keras"
+            model_paths = []
+            for index, model in enumerate(models):
+                model_path = tmp / f"model-{index}.keras"
+                model.save(model_path)
+                model_paths.append(str(model_path))
+            manifest_path = tmp / "models.json"
             inputs_path = tmp / "inputs.npz"
             output_path = tmp / "predictions.npz"
-            model.save(model_path)
+            manifest_path.write_text(json.dumps(model_paths), encoding="utf-8")
             np.savez(
                 inputs_path,
                 n=len(inputs),
@@ -338,7 +416,7 @@ class SerializationTest(unittest.TestCase):
                     sys.executable,
                     "-c",
                     RELOAD_IN_CHILD,
-                    str(model_path),
+                    str(manifest_path),
                     str(inputs_path),
                     str(output_path),
                 ],
@@ -348,10 +426,12 @@ class SerializationTest(unittest.TestCase):
             )
 
             with np.load(output_path) as data:
-                actual = [data[f"arr_{i}"] for i in range(len(expected))]
-
-        for restored_pred, original_pred in zip(actual, expected):
-            np.testing.assert_allclose(restored_pred, original_pred, rtol=1e-6, atol=1e-6)
+                for model_index, original_outputs in enumerate(expected):
+                    for output_index, original_pred in enumerate(original_outputs):
+                        restored_pred = data[f"m{model_index}_o{output_index}"]
+                        np.testing.assert_allclose(
+                            restored_pred, original_pred, rtol=1e-6, atol=1e-6
+                        )
 
 
 if __name__ == "__main__":
