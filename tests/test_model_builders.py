@@ -110,6 +110,42 @@ class BuilderShapeTest(unittest.TestCase):
         )
         self._assert_multi_output(model, 4)
 
+    def test_ple_cgc_supports_one_and_two_progressive_layers(self):
+        for num_layers in (1, 2):
+            with self.subTest(num_layers=num_layers):
+                model, axes = build_model(
+                    encoder="mlp",
+                    structure="ple_cgc",
+                    categorical_cols=CAT_COLS,
+                    numeric_cols=NUM_COLS,
+                    cat_vocab_size=VOCAB,
+                    num_tasks=4,
+                    num_layers=num_layers,
+                    num_shared_experts=2,
+                    num_task_experts=2,
+                    expert_units=8,
+                    tower_units=4,
+                )
+                self._assert_multi_output(model, 4)
+                self.assertEqual(axes["structure"]["name"], "ple_cgc")
+                self.assertEqual(
+                    axes["structure"]["hyperparams"]["num_layers"], num_layers
+                )
+
+    def test_ple_cgc_rejects_invalid_layer_counts(self):
+        for invalid in (0, -1, True, 1.5):
+            with self.subTest(num_layers=invalid):
+                with self.assertRaisesRegex(ValueError, "num_layers"):
+                    build_model(
+                        encoder="mlp",
+                        structure="ple_cgc",
+                        categorical_cols=CAT_COLS,
+                        numeric_cols=NUM_COLS,
+                        cat_vocab_size=VOCAB,
+                        num_tasks=4,
+                        num_layers=invalid,
+                    )
+
     def test_every_encoder_structure_combination(self):
         for structure in available_structures():
             for encoder in available_encoders():
@@ -139,11 +175,25 @@ class BuilderShapeTest(unittest.TestCase):
 
 REGISTRY_KWARGS = {
     "mmoe": {"num_tasks": 4, "num_experts": 2, "units": 8, "tower_units": 4},
+    "ple_cgc": {
+        "num_tasks": 4,
+        "num_layers": 1,
+        "num_shared_experts": 2,
+        "num_task_experts": 2,
+        "expert_units": 8,
+        "tower_units": 4,
+    },
     "shared_bottom": {"num_tasks": 4, "bottom_units": 8, "tower_units": 4},
     "single_task": {"units": 8, "tower_units": 4},
     "logistic": {"num_tasks": 4},
 }
-REGISTRY_OUTPUTS = {"mmoe": 4, "shared_bottom": 4, "single_task": 1, "logistic": 4}
+REGISTRY_OUTPUTS = {
+    "mmoe": 4,
+    "ple_cgc": 4,
+    "shared_bottom": 4,
+    "single_task": 1,
+    "logistic": 4,
+}
 
 
 def assert_multi_output(test_case, model, expected_outputs):
@@ -279,7 +329,8 @@ class FeatureEncoderAxisTest(unittest.TestCase):
 class RegistryTest(unittest.TestCase):
     def test_registry_lists_the_documented_models(self):
         self.assertEqual(
-            available_models(), ["logistic", "mmoe", "shared_bottom", "single_task"]
+            available_models(),
+            ["logistic", "mmoe", "ple_cgc", "shared_bottom", "single_task"],
         )
 
     def test_create_model_dispatches_by_name(self):
@@ -340,6 +391,22 @@ class SerializationTest(unittest.TestCase):
 
     def test_saved_model_reloads_and_predicts_identically(self):
         self.assert_reloads_identically(build_small_mmoe_model())
+
+    def test_ple_cgc_reloads_and_predicts_identically(self):
+        model, _ = build_model(
+            encoder="mlp",
+            structure="ple_cgc",
+            categorical_cols=CAT_COLS,
+            numeric_cols=NUM_COLS,
+            cat_vocab_size=VOCAB,
+            num_tasks=2,
+            num_layers=1,
+            num_shared_experts=2,
+            num_task_experts=2,
+            expert_units=8,
+            tower_units=4,
+        )
+        self.assert_reloads_identically(model)
 
     def test_every_encoder_model_reloads_and_predicts_identically(self):
         for encoder in available_encoders():

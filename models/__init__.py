@@ -34,6 +34,7 @@ from models.encoders import (
 from models.inputs import FeatureLayout, build_shared_inputs
 from models.mtl.logistic import build_logistic_model
 from models.mtl.mmoe import MMoE
+from models.mtl.ple_cgc import PLECGC
 from models.mtl.single_task import build_single_task_model
 from models.registry import (
     DEFAULT_STRUCTURE,
@@ -51,6 +52,7 @@ __all__ = [
     "FeatureLayout",
     "MLPEncoder",
     "MMoE",
+    "PLECGC",
     "available_encoders",
     "available_models",
     "available_structures",

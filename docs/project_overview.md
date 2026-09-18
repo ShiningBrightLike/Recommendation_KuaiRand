@@ -11,7 +11,7 @@
 当前实现状态：
 
 - 数据预处理管线已完成：原始 CSV → 样本拼接 → 特征编码/归一化 → parquet + 编码器产物；
-- 已实现 **MMoE（Multi-gate Mixture-of-Experts）** 多任务模型并完成两轮训练/评估；
+- 已实现 **MMoE（Multi-gate Mixture-of-Experts）** 与 **PLE-CGC（Progressive Layered Extraction with Customized Gate Control）** 多任务模型；MMoE 已完成多 seed 训练/评估，PLE-CGC 已完成结构、序列化与单层三 seed 验证集对照；
 - 已切换到 **train/val/test 时间切分协议**：验证集（4/16–4/21）从训练日志内切出，测试集（4/22–5/08）仅在训练结束后评估一次；
 - 新增单一配置源 `config.py` 与动态 `cat_vocab_size`（写于 `pipeline_meta.json`），特征清单不再三处重复；
 - 每次运行的产物（`model.keras` / `metrics.json` / `curves.png` / `training.log`）统一保存到 `KuaiRand-Pure/saved/runs/<run>/`；`KuaiRand-Pure/saved/` 根目录下为旧协议历史产物。
@@ -67,6 +67,7 @@ models/
 └── mtl/                  # 多任务结构轴
     ├── mmoe.py           #   MMoE：8 个专家 + 每任务 softmax gate
     ├── shared_bottom.py  #   共享底层：一个主干 + 每任务塔
+    ├── ple_cgc.py        #   PLE-CGC：分层 shared/task experts + CGC gates
     ├── single_task.py    #   单任务：每任务各自一份编码器与塔
     └── logistic.py       #   逻辑回归：每个特征一个权重，按定义不接受编码器
 ```
@@ -76,7 +77,7 @@ models/
 | 轴 | 取值 | 说明 |
 | --- | --- | --- |
 | 特征编码器 `--encoder` | `mlp`（默认）、`dcn`、`senet` | 把拼接后的特征向量（35 个类别域 × 8 + 58 个数值域 = 338 维）变换成多任务结构的输入 |
-| 多任务结构 `--mtl` | `mmoe`（默认）、`shared_bottom` | 决定任务之间如何共享与分化；`single_task`、`logistic` 是只在 `baselines.py` 出现的对照基线 |
+| 多任务结构 `--mtl` | `mmoe`（默认）、`shared_bottom`、`ple_cgc` | 决定任务之间如何共享与分化；`single_task`、`logistic` 是只在 `baselines.py` 出现的对照基线 |
 
 编码器规格与参数量（默认 schema：35 类别 + 58 数值，无影子特征）：
 
@@ -89,6 +90,7 @@ models/
 - 每个编码器都是自定义 Layer：统一「稠密张量进、稠密张量出」，自带默认超参（模块级 `DEFAULTS`，可用 `encoder_overrides` 覆盖），实现 `get_config`/`build` 并注册；`models.custom_objects()` 是保存后重新加载的唯一入口。
 - 低秩交叉层 `x' = x0 ⊙ (x V Uᵀ + b) + x`，`U`、`V` 各为 `dim × rank`，从不物化 `dim × dim` 矩阵，因此开销随 rank 而非输入宽度增长。
 - 所有类别特征共享同一个 Embedding 层（`embed_dim=8`），数值特征直接拼接后交给编码器；`MMoE` 层为 `num_experts=8`，每任务一个 softmax gate，塔为 `Dense(32, ReLU) → Dense(1, sigmoid)`。
+- `PLE-CGC` 作为同一结构轴上的可选实现：默认 `num_layers=1`，但接口接受正整数 `num_layers=n`；每层独立维护 2 个 shared experts、每任务 2 个 task-specific experts（expert units=48），task gate 只混合 shared 与本任务 experts，shared gate 混合 shared 与全部 task experts，最终只将 task-specific 表征送入各任务 `Dense(32, ReLU) → Dense(1, sigmoid)` tower。单层时最后一个 shared gate 没有下游 shared 层可接，这是“最后一层 shared 输出不直接入 tower”取舍的已知现象。完整决策见 ADR-0006。
 
 ### 2.3 训练配置（`main.py`）
 
@@ -301,7 +303,7 @@ Top 5 特征：`tab`（0.0612）、`onehot_feat3`（0.0316）、`valid_play_user
 | 单任务 | 0.7227 | 0.8143 | 0.6955 | 0.6420 | 0.7186 |
 | MMoE | 0.7225 | 0.8104 | 0.6869 | 0.6375 | 0.7143 |
 
-结论（门控任务早停口径）：单任务领先，MMoE 优于 Shared-Bottom 但未超过单任务，多任务结构价值待 PLE-CGC 对照。统计特征审计显示去掉 51 列全期统计特征后四任务均值下降 0.0214，point-in-time 重算列为后续必做项。结果与审计报告见 `docs/assets/baselines_v1.md`、`docs/leakage_audit.md`。
+结论（门控任务早停口径，当时尚未有 PLE-CGC）：单任务领先，MMoE 优于 Shared-Bottom 但未超过单任务。当前 PLE-CGC 对照结果见 §7.7。统计特征审计显示去掉 51 列全期统计特征后四任务均值下降 0.0214，point-in-time 重算列为后续必做项。结果与审计报告见 `docs/assets/baselines_v1.md`、`docs/leakage_audit.md`。
 
 ### 7.5 对照模型 v2（验证集 × 3 seed，2026-09-16）
 
@@ -348,13 +350,24 @@ ADR-0005 落地后默认模型变为「特征编码器 `mlp` → MMoE」。本�
 
 > 本节只是 ADR-0002 的**批量阶段**；采纳前仍需确认阶段（同种子重训对比），该阶段尚未实现（RANK-P2-1）。
 
+### 7.7 PLE-CGC 对照结果（验证集 × 3 seed，2026-09-19）
+
+按 ADR-0006，先运行单层 `ple_cgc+mlp`，再与 baseline v2 当前冠军 `mmoe+senet` 在相同协议下比较。两组均使用 seeds 2025/2026/2027、全量 train/val = 950,310 / 190,802、30 epochs 上限、`val_auc_mean` 早停；最终确认集未加载。
+
+| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) | 参数量 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `ple_cgc+mlp`（`num_layers=1`） | 0.7362±0.0006 | 0.8309±0.0040 | 0.7151±0.0101 | 0.6599±0.0111 | 0.7355±0.0013 | 0.7835±0.0023 | 80,134 |
+| `mmoe+senet` | 0.7414±0.0012 | 0.8388±0.0062 | 0.7062±0.0188 | 0.6718±0.0114 | 0.7395±0.0073 | 0.7901±0.0028 | 221,469 |
+
+`mmoe+senet` 的四任务均值高 +0.0040、门控均值高 +0.0066；门控均值三个配对 seed 均胜出，四任务均值两个 seed 胜出。PLE-CGC 只在关注任务均值高 +0.0089，当前不替换冠军。该结论只覆盖单层 PLE，不外推到 `num_layers>1`。发布产物见 `docs/assets/ple_cgc_val_3seed.*`。
+
 ---
 
 ## 8. 后续计划与建议
 
 精排范围的完整路线图（含 P0/P1/P2 里程碑、验收标准与 issue 清单）见仓库根目录 `ROADMAP.md`。
 
-1. **多任务结构升级**：尝试 PLE/CGC（渐进式分层抽取）替代基础 MMoE，或按任务相关性分组专家；
+1. **多任务结构对照**：单层 PLE-CGC 已按验证集三 seed 与 `mmoe+senet` 完成对照，当前不替换冠军；下一步可做 `num_layers>1` 的深度消融，不提前使用最终确认集；
 2. **特征工程与优选**：加入序列特征（用户观看历史）、时间衰减、视频画像聚合特征；新特征先用置换重要度门控（批量过滤 + 同种子重训确认，见 ADR-0002），避免“全量加入”；
 3. **样本不均衡**：针对关注/评论使用 focal loss、负采样或任务独立阈值；
 4. **Embedding 优化**：按特征分域设置不同 vocab/dim（动态 vocab 已由 `pipeline_meta.json` 完成）；

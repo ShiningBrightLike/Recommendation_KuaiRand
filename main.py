@@ -66,6 +66,12 @@ def parse_args():
         help="multi-task structure (see ADR-0005)",
     )
     parser.add_argument(
+        "--ple-layers",
+        type=int,
+        default=1,
+        help="PLE-CGC progressive extraction depth (used when --mtl=ple_cgc)",
+    )
+    parser.add_argument(
         "--tag",
         default=None,
         help="prefix for the run directory (default: <mtl>_<encoder>)",
@@ -253,6 +259,9 @@ def main():
         f"Building {args.mtl} + {args.encoder} model "
         f"(cat_vocab_size={cat_vocab_size})..."
     )
+    structure_kwargs = (
+        {"num_layers": args.ple_layers} if args.mtl == "ple_cgc" else {}
+    )
     model, model_axes = build_model(
         encoder=args.encoder,
         structure=args.mtl,
@@ -261,6 +270,7 @@ def main():
         cat_vocab_size=cat_vocab_size,
         embed_dim=C.EMBED_DIM,
         num_tasks=len(C.LABEL_COLS),
+        **structure_kwargs,
     )
     logger.info(
         f"Model axes: encoder={model_axes['encoder']['name']} "

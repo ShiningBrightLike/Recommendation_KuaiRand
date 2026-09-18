@@ -2,7 +2,7 @@
 
 ## KuaiRand场景中多目标CVR预测的任务特化专家优化实践
 
-本项目基于 KuaiRand 数据集，构建用于点击、点赞、关注、评论等多任务反馈预测的推荐系统模型。当前已完成数据加载与样本拼接的基础处理流程，以及MMoE基本框架。
+本项目基于 KuaiRand 数据集，构建用于点击、点赞、关注、评论等多任务反馈预测的推荐系统模型。当前已完成数据加载与样本拼接、可插拔特征编码器，以及 MMoE / Shared-Bottom / PLE-CGC 多任务结构。
 
 ---
 
@@ -24,7 +24,7 @@ Recommendation\_KuaiRand/
 ├── main.py                                # 模型训练评估
 ├── models/                                # 模型定义：两条正交的轴（ADR-0005）
 │   ├── encoders/                          #   特征编码器：mlp（默认）/ dcn / senet
-│   ├── mtl/                               #   多任务结构：mmoe（默认）/ shared_bottom / single_task / logistic
+│   ├── mtl/                               #   多任务结构：mmoe（默认）/ shared_bottom / ple_cgc / single_task / logistic
 │   ├── builders.py                        #   build_model()：组装两条轴并产出 run 元数据
 │   ├── registry.py                        #   名称表 + 自定义层加载入口
 │   └── inputs.py                          #   共享输入分支与字段划分
@@ -40,7 +40,7 @@ Recommendation\_KuaiRand/
 - [x] 将用户和视频特征合并至行为数据，生成训练样本
 - [x] 特征处理（缺失值填充、编码、归一化等）
 - [x] 构建 CVR 预测模型（点击/点赞/关注/评论等）
-- [x] 精排模型拆成「特征编码器 × 多任务结构」两条可插拔的轴（`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom`，ADR-0005）
+- [x] 精排模型拆成「特征编码器 × 多任务结构」两条可插拔的轴（`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom`/`ple_cgc`，ADR-0005、ADR-0006）
 - [ ] 模型评估与优化
 
 ---
@@ -79,19 +79,26 @@ training.log     # 训练日志
 
 快速自检可运行 `python main.py --smoke`（每份数据最多取 2048 行、只跑 1 个 epoch）。
 
-模型由两条独立的轴组成（ADR-0005）：特征编码器 `--encoder`（默认 `mlp`，可选 `dcn`、`senet`）与多任务结构 `--mtl`（默认 `mmoe`，可选 `shared_bottom`）。两者都会写进每个 run 的 `metrics.json`：
+模型由两条独立的轴组成（ADR-0005）：特征编码器 `--encoder`（默认 `mlp`，可选 `dcn`、`senet`）与多任务结构 `--mtl`（默认 `mmoe`，可选 `shared_bottom`、`ple_cgc`）。两者都会写进每个 run 的 `metrics.json`：
 
 ```bash
 python main.py --encoder dcn                          # DCN-v2 编码器 + MMoE（默认结构）
 python main.py --encoder senet                        # SENet 编码器（按特征域重加权）
 python main.py --mtl shared_bottom --encoder mlp      # 共享底层结构
+python main.py --mtl ple_cgc --encoder mlp            # 单层 PLE-CGC（num_layers 默认 1）
+python main.py --mtl ple_cgc --encoder mlp --ple-layers 2  # 两层 PLE-CGC
 python baselines.py --models "mmoe+mlp,mmoe+dcn,mmoe+senet"   # 默认只在验证集比较
+python baselines.py --models "ple_cgc+mlp" --seeds 2025,2026,2027  # PLE 验证集多 seed
 python baselines.py --models "mmoe+mlp" --final-test           # 配置锁定后的最终确认
 ```
 
 `baselines.py` 的每个「配置 × seed」都会保存到汇总目录下的
 `runs/<结构+编码器>/seed-<seed>/`，包含模型与独立 `metrics.json`。为保护最终确认集，
 多模型比较不能使用 `--final-test`；该选项只接受一个已经锁定的模型配置和一个 seed。
+
+### PLE-CGC 结构
+
+PLE-CGC（Progressive Layered Extraction with Customized Gate Control）属于多任务结构轴，不是特征编码器。首版采用单层配置，但 `num_layers=n` 保留为正整数参数，后续可直接堆叠 progressive extraction 层。每层默认使用 2 个 shared experts、每个任务 2 个 task-specific experts，expert units=48、tower units=32；每层参数独立。任务 gate 混合 shared experts 与本任务 experts，shared gate 混合 shared experts 与全部 task experts，最后只把 task-specific 表征送入任务 tower。按此取舍，`n=1` 时最后一个 shared gate 没有下游 shared 层，因此不会获得反向梯度；这是已知结构现象。结构决策与序列化约束见 [ADR-0006](docs/adr/0006-ple-cgc-multi-task-structure.md)。
 
 ---
 
@@ -142,6 +149,17 @@ ADR-0005 之后默认模型是「特征编码器 `mlp` → MMoE」。下表使�
 - 只有 3 个 seed，因此这里用于候选排序，不把差值解释为统计显著性；最终确认集仍保持未消费。
 
 完整结果见 [baselines_v2.md](docs/assets/baselines_v2.md) 与 [baselines_v2.json](docs/assets/baselines_v2.json)，每个 seed 的模型与 metadata 保存在 `KuaiRand-Pure/saved/runs/baseline-v2-val-3seed-20260916/`。
+
+### PLE-CGC 对照（2026-09-19，验证集 × 3 seed）
+
+按 ADR-0006 先跑单层 `ple_cgc+mlp`，再与 baseline v2 当前冠军 `mmoe+senet` 在相同验证集协议下比较。两组均使用 seeds 2025 / 2026 / 2027、`val_auc_mean` 早停；最终确认集未加载。
+
+| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) | 参数量 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ple_cgc+mlp（`num_layers=1`） | 0.7362±0.0006 | 0.8309±0.0040 | 0.7151±0.0101 | 0.6599±0.0111 | 0.7355±0.0013 | 0.7835±0.0023 | 80,134 |
+| mmoe+senet | 0.7414±0.0012 | 0.8388±0.0062 | 0.7062±0.0188 | 0.6718±0.0114 | 0.7395±0.0073 | 0.7901±0.0028 | 221,469 |
+
+本批次中 `mmoe+senet` 的四任务均值高 **+0.0040**、门控均值高 **+0.0066**；门控均值在三个配对 seed 均胜出，四任务均值在两个 seed 胜出。PLE-CGC 仅在关注任务均值高 **+0.0089**，不足以改变当前候选选择。该结论只适用于 `num_layers=1` 的 PLE 配置，不代表更深 PLE 层数。完整产物见 [ple_cgc_val_3seed.md](docs/assets/ple_cgc_val_3seed.md)、[JSON](docs/assets/ple_cgc_val_3seed.json) 和 [图表](docs/assets/ple_cgc_val_3seed.png)。
 
 ---
 
@@ -303,8 +321,8 @@ Top 10 特征（总体重要度 = 门控任务平均绝对 AUC 下降；分任�
 
 * ~~模块化数据处理与建模流程~~ 已完成（里程碑 1：train/val/test 协议 + 单一配置源 + run 产物归档）
 * ~~支持多反馈目标的多任务学习~~ 已完成（MMoE 四任务可复现基线）
-* ~~精排模型两轴可插拔（特征编码器 × 多任务结构）~~ 已完成（ADR-0005：`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom`，含 3 seed 对照与置换重要度重跑）
-* 多任务结构升级（PLE/CGC）——接口已就位，需要先做一轮设计拷问（分层专家、任务共享/独享、门控结构）
+* ~~精排模型两轴可插拔（特征编码器 × 多任务结构）~~ 已完成（ADR-0005：`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom` 的 baseline v2 三 seed 对照与置换重要度重跑；ADR-0006 新增 `ple_cgc` 工程实现）
+* ~~多任务结构升级（PLE/CGC）~~ 已完成首版实现与验证集 3 seed 对照（`ple_cgc`，支持 `num_layers=n`）；当前单层 PLE 未替换 `mmoe+senet` 冠军，多层消融仍待做
 * 特征门控的确认阶段（ADR-0002 同种子重训对比，RANK-P2-1）
 * 排序指标套件（GAUC / NDCG@K / Recall@K / MAP）与概率校准（ECE）
 * 引入深度模型（如 Transformer）进行序列建模

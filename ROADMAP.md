@@ -2,7 +2,7 @@
 
 > 范围：本项目定位为**个人离线研究仓库**，数据为离线下载的 KuaiRand 数据集，不追公司级全链路，不实现召回/粗排/重排与线上服务。目标是把**精排（Fine Ranking）**这一环做成一个自洽、完整、可复现的离线研究模块。
 
-相关文档：[README](README.md) · [project_overview](docs/project_overview.md) · [实验台账](docs/experiments.md) · [CONTEXT](CONTEXT.md) · [ADR-0001 特征决策集纪律](docs/adr/0001-feature-decision-set-discipline.md) · [ADR-0002 置换重要度与两阶段门控](docs/adr/0002-permutation-importance-and-two-stage-gate.md) · [ADR-0005 两轴分层](docs/adr/0005-pluggable-encoder-and-multi-task-structure.md)
+相关文档：[README](README.md) · [project_overview](docs/project_overview.md) · [实验台账](docs/experiments.md) · [CONTEXT](CONTEXT.md) · [ADR-0001 特征决策集纪律](docs/adr/0001-feature-decision-set-discipline.md) · [ADR-0002 置换重要度与两阶段门控](docs/adr/0002-permutation-importance-and-two-stage-gate.md) · [ADR-0005 两轴分层](docs/adr/0005-pluggable-encoder-and-multi-task-structure.md) · [ADR-0006 PLE-CGC 结构](docs/adr/0006-ple-cgc-multi-task-structure.md)
 
 ---
 
@@ -18,7 +18,7 @@
 
 | 维度 | 现状 | 缺口 |
 | --- | --- | --- |
-| 精排模型 | 两轴可插拔：特征编码器（`mlp`/`dcn`/`senet`）× 多任务结构（`mmoe`/`shared_bottom`），另有 `single_task`/`logistic` 对照（ADR-0005） | 缺 PLE-CGC 结构、缺 FM/PNN 等编码器、缺序列建模（DIN） |
+| 精排模型 | 两轴可插拔：特征编码器（`mlp`/`dcn`/`senet`）× 多任务结构（`mmoe`/`shared_bottom`/`ple_cgc`），另有 `single_task`/`logistic` 对照（ADR-0005、ADR-0006） | 缺 PLE-CGC 多层/超参消融、缺 FM/PNN 等编码器、缺序列建模（DIN） |
 | 训练协议 | train/val/test 时间切分、固定 seed、早停只看 val；`baselines.py --seeds` 支持多种子重跑并汇总 mean±std | 缺超参搜索、缺损失/采样策略实验 |
 | 特征迭代 | 置换重要度 + 影子特征噪声对照（`feature_importance.py`），已在新默认模型上重跑（v2 判定：通过 50 / 待确认 4 / 不通过 40） | ADR-0002 的“确认阶段（同种子重训对比）”未实现；特征无版本指纹 |
 | 评估指标 | 每任务 AUC | 缺排序指标（GAUC / NDCG@K / Recall@K / MAP）、缺概率校准（ECE）、缺分片评估 |
@@ -138,7 +138,7 @@
 | 概率校准与 ECE 报告 | RANK-P0-3 | `ready-for-agent` | P0 |
 | 视频统计特征泄漏审计（全期 vs 训练期） | RANK-P0-4 | `ready-for-human` | P0 |
 | 分片评估与 bootstrap 置信区间 | RANK-P0-5 | `ready-for-agent` | P0 |
-| 模型对照矩阵（Shared-Bottom/MMoE/PLE-CGC） | RANK-P1-1 | `ready-for-agent` | P1 |
+| 模型对照矩阵（Shared-Bottom/MMoE/PLE-CGC） | RANK-P1-1 | `ready-for-agent` | P1（单层矩阵与三 seed 对照已完成；多层消融仍待做） |
 | DCN-v2/FM 特征交叉模块 | RANK-P1-2 | `ready-for-agent` | P1 |
 | 多种子方差报告 | RANK-P1-3 | `ready-for-agent` | P1 |
 | 损失与采样策略实验 | RANK-P1-4 | `ready-for-human` | P1 |
@@ -157,7 +157,7 @@
 - FIX-2：统一“总体重要度”口径为门控任务（代码/README/CONTEXT 一致）。
 - FIX-3：早停默认改为 `val_auc_mean`（ADR-0003），`--monitor` 可切换。
 - FIX-4：新增 `--drop-features` / `--drop-stat-features` 与 `leakage_audit.py`；已完成首轮统计特征泄漏审计，结论见 `docs/leakage_audit.md`（严格 point-in-time 重算仍待做，RANK-P0-4 保持 open）。
-- FIX-5：新增 Logistic / Shared-Bottom / 单任务对照模型与 `baselines.py`，首轮结果见 `docs/assets/baselines_v1.md`；PLE-CGC 等结构升级仍属 RANK-P1-1 后续。
+- FIX-5：新增 Logistic / Shared-Bottom / 单任务对照模型与 `baselines.py`，首轮结果见 `docs/assets/baselines_v1.md`。
 - 复审修正：`val_auc_mean` 早停改为**门控任务（点击/点赞）平均**，与 ADR-0003/CONTEXT 口径一致；新增 ADR-0004 记录泄漏审计的默认取舍。
 - 复审后按新口径重跑：单任务 0.7186 > MMoE 0.7143 > Shared-Bottom 0.7050 > Logistic 0.6898（四任务均值）；泄漏审计差值调整为 −0.0214（四任务均值）/ −0.0072（门控均值）。
 
@@ -215,3 +215,14 @@
   - `mmoe+senet` 在四任务与门控口径均最高，相对默认 `mmoe+mlp` 为 +0.0090 / +0.0094，且三个配对 seed 差值方向一致；列为后续锁定与最终确认的首选候选。
   - 18 份独立 seed metadata、27 个模型文件全部保存；发布资产为 `docs/assets/baselines_v2.{md,json,png}`，JSON 标记 `protocol_status=valid_for_model_selection`。
   - 该批次不包含最终测试指标；只有 3 个 seed，差值不解释为统计显著性。
+
+### 2026-09-19
+
+- **PLE-CGC 结构实现（RANK-P1-1 工程阶段）**：新增 `ple_cgc` 多任务结构并注册到两轴模型 API，可与 `mlp` / `dcn` / `senet` 编码器组合；设计决策见 ADR-0006。
+  - 首版默认一层，但公开正整数参数 `num_layers=n`；各层参数独立。每层默认 2 个 shared experts、每任务 2 个 task-specific experts，expert units=48、tower units=32。
+  - task gate 混合 shared experts 与对应任务 experts；shared gate 混合 shared experts 与全部 task experts。层间分别传递 shared/task 表征，最终只把 task-specific 表征送入任务 tower。
+  - 已覆盖 `n=1/n=2` 构建、非法层数拒绝、三个编码器组合与 `.keras` 保存/重载一致性；正式性能实验沿用验证集 seeds 2025/2026/2027，最终确认集不得提前使用。
+- **PLE-CGC 正式验证集对照完成**：run `ple-cgc-val-3seed_20260919_003412`，单层 `ple_cgc+mlp` 与 `mmoe+senet` 各跑 seeds 2025/2026/2027，未加载最终确认集。
+  - `ple_cgc+mlp`：四任务均值 `0.7355±0.0013`，门控均值 `0.7835±0.0023`，参数量 80,134。
+  - `mmoe+senet`：四任务均值 `0.7395±0.0073`，门控均值 `0.7901±0.0028`，参数量 221,469。
+  - `mmoe+senet` 在两个汇总口径分别高 +0.0040 / +0.0066；PLE 仅在关注任务均值高 +0.0089。结论只覆盖 `num_layers=1`，不外推到更深 PLE；发布资产见 `docs/assets/ple_cgc_val_3seed.*`。

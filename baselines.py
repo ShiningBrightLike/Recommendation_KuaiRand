@@ -8,6 +8,7 @@ Baselines (same data/protocol/seed as main.py):
     - shared_bottom: one shared trunk + per-task towers
     - single_task:   one independent MLP per task (trained separately)
     - mmoe:          the current MMoE model, for a matched-protocol reference
+    - ple_cgc:       progressive shared/task expert extraction
 
 Usage:
     python baselines.py
@@ -66,6 +67,12 @@ def parse_args():
     parser.add_argument("--patience", type=int, default=C.EARLY_STOP_PATIENCE)
     parser.add_argument("--learning-rate", type=float, default=C.LEARNING_RATE)
     parser.add_argument("--seed", type=int, default=C.RANDOM_SEED)
+    parser.add_argument(
+        "--ple-layers",
+        type=int,
+        default=1,
+        help="PLE-CGC progressive extraction depth (used for ple_cgc specs)",
+    )
     parser.add_argument("--max-rows", type=int, default=None)
     parser.add_argument(
         "--monitor",
@@ -276,8 +283,11 @@ def format_model_spec(spec):
     return structure if encoder is None else f"{structure}+{encoder}"
 
 
-def build_multi_task_model(structure, encoder, cat_cols, num_cols, vocab, num_tasks):
+def build_multi_task_model(
+    structure, encoder, cat_cols, num_cols, vocab, num_tasks, ple_layers=1
+):
     """Build one encoder-fed structure, plus its two-axis run metadata."""
+    structure_kwargs = {"num_layers": ple_layers} if structure == "ple_cgc" else {}
     return build_registered_model(
         structure,
         encoder=encoder,
@@ -286,6 +296,7 @@ def build_multi_task_model(structure, encoder, cat_cols, num_cols, vocab, num_ta
         cat_vocab_size=vocab,
         embed_dim=C.EMBED_DIM,
         num_tasks=num_tasks,
+        **structure_kwargs,
     )
 
 
@@ -461,7 +472,13 @@ def train_one_seed(
         )
     else:
         model, axes = build_multi_task_model(
-            structure, encoder, cat_cols, num_cols, vocab, len(task_names)
+            structure,
+            encoder,
+            cat_cols,
+            num_cols,
+            vocab,
+            len(task_names),
+            ple_layers=args.ple_layers,
         )
     result = train_multi_output(
         model, train, val, evaluation, args, task_names, run_dir
@@ -531,6 +548,7 @@ def main():
             "batch_size": args.batch_size,
             "patience": args.patience,
             "learning_rate": args.learning_rate,
+            "ple_layers": args.ple_layers,
             "monitor": args.monitor,
             "evaluation_split": evaluation_split,
             "rows": rows,

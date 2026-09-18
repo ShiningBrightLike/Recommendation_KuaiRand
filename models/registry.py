@@ -10,6 +10,7 @@ from models.encoders import DCNEncoder, MLPEncoder, SENetEncoder
 from models.encoders.dcn import LowRankCrossLayer
 from models.mtl.logistic import build_logistic_model
 from models.mtl.mmoe import MMoE, build_mmoe_structure
+from models.mtl.ple_cgc import PLECGC, build_ple_cgc_structure
 from models.mtl.shared_bottom import build_shared_bottom_structure
 from models.mtl.single_task import build_single_task_model
 
@@ -19,6 +20,7 @@ DEFAULT_STRUCTURE = "mmoe"
 # Structures consume a feature encoder and produce one output per task.
 STRUCTURES = {
     "mmoe": build_mmoe_structure,
+    "ple_cgc": build_ple_cgc_structure,
     "shared_bottom": build_shared_bottom_structure,
 }
 
@@ -35,6 +37,7 @@ CUSTOM_LAYERS = {
     "DCNEncoder": DCNEncoder,
     "LowRankCrossLayer": LowRankCrossLayer,
     "MMoE": MMoE,
+    "PLECGC": PLECGC,
     "MLPEncoder": MLPEncoder,
     "SENetEncoder": SENetEncoder,
 }

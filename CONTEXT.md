@@ -53,8 +53,12 @@ _Avoid_: 单特征 AUC（只是关联证据，不是泄漏结论）
 _Avoid_: encode 层、底层网络、backbone
 
 **多任务结构（multi-task structure）**：
-在特征编码器之后，决定多个任务如何共享与分化建模、并给出各任务输出的整块结构；本项目现有 MMoE、Shared-Bottom 与单任务（每任务独立塔），后续扩展 PLE-CGC。
+在特征编码器之后，决定多个任务如何共享与分化建模、并给出各任务输出的整块结构；本项目现有 MMoE、Shared-Bottom、PLE-CGC 与单任务（每任务独立塔）。
 _Avoid_: 专家层（只是其中一种实现）、decode 层
+
+**PLE-CGC（Progressive Layered Extraction with Customized Gate Control）**：
+一种多任务结构：每个抽取层同时维护 shared experts 与每个任务的 task-specific experts；每个任务的 CGC gate 只混合 shared experts 与该任务自己的 experts，shared gate 混合 shared experts 与全部 task-specific experts。各 gate 使用 softmax，抽取层可以堆叠；`num_layers=n` 表示抽取层数，首版固定以 `n=1` 验证结构契约，但保留 `n` 作为可控参数。抽取结果再进入各任务 tower 输出点击、点赞、关注、评论。
+_Avoid_: 把 PLE-CGC 当作特征编码器、把 CGC gate 与特征筛选门控混为一谈、默认暗示只有单层不可扩展
 
 **专家混合门（mixing gate）**：
 MMoE 中每个任务用来对各专家输出做软加权（softmax）的门；它属于多任务结构的内部机制，与特征筛选的“门控”无关。

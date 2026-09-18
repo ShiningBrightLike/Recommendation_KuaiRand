@@ -1,0 +1,351 @@
+{
+  "protocol_status": "valid_for_model_selection",
+  "protocol_note": "Candidate models are compared on the validation split; the final confirmation set was not loaded.",
+  "config": {
+    "seeds": [
+      2025,
+      2026,
+      2027
+    ],
+    "epochs": 30,
+    "batch_size": 1024,
+    "patience": 5,
+    "learning_rate": 0.001,
+    "ple_layers": 1,
+    "monitor": "val_auc_mean",
+    "evaluation_split": "val",
+    "rows": [
+      950310,
+      190802,
+      190802
+    ],
+    "shadow_cols": [
+      "shadow_0"
+    ],
+    "dropped_features": [],
+    "features": {
+      "categorical": 35,
+      "numeric": 59
+    }
+  },
+  "models": {
+    "ple_cgc+mlp": {
+      "tasks_mean": {
+        "is_click": 0.7361526489257812,
+        "is_like": 0.8308826088905334,
+        "is_follow": 0.715056856473287,
+        "is_comment": 0.6599435607592264
+      },
+      "tasks_std": {
+        "is_click": 0.0006213116209683099,
+        "is_like": 0.0039756749301956135,
+        "is_follow": 0.010121534972816862,
+        "is_comment": 0.011125697074854243
+      },
+      "summary": {
+        "mean_all_tasks": 0.735508918762207,
+        "std_all_tasks": 0.001275218257239851,
+        "mean_gate_tasks": 0.7835176289081573,
+        "std_gate_tasks": 0.0022706975470029246
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7356247305870056,
+            "is_like": 0.8292249441146851,
+            "is_follow": 0.7199503779411316,
+            "is_comment": 0.6533017158508301
+          },
+          "best_epoch": 16,
+          "params": 80134,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "ple_cgc",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_layers": 1,
+                "num_shared_experts": 2,
+                "num_task_experts": 2,
+                "expert_units": 48,
+                "tower_units": 32
+              }
+            },
+            "total_params": 80134
+          },
+          "seed": 2025,
+          "train_seconds": 129.7
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.7368373274803162,
+            "is_like": 0.8354188799858093,
+            "is_follow": 0.7218016982078552,
+            "is_comment": 0.6537410616874695
+          },
+          "best_epoch": 17,
+          "params": 80134,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "ple_cgc",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_layers": 1,
+                "num_shared_experts": 2,
+                "num_task_experts": 2,
+                "expert_units": 48,
+                "tower_units": 32
+              }
+            },
+            "total_params": 80134
+          },
+          "seed": 2026,
+          "train_seconds": 132.1
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.735995888710022,
+            "is_like": 0.828004002571106,
+            "is_follow": 0.703418493270874,
+            "is_comment": 0.6727879047393799
+          },
+          "best_epoch": 14,
+          "params": 80134,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "mlp",
+              "output_dim": 64,
+              "params": 21760,
+              "hyperparams": {
+                "hidden": [
+                  64
+                ],
+                "activation": "relu"
+              }
+            },
+            "structure": {
+              "name": "ple_cgc",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_layers": 1,
+                "num_shared_experts": 2,
+                "num_task_experts": 2,
+                "expert_units": 48,
+                "tower_units": 32
+              }
+            },
+            "total_params": 80134
+          },
+          "seed": 2027,
+          "train_seconds": 156.3
+        }
+      },
+      "params": 80134,
+      "model": {
+        "encoder": {
+          "name": "mlp",
+          "output_dim": 64,
+          "params": 21760,
+          "hyperparams": {
+            "hidden": [
+              64
+            ],
+            "activation": "relu"
+          }
+        },
+        "structure": {
+          "name": "ple_cgc",
+          "hyperparams": {
+            "num_tasks": 4,
+            "num_layers": 1,
+            "num_shared_experts": 2,
+            "num_task_experts": 2,
+            "expert_units": 48,
+            "tower_units": 32
+          }
+        },
+        "total_params": 80134
+      },
+      "train_seconds": 418.1
+    },
+    "mmoe+senet": {
+      "tasks_mean": {
+        "is_click": 0.7414150834083557,
+        "is_like": 0.838803788026174,
+        "is_follow": 0.7061555782953898,
+        "is_comment": 0.6718108654022217
+      },
+      "tasks_std": {
+        "is_click": 0.0011693417814966315,
+        "is_like": 0.006167837843663813,
+        "is_follow": 0.018762654870855072,
+        "is_comment": 0.011360814152486657
+      },
+      "summary": {
+        "mean_all_tasks": 0.7395463287830353,
+        "std_all_tasks": 0.007332881524755849,
+        "mean_gate_tasks": 0.7901094357172648,
+        "std_gate_tasks": 0.0027741022612280015
+      },
+      "per_seed": {
+        "2025": {
+          "tasks": {
+            "is_click": 0.7426333427429199,
+            "is_like": 0.8324993848800659,
+            "is_follow": 0.7129706740379333,
+            "is_comment": 0.661696195602417
+          },
+          "best_epoch": 13,
+          "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2025,
+          "train_seconds": 315.1
+        },
+        "2026": {
+          "tasks": {
+            "is_click": 0.741310179233551,
+            "is_like": 0.8448253273963928,
+            "is_follow": 0.720558226108551,
+            "is_comment": 0.6841027140617371
+          },
+          "best_epoch": 12,
+          "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2026,
+          "train_seconds": 367.5
+        },
+        "2027": {
+          "tasks": {
+            "is_click": 0.7403017282485962,
+            "is_like": 0.839086651802063,
+            "is_follow": 0.6849378347396851,
+            "is_comment": 0.669633686542511
+          },
+          "best_epoch": 14,
+          "params": 221469,
+          "artifacts": {
+            "model": "model.keras"
+          },
+          "model": {
+            "encoder": {
+              "name": "senet",
+              "output_dim": 339,
+              "params": 8977,
+              "hyperparams": {
+                "reduction": 2
+              }
+            },
+            "structure": {
+              "name": "mmoe",
+              "hyperparams": {
+                "num_tasks": 4,
+                "num_experts": 8,
+                "units": 64,
+                "tower_units": 32
+              }
+            },
+            "total_params": 221469
+          },
+          "seed": 2027,
+          "train_seconds": 416.1
+        }
+      },
+      "params": 221469,
+      "model": {
+        "encoder": {
+          "name": "senet",
+          "output_dim": 339,
+          "params": 8977,
+          "hyperparams": {
+            "reduction": 2
+          }
+        },
+        "structure": {
+          "name": "mmoe",
+          "hyperparams": {
+            "num_tasks": 4,
+            "num_experts": 8,
+            "units": 64,
+            "tower_units": 32
+          }
+        },
+        "total_params": 221469
+      },
+      "train_seconds": 1098.7
+    }
+  }
+}
