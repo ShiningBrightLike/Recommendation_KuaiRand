@@ -1,326 +1,383 @@
 # Recommendation_KuaiRand
 
-## KuaiRand场景中多目标CVR预测的任务特化专家优化实践
+基于 KuaiRand 公开数据集的离线多任务推荐精排研究项目。项目把用户、视频和曝光日志拼接成样本，同时预测四类用户反馈：点击（`is_click`）、点赞（`is_like`）、关注（`is_follow`）和评论（`is_comment`）。
 
-本项目基于 KuaiRand 数据集，构建用于点击、点赞、关注、评论等多任务反馈预测的推荐系统模型。当前已完成数据加载与样本拼接、可插拔特征编码器，以及 MMoE / Shared-Bottom / PLE-CGC 多任务结构。
+本仓库聚焦“给定曝光集合后的精排建模与评估”，不实现召回、粗排、全量候选生成或线上服务。历史实验记录与完整结果不堆放在本文件中，分别维护在 [`docs/experiments.md`](docs/experiments.md) 和 [`docs/project_overview.md`](docs/project_overview.md)。
 
----
+## 当前状态
 
-## 📁 项目结构
+- 数据处理、可插拔特征编码器、多任务结构、训练产物保存和测试覆盖已经落地。
+- 模型由两条正交轴组成：特征编码器（`mlp`、`dcn`、`senet`）和多任务结构（`mmoe`、`shared_bottom`、`ple_cgc`、`single_task`、`logistic`）。
+- 当前合规验证集对比中，`mmoe+senet` 是候选冠军；单层 `ple_cgc+mlp`（`num_layers=1`）已完成三个 seed 的验证集对照，但尚未替换该候选。这个结论不外推到更深的 PLE 层数。
+- 用户级曝光内排序评估已经提供 GAUC、NDCG@K、Recall@K、MAP@K 和 ECE，并支持以用户为重采样单位的 bootstrap 置信区间。
+- 候选比较默认只读取验证集。`baselines.py --final-test` 和配置锁定后的单模型运行才应使用最终确认集（test）；test 指标不能回流到候选选择或调参。
+
+最新实验摘要和可发布资产见：
+
+- [`docs/experiments.md`](docs/experiments.md)：实验台账、运行目录、配置、指标和结论。
+- [`docs/project_overview.md`](docs/project_overview.md)：架构、评估协议、结果解释和后续计划。
+- [`docs/assets/baselines_v2.md`](docs/assets/baselines_v2.md)：六个配置 × 三个 seed 的合规验证集对照。
+- [`docs/assets/ple_cgc_val_3seed.md`](docs/assets/ple_cgc_val_3seed.md)：单层 PLE-CGC 与当前候选的验证集对照。
+- [`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)：用户级曝光内排序评估汇总。
+
+## 快速开始
+
+### 1. 安装环境
+
+项目按 Windows 上的 conda 环境 `env_tf` 验证，主要版本见 [`requirements.txt`](requirements.txt)。推荐使用 Python 3.11、TensorFlow 2.19 和 Keras 3.9：
+
+```powershell
+conda create -n env_tf python=3.11
+conda activate env_tf
+python -m pip install -r requirements.txt
 ```
-Recommendation\_KuaiRand/
-├── KuaiRand-Pure/
-│   ├── data/
-│   │   ├── log_standard_4_08_to_4_21_pure.csv
-│   │   ├── log_standard_4_22_to_5_08_pure.csv
-│   │   ├── log_random_4_22_to_5_08_pure.csv   # 随机曝光日志（尚未接入）
-│   │   ├── user_features_pure.csv
-│   │   ├── video_features_basic_pure.csv
-│   │   └── video_features_statistic_pure.csv
-│   ├── data_processed/                        # 预处理产物（train/val/test + pipeline_meta.json）
-│   └── saved/
-│       └── runs/                              # 每次训练一个子目录
-├── data_process.py                        # 数据预处理脚本
-├── main.py                                # 模型训练评估
-├── models/                                # 模型定义：两条正交的轴（ADR-0005）
-│   ├── encoders/                          #   特征编码器：mlp（默认）/ dcn / senet
-│   ├── mtl/                               #   多任务结构：mmoe（默认）/ shared_bottom / ple_cgc / single_task / logistic
-│   ├── builders.py                        #   build_model()：组装两条轴并产出 run 元数据
-│   ├── registry.py                        #   名称表 + 自定义层加载入口
-│   └── inputs.py                          #   共享输入分支与字段划分
-├── config.py                              # 特征清单与超参数唯一配置源
-├── requirements.txt                       # 锁版本依赖清单
-└── README.md
+
+如果已有兼容的 TensorFlow 环境，只需确认依赖版本满足 `requirements.txt`。仓库没有把生成的 `data_processed/` 和 `saved/` 训练目录作为源码依赖提交。
+
+### 2. 准备原始数据并预处理
+
+将 KuaiRand-Pure 的原始文件放到 `KuaiRand-Pure/data/`：
+
+```text
+log_standard_4_08_to_4_21_pure.csv
+log_standard_4_22_to_5_08_pure.csv
+user_features_pure.csv
+video_features_basic_pure.csv
+video_features_statistic_pure.csv
 ```
----
 
-## ✅ 已完成工作
+运行：
 
-- [x] 加载行为日志、用户特征、视频特征数据
-- [x] 将用户和视频特征合并至行为数据，生成训练样本
-- [x] 特征处理（缺失值填充、编码、归一化等）
-- [x] 构建 CVR 预测模型（点击/点赞/关注/评论等）
-- [x] 精排模型拆成「特征编码器 × 多任务结构」两条可插拔的轴（`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom`/`ple_cgc`，ADR-0005、ADR-0006）
-- [ ] 模型评估与优化
-
----
-
-## 🚀 使用说明
-
-标准运行环境为 conda 环境 `env_tf`（Python 3.11 + TensorFlow 2.19），依赖版本见 `requirements.txt`。
-
-1. 确保将原始数据放置在 `KuaiRand-Pure/data/` 目录下；
-2. 运行数据预处理：从训练日志（4/08–4/21）中按时间切出验证集（4/16–4/21），训练集仅用于拟合编码器/标准化器，测试日志（4/22–5/08）作为最终测试集：
-
-```bash
+```powershell
 python data_process.py
-````
-
-3. 预处理数据结果将保存在：
-
-```
-KuaiRand-Pure/data_processed/   # processed_{X,y}[_val|_test].parquet + pipeline_meta.json
 ```
 
-4. MMoE 模型训练评估（早停只看验证集，测试集仅在训练结束后评估一次）：
+预处理脚本会合并曝光日志、用户特征和视频特征，按时间从训练日志中切出验证集，并只用训练子集拟合类别编码器和数值标准化器。若需要验证置换重要度的噪声下限，可以显式加入真实模型输入中的 shadow 特征：
 
-```
-python main.py
-```
-
-每次运行都会在 `KuaiRand-Pure/saved/runs/<tag_时间戳>/` 下生成：
-
-```
-model.keras      # Keras 3 原生格式模型
-metrics.json     # 种子/超参/正样本占比/逐 epoch 历史/测试集指标
-curves.png       # 训练与验证 loss/AUC 曲线
-training.log     # 训练日志
+```powershell
+python data_process.py --shadow-features 1
 ```
 
-快速自检可运行 `python main.py --smoke`（每份数据最多取 2048 行、只跑 1 个 epoch）。
+### 3. 训练一个模型
 
-模型由两条独立的轴组成（ADR-0005）：特征编码器 `--encoder`（默认 `mlp`，可选 `dcn`、`senet`）与多任务结构 `--mtl`（默认 `mmoe`，可选 `shared_bottom`、`ple_cgc`）。两者都会写进每个 run 的 `metrics.json`：
+默认是 `mlp` 特征编码器 + `mmoe` 多任务结构：
 
-```bash
-python main.py --encoder dcn                          # DCN-v2 编码器 + MMoE（默认结构）
-python main.py --encoder senet                        # SENet 编码器（按特征域重加权）
-python main.py --mtl shared_bottom --encoder mlp      # 共享底层结构
-python main.py --mtl ple_cgc --encoder mlp            # 单层 PLE-CGC（num_layers 默认 1）
-python main.py --mtl ple_cgc --encoder mlp --ple-layers 2  # 两层 PLE-CGC
-python baselines.py --models "mmoe+mlp,mmoe+dcn,mmoe+senet"   # 默认只在验证集比较
-python baselines.py --models "ple_cgc+mlp" --seeds 2025,2026,2027  # PLE 验证集多 seed
-python baselines.py --models "mmoe+mlp" --final-test           # 配置锁定后的最终确认
+```powershell
+python main.py --seed 2025
 ```
 
-`baselines.py` 的每个「配置 × seed」都会保存到汇总目录下的
-`runs/<结构+编码器>/seed-<seed>/`，包含模型与独立 `metrics.json`。为保护最终确认集，
-多模型比较不能使用 `--final-test`；该选项只接受一个已经锁定的模型配置和一个 seed。
+快速检查代码、数据和模型是否能完整跑通：
+
+```powershell
+python main.py --smoke
+```
+
+常用组合：
+
+```powershell
+python main.py --encoder dcn --mtl mmoe --seed 2025
+python main.py --encoder senet --mtl mmoe --seed 2025
+python main.py --encoder mlp --mtl shared_bottom --seed 2025
+python main.py --encoder mlp --mtl ple_cgc --ple-layers 1 --seed 2025
+python main.py --encoder mlp --mtl ple_cgc --ple-layers 2 --seed 2025
+```
+
+`--ple-layers n` 只在 `--mtl ple_cgc` 时生效，`n` 必须是正整数。首版正式对照采用 `n=1`，更深层数需要单独实验，不能沿用单层 PLE 的结论。
+
+## 数据与划分
+
+### 原始数据和时间窗口
+
+项目使用 KuaiRand 的标准曝光日志。`log_random_4_22_to_5_08_pure.csv` 当前未接入默认处理流程；默认流程使用两个 `log_standard` 文件。
+
+训练日志中的 `date >= 20220416` 行作为验证集，其余行作为训练集；`4/22–5/08` 的日志作为最终确认集：
+
+| 划分 | 来源 | 用途 |
+| --- | --- | --- |
+| train | `4/08–4/15` | 拟合模型、类别编码器和数值标准化器 |
+| val | `4/16–4/21` | 早停、模型选择、特征决策和用户级排序比较 |
+| test | `4/22–5/08` | 配置锁定后的最终确认 |
+
+当前处理产物的规模约为 train 950,310 行、val 190,802 行、test 295,497 行；实际行数以 `pipeline_meta.json` 为准。
+
+### 处理产物
+
+`data_process.py` 会在 `KuaiRand-Pure/data_processed/` 下生成：
+
+```text
+processed_X.parquet              # train 特征
+processed_y.parquet              # train 四任务标签
+processed_X_val.parquet
+processed_y_val.parquet
+processed_X_test.parquet
+processed_y_test.parquet
+processed_ids.parquet            # 评估 sidecar
+processed_ids_val.parquet
+processed_ids_test.parquet
+pipeline_meta.json               # 行数、字段、词表规模、划分元数据
+label_encoders.pkl               # 训练集拟合的类别编码器
+scaler.pkl                       # 训练集拟合的数值标准化器
+feature_offsets.pkl              # 类别字段的词表偏移
+```
+
+模型输入不包含 `user_id`、`video_id` 和原始日期字符串。它们与 `row_id` 保存在评估 sidecar 中，只用于用户分组、相同分数时的稳定排序和审计，不参与模型训练。
+
+### 特征处理边界
+
+- 类别字段使用训练集拟合的编码器，验证集和测试集的未见值映射到 `UNK`。
+- 数值字段使用训练集拟合的 `StandardScaler`。
+- 原始 `date` 转为星期几后进入特征；原始日期仍保留在 sidecar。
+- 当前视频统计特征包含全期聚合信息，存在 point-in-time 风险。已有 [`docs/leakage_audit.md`](docs/leakage_audit.md) 记录审计证据，但严格按训练窗口重算仍是后续工作，不应把现有结果理解为泄漏已经完全解决。
+
+## 代码结构
+
+```text
+Recommendation_KuaiRand/
+├── KuaiRand-Pure/
+│   ├── data/                       # 原始 CSV
+│   ├── data_processed/             # 预处理 Parquet 与编码器产物
+│   └── saved/runs/                 # 本地训练运行目录，不作为源码提交
+├── data_process.py                 # 合并、时间切分、编码、标准化
+├── data_loading.py                 # 读取 split、字段 schema 和评估 sidecar
+├── config.py                       # 路径、字段清单、标签和训练默认值
+├── main.py                         # 单模型训练、早停、保存和最终评估
+├── baselines.py                    # 多配置、多 seed 的验证集对照
+├── evaluation.py                   # 用户级曝光内排序指标
+├── aggregate_ranking.py            # 多 seed 排序评估汇总
+├── feature_importance.py           # 置换重要度与两阶段门控报告
+├── leakage_audit.py                # 统计特征泄漏对照审计
+├── models/
+│   ├── inputs.py                   # 共享输入和字段布局
+│   ├── builders.py                 # 组装“编码器 × 多任务结构”
+│   ├── registry.py                 # 模型名称注册与 Keras 自定义层
+│   ├── encoders/                   # mlp、dcn、senet
+│   └── mtl/                        # mmoe、shared_bottom、ple_cgc 等
+├── tests/                          # 数据、构建、训练辅助和评估测试
+├── docs/                           # 架构、实验、审计、ADR 与发布资产
+├── CONTEXT.md                      # 项目术语和评估边界
+└── ROADMAP.md                      # 里程碑和后续任务
+```
+
+## 模型说明
+
+### 两条正交轴
+
+模型构建由 `models/builders.py` 统一完成，不同轴可以独立组合：
+
+| 轴 | 可选项 | 作用 |
+| --- | --- | --- |
+| 特征编码器 | `mlp`、`dcn`、`senet` | 将拼接后的类别 embedding 和数值字段变换为共享表示 |
+| 多任务结构 | `mmoe`、`shared_bottom`、`ple_cgc` | 决定四个任务如何共享或分化表示 |
+
+`logistic` 和 `single_task` 是用于对照的基线：前者没有隐藏特征编码器，后者为每个任务训练独立模型。
+
+### 默认 MMoE
+
+默认链路为：
+
+```text
+共享输入 → MLP 编码器 → MMoE 专家与任务 gate → 四个任务 tower → sigmoid 输出
+```
+
+每个任务输出一个点击/点赞/关注/评论概率。训练损失使用四个二元交叉熵，任务权重在 `config.py` 中统一定义；早停默认监控 `val_auc_mean`，即点击和点赞两个门控任务的验证集 AUC 均值。
+
+### PLE-CGC
+
+PLE-CGC 是多任务结构，不是特征编码器。每个 progressive extraction 层包含：
+
+- 2 个 shared experts；
+- 每个任务 2 个 task-specific experts；
+- expert units=48，tower units=32；
+- task gate 混合 shared experts 与本任务 experts；
+- shared gate 混合 shared experts 与全部 task experts。
+
+`num_layers=n` 控制 PLE 层数，当前首版正式实验是 `n=1`。最后一层的 shared 输出不接预测头，因此 `n=1` 时最后一个 shared gate 没有下游 shared 层提供梯度；这是当前结构取舍，不是运行故障。结构决策和序列化约束见 [`docs/adr/0006-ple-cgc-multi-task-structure.md`](docs/adr/0006-ple-cgc-multi-task-structure.md)。
+
+## 训练与模型比较
+
+### 单模型运行
+
+`main.py` 的主要参数：
+
+```text
+--encoder {mlp,dcn,senet}
+--mtl {mmoe,shared_bottom,ple_cgc}
+--ple-layers N
+--seed SEED
+--epochs N
+--batch-size N
+--patience N
+--monitor {val_auc_mean,val_loss,val_output_*_auc}
+--max-rows N
+--drop-features col_a,col_b
+--drop-stat-features
+--smoke
+```
+
+每次运行写入 `KuaiRand-Pure/saved/runs/<tag>_<时间戳>/`。`main.py` 在训练完成后会评估 test 并将结果写入 `metrics.json`，因此只有在配置锁定后才应把该命令作为最终确认运行；候选比较请使用下方只读取 val 的 `baselines.py`：
+
+```text
+model.keras       # Keras 3 模型
+metrics.json      # 配置、模型轴、行数、正样本率、训练历史和评估指标
+curves.png        # loss/AUC 曲线
+training.log      # 训练日志
+```
+
+### 合规验证集对照
+
+模型选择推荐使用 `baselines.py`，一次运行可以重复多个配置和 seed。示例：
+
+```powershell
+python baselines.py `
+  --models "logistic,shared_bottom+mlp,single_task+mlp,mmoe+mlp,mmoe+dcn,mmoe+senet" `
+  --seeds 2025,2026,2027
+```
+
+PLE-CGC 对照：
+
+```powershell
+python baselines.py --models "ple_cgc+mlp" --ple-layers 1 --seeds 2025,2026,2027
+```
+
+默认报告只使用验证集，表格中的多 seed 结果是均值 ± 样本标准差。`--final-test` 只允许一个已经锁定的模型配置和一个 seed，用于最终确认；不要把 test 指标用于候选比较或调参。
 
 ## 用户级曝光内排序评估
 
-排序评估协议由 `evaluation.py` 实现：按 `user_id` 分组，在指定数据划分（split）
-内对该用户看到的全部曝光样本重新排序，并报告 GAUC、NDCG@10、Recall@10、
-MAP@10 和固定宽度分箱的 ECE。模型分数相同时，以评估侧表中的 `row_id`
-作为稳定的次级排序键。
+### 评估含义
 
-这里评估的是曝光集合内重排序，不是全量视频召回，也不是线上排序效果。
-GAUC 对同时包含正负样本的用户按曝光数加权；NDCG/MAP 对全部用户取宏平均，
-无正样本用户记为 0；Recall 只在至少有一个正样本的用户上平均。每个指标
-（包括 ECE）都在单个随机种子（seed）报告中按用户进行自助法（bootstrap）
-重采样，并给出默认 1,000 次重采样的 95% 百分位置信区间；汇总报告给出各
-随机种子的均值 ± 样本标准差。
+`evaluation.py` 将同一 split 中同一用户看到的全部曝光行作为候选集合，在这个集合内按模型分数重新排序。它回答的是“给定曝光集合，模型能否把该用户更可能反馈的样本排到前面”，不是全量视频召回、候选覆盖率或线上排序效果。
 
-```powershell
-python evaluation.py --model <run>\model.keras --split val --k 10 --bootstrap 1000
-python aggregate_ranking.py --run-root <batch-run> --models ple_cgc+mlp,mmoe+senet --seeds 2025,2026,2027
-```
+评估 sidecar 提供 `user_id` 和 `row_id`：
 
-验证集对比结果记录在
-[`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)
-和 [`docs/assets/ranking_metrics_val_ple_mmoe.json`](docs/assets/ranking_metrics_val_ple_mmoe.json) 中。
-最终确认集仍受保护，只有显式传入 `--final-confirmation` 才允许评估。
+- `user_id` 是分组键；
+- 分数相同时用 `row_id` 做稳定排序；
+- GAUC 对有正负样本的用户按曝光数加权；
+- NDCG@K 和 MAP@K 对全部用户宏平均，无正样本用户记为 0；
+- Recall@K 只在至少有一个正样本的用户上平均；
+- GAUC、NDCG、Recall、MAP 和 ECE 都以用户为 bootstrap 单位，默认 1,000 次、95% 百分位置信区间。
 
-### PLE-CGC 结构
-
-PLE-CGC（Progressive Layered Extraction with Customized Gate Control）属于多任务结构轴，不是特征编码器。首版采用单层配置，但 `num_layers=n` 保留为正整数参数，后续可直接堆叠 progressive extraction 层。每层默认使用 2 个 shared experts、每个任务 2 个 task-specific experts，expert units=48、tower units=32；每层参数独立。任务 gate 混合 shared experts 与本任务 experts，shared gate 混合 shared experts 与全部 task experts，最后只把 task-specific 表征送入任务 tower。按此取舍，`n=1` 时最后一个 shared gate 没有下游 shared 层，因此不会获得反向梯度；这是已知结构现象。结构决策与序列化约束见 [ADR-0006](docs/adr/0006-ple-cgc-multi-task-structure.md)。
-
----
-
-## 📈 运行效果（Baseline v1，2026-09-07）
-
-可复现基线的默认配置运行结果（`seed=2025`，best epoch=9，早停于 epoch 13；train 950,310 / val 190,802 / test 295,497）：
-
-> ⚠️ 下表与「对照模型」表都是**旧默认模型**（共享输入直接进 MMoE、没有特征编码器）的结果。ADR-0005 落地后默认模型改为「特征编码器（mlp）→ 多任务结构」，这些数字不再是可复现基线，需按 ROADMAP 中的重刷任务用新默认重跑后再发布。
-
-| 指标（测试集 4/22–5/08） | Baseline v1 |
-| --- | --- |
-| 总 loss | 0.6914 |
-| 点击 AUC | 0.7223 |
-| 点赞 AUC | 0.8090 |
-| 关注 AUC | 0.7110 |
-| 评论 AUC | 0.6495 |
-
-训练与验证的 loss / AUC 曲线：
-
-![Baseline v1 训练曲线](docs/assets/baseline_v1_curves.png)
-
-完整逐 epoch 历史与配置见 [`docs/assets/baseline_v1_metrics.json`](docs/assets/baseline_v1_metrics.json)。
-
----
-
-## 📊 对照模型 v2（2026-09-16，验证集 × 3 seed）
-
-> **合规模型选型结果。** 六个候选配置只在验证集比较，最终确认集没有加载；待配置正式锁定后，再单独进行一次最终确认。
-
-ADR-0005 之后默认模型是「特征编码器 `mlp` → MMoE」。下表使用 seeds 2025 / 2026 / 2027、`val_auc_mean` 早停，数字为三个 seed 的验证集 mean±样本标准差（ddof=1）。
-
-| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) |
-| --- | --- | --- | --- | --- | --- | --- |
-| logistic | 0.7189±0.0003 | 0.7895±0.0015 | 0.6885±0.0058 | 0.6236±0.0153 | 0.7051±0.0036 | 0.7542±0.0006 |
-| shared_bottom+mlp | 0.7353±0.0002 | 0.8275±0.0020 | 0.6828±0.0059 | 0.6420±0.0264 | 0.7219±0.0082 | 0.7814±0.0011 |
-| single_task+mlp | 0.7362±0.0006 | 0.8326±0.0031 | 0.7118±0.0124 | 0.6557±0.0100 | 0.7341±0.0054 | 0.7844±0.0016 |
-| mmoe+mlp（默认） | 0.7356±0.0006 | 0.8270±0.0041 | 0.7138±0.0235 | 0.6528±0.0320 | 0.7323±0.0086 | 0.7813±0.0022 |
-| mmoe+dcn | 0.7388±0.0023 | 0.8346±0.0015 | 0.6837±0.0266 | 0.6542±0.0119 | 0.7278±0.0080 | 0.7867±0.0011 |
-| mmoe+senet | 0.7412±0.0009 | 0.8402±0.0042 | 0.7102±0.0220 | 0.6735±0.0093 | 0.7413±0.0072 | 0.7907±0.0020 |
-
-![对照模型 v2](docs/assets/baselines_v2.png)
-
-观察（模型选择只依据本验证集批次）：
-
-- `mmoe+senet` 两个汇总口径都最高：四任务均值 0.7413、门控均值 0.7907；相对默认 `mmoe+mlp` 分别提升 **+0.0090 / +0.0094**，且三个配对 seed 的差值方向一致。它是后续锁定配置与最终确认的首选候选。
-- 固定 `mlp` 编码器时，Single-task 的四任务均值 0.7341、门控均值 0.7844，均高于 MMoE 和 Shared-Bottom；当前验证结果没有显示 MMoE 结构优于独立单任务模型。
-- `mmoe+dcn` 的门控均值比默认 MLP 高 +0.0054，但四任务均值低 −0.0044，且整模型参数为 356,530 vs 84,652；`senet` 的整模型参数为 221,469。
-- 只有 3 个 seed，因此这里用于候选排序，不把差值解释为统计显著性；最终确认集仍保持未消费。
-
-完整结果见 [baselines_v2.md](docs/assets/baselines_v2.md) 与 [baselines_v2.json](docs/assets/baselines_v2.json)，每个 seed 的模型与 metadata 保存在 `KuaiRand-Pure/saved/runs/baseline-v2-val-3seed-20260916/`。
-
-### PLE-CGC 对照（2026-09-19，验证集 × 3 seed）
-
-按 ADR-0006 先跑单层 `ple_cgc+mlp`，再与 baseline v2 当前冠军 `mmoe+senet` 在相同验证集协议下比较。两组均使用 seeds 2025 / 2026 / 2027、`val_auc_mean` 早停；最终确认集未加载。
-
-| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) | 参数量 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ple_cgc+mlp（`num_layers=1`） | 0.7362±0.0006 | 0.8309±0.0040 | 0.7151±0.0101 | 0.6599±0.0111 | 0.7355±0.0013 | 0.7835±0.0023 | 80,134 |
-| mmoe+senet | 0.7414±0.0012 | 0.8388±0.0062 | 0.7062±0.0188 | 0.6718±0.0114 | 0.7395±0.0073 | 0.7901±0.0028 | 221,469 |
-
-本批次中 `mmoe+senet` 的四任务均值高 **+0.0040**、门控均值高 **+0.0066**；门控均值在三个配对 seed 均胜出，四任务均值在两个 seed 胜出。PLE-CGC 仅在关注任务均值高 **+0.0089**，不足以改变当前候选选择。该结论只适用于 `num_layers=1` 的 PLE 配置，不代表更深 PLE 层数。完整产物见 [ple_cgc_val_3seed.md](docs/assets/ple_cgc_val_3seed.md)、[JSON](docs/assets/ple_cgc_val_3seed.json) 和 [图表](docs/assets/ple_cgc_val_3seed.png)。
-
----
-
-## ⚖️ 对照模型与统计特征泄漏审计（2026-09-13，旧默认模型，历史档案）
-
-> 下列单 seed 对照也在测试集上比较了多个候选模型，且使用旧默认模型；仅供历史审计，不作为当前模型选型依据。当前有效对照以上方 2026-09-16 的验证集 v2 为准。
-
-当时记录的结果如下：
-
-| 模型 | 点击 | 点赞 | 关注 | 评论 | 平均(4任务) | 门控均值(点击/点赞) |
-| --- | --- | --- | --- | --- | --- | --- |
-| Logistic | 0.7077 | 0.7780 | 0.6672 | 0.6065 | 0.6898 | 0.7428 |
-| Shared-Bottom | 0.7221 | 0.8108 | 0.6699 | 0.6172 | 0.7050 | 0.7664 |
-| 单任务（每任务独立） | 0.7227 | 0.8143 | 0.6955 | 0.6420 | 0.7186 | 0.7685 |
-| MMoE | 0.7225 | 0.8104 | 0.6869 | 0.6375 | 0.7143 | 0.7664 |
-
-历史数字中 Single-task 为 0.7186、MMoE 为 0.7143、Shared-Bottom 为 0.7050、Logistic 为 0.6898；这些差值必须在验证集多 seed 重跑后才能解释。完整历史结果见 [baselines_v1.md](docs/assets/baselines_v1.md) 与 [baselines_v1.json](docs/assets/baselines_v1.json)。
-
-**统计特征泄漏审计**：去掉全部 51 列全期视频统计特征后，四任务平均测试 AUC 从 0.7143 降到 0.6929（−0.0214），门控均值 −0.0072，评论 −0.0505、关注 −0.0210。结论是这批特征贡献可观且存在 point-in-time 风险，需按训练窗口重算后再决定保留策略，详见 [leakage_audit.md](docs/leakage_audit.md)。
+### 运行单个模型
 
 ```powershell
-python baselines.py --models logistic,shared_bottom,single_task,mmoe --seeds 2025,2026,2027
-python baselines.py --models "" --mmoe-run <已有的 MMoE run 目录> --final-test
-python leakage_audit.py --seed 2025          # 训练两个变体并生成审计报告
-python leakage_audit.py --skip-train         # 复用已有 run，只重写报告
+python evaluation.py `
+  --model KuaiRand-Pure/saved/runs/<run>/model.keras `
+  --split val `
+  --k 10 `
+  --bootstrap 1000
 ```
 
----
+结果默认写到：
 
-## 🔬 特征优选（置换重要度）
+```text
+<run>/ranking_eval/val/ranking_metrics.json
+<run>/ranking_eval/val/ranking_metrics.md
+```
 
-在训练好的模型上，把单个特征取值随机打乱后重新预测，用“各任务 AUC 相对基线的下降幅度”衡量该特征的置换重要度；下降越多越重要。该模块适合定期体检现有特征，也用于将来大量新特征加入时先筛一轮再决定是否纳入模型。
+test 评估必须显式声明最终确认：
 
 ```powershell
-# 1.（可选）如需精确噪声对照，预处理时注入影子特征
-python data_process.py --shadow-features 1
-
-# 2. 训练模型（会读取 data_process 记录的完整特征 schema，含影子特征）
-python main.py --tag fi-base
-
-# 3. 计算置换重要度（默认在验证集上、每特征打乱 3 次）
-python feature_importance.py --model KuaiRand-Pure/saved/runs/fi-base_<时间戳>/model.keras
-
-# 快速自检 / 只分析部分特征 / 更高重复次数
-python feature_importance.py --model ... --smoke
-python feature_importance.py --model ... --candidate-cols shadow_0,some_new_feat
-python feature_importance.py --model ... --repeats 5
+python evaluation.py --model <run>/model.keras --split test --final-confirmation
 ```
 
-结果写入模型目录下的 `feature_importance/`：`importance.json`（机器可读）、`importance.csv`、`importance.md`（含结论表与相关特征提示）、`importance_top.png`（Top-N 条形图）。
+### 汇总多个模型和 seed
 
-判定口径（详见 `docs/adr/0002` 与 `CONTEXT.md`）：
+当每个配置和 seed 都已经生成 `ranking_metrics.json` 后：
 
-- 报告输出 4 个任务的逐任务下降（含负值，不隐式归零）；门控默认只看点击、点赞两个信号充足任务（`--tasks` 可改）；
-- 判定规则：`均值 − std ≥ cutoff` 为“通过”；仅均值过线为“待确认”；否则“不通过”（默认 `--cutoff 0.001`）；
-- `shadow_*` 影子特征是随机噪声，其重要度即噪声下限参考；
-- 强相关数值特征（默认 `|r| ≥ 0.9`）会在报告中列出——置换重要度会在相关特征间摊薄，请合并解读，不单独按排名下结论。
+```powershell
+python aggregate_ranking.py `
+  --run-root <batch-run> `
+  --models ple_cgc+mlp,mmoe+senet `
+  --seeds 2025,2026,2027
+```
 
-### 真实结果 v2（2026-09-15，新默认模型）
+汇总脚本只对各 seed 的点估计计算均值和样本标准差，不平均 bootstrap 区间。已发布的验证集汇总见 [`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)。
 
-用 ADR-0005 之后的新默认模型（`mmoe+mlp`，seed 2025）在**同一个特征决策集**上重跑：`fi-v2-base_20260915_090053`（验证集 190,802 行，94 特征 × 3 次置换，耗时 213 秒）。**旧默认模型得出的判定已全部作废**——模型换了，重要度数值与阈值判定都随之变化。
+## 特征重要度与泄漏审计
 
-| 汇总项 | v2（新默认模型） | v1（旧默认模型，2026-09-10） |
-| --- | --- | --- |
-| 判定分布（通过 / 待确认 / 不通过） | 50 / 4 / 40 | 50 / 0 / 44 |
-| 影子特征 `shadow_0` 总体重要度 | 0.000082 ± 0.000050 | 0.000095 ± 0.000062 |
-| 高相关系数值特征对（\|r\| ≥ 0.9） | 93 对 | 93 对 |
-| 决策集基线 AUC（点击/点赞/关注/评论） | 0.7352 / 0.8271 / 0.8108 / 0.7441 | 0.7378 / 0.8318 / 0.8275 / 0.7614 |
+### 置换重要度
 
-两个 run 的影子特征都远低于 `cutoff=0.001`，噪声下限依旧被正确识别，阈值口径无需调整。
+置换重要度在固定模型和验证集上逐列打乱输入，报告各任务 AUC 相对基线的下降幅度。默认门控任务是点击和点赞；关注、评论仍会报告，但不默认参与门控排序。运行：
 
-**13 个特征的判定发生变化**（变化集中在 0.0005–0.002 的弱信号边界区）：
+```powershell
+python feature_importance.py --model <run>/model.keras
+```
 
-| 变化 | 特征 |
-| --- | --- |
-| 通过 → 待确认 | `onehot_feat6`、`onehot_feat11`、`onehot_feat12` |
-| 通过 → 不通过 | `is_live_streamer`、`register_days_range`、`share_user_num` |
-| 不通过 → 通过 | `complete_play_user_num`、`direct_comment_cnt`、`download_cnt`、`follow_cnt`、`follow_user_num1`、`reduce_similar_cnt` |
-| 不通过 → 待确认 | `comment_like_user_num` |
+常用选项：
 
-Top 10 的头部排序基本稳定（`tab` 0.0632 仍是第一），只有第 10 位由 `onehot_feat1` 换成 `like_cnt`：
+```powershell
+python feature_importance.py --model <run>/model.keras --smoke
+python feature_importance.py --model <run>/model.keras --candidate-cols tab,like_cnt
+python feature_importance.py --model <run>/model.keras --repeats 5
+```
 
-| 特征 | 总体重要度 | 点击 | 点赞 | 关注 | 评论 |
-| --- | --- | --- | --- | --- | --- |
-| tab | 0.06315 ± 0.00151 | +0.0940 | +0.0323 | +0.0033 | +0.0394 |
-| onehot_feat3 | 0.03475 ± 0.00097 | +0.0209 | +0.0486 | +0.0062 | +0.0055 |
-| valid_play_cnt | 0.02523 ± 0.00038 | +0.0401 | +0.0104 | +0.0076 | +0.0056 |
-| valid_play_user_num | 0.02290 ± 0.00114 | +0.0378 | +0.0080 | +0.0080 | +0.0022 |
-| onehot_feat8 | 0.01745 ± 0.00058 | +0.0108 | +0.0241 | +0.0013 | +0.0052 |
-| follow_user_num | 0.01476 ± 0.00042 | +0.0031 | +0.0264 | +0.1001 | +0.0101 |
-| short_time_play_user_num | 0.01442 ± 0.00070 | +0.0216 | +0.0073 | +0.0066 | +0.0150 |
-| short_time_play_cnt | 0.01316 ± 0.00113 | +0.0196 | +0.0068 | +0.0045 | +0.0126 |
-| double_click_cnt | 0.01162 ± 0.00072 | +0.0009 | +0.0223 | +0.0004 | +0.0062 |
-| like_cnt | 0.01052 ± 0.00021 | +0.0007 | +0.0203 | +0.0053 | +0.0043 |
+报告会写入模型目录下的 `feature_importance/`，包括 JSON、CSV、Markdown 和图表。完整判定规则见 [`docs/adr/0002-permutation-importance-and-two-stage-gate.md`](docs/adr/0002-permutation-importance-and-two-stage-gate.md)。
 
-![特征重要度 Top-N v2](docs/assets/feature_importance_v2_top.png)
+### 泄漏审计
 
-完整报告：[Markdown](docs/assets/feature_importance_v2_report.md) · [CSV](docs/assets/feature_importance_v2.csv) · [JSON](docs/assets/feature_importance_v2.json)
+```powershell
+python leakage_audit.py --seed 2025
+python leakage_audit.py --skip-train
+```
 
-> ⚠️ 这只是 ADR-0002 两阶段门控的**批量阶段**：任何「通过」在采纳前仍需确认阶段（同种子重训对比有/无该特征），该阶段至今未实现（RANK-P2-1）。
+审计结果只能说明统计特征对离线指标的影响及其风险，不能证明因果关系，也不能替代严格按时间窗口重算视频统计特征。详细边界见 [`docs/leakage_audit.md`](docs/leakage_audit.md)。
 
-### 真实结果 v1（2026-09-10，旧默认模型，已被上面的 v2 取代）
+## 输出与复现实验纪律
 
-在带 1 个影子特征的基线上运行：`fi-shadow_20260910_010531`（验证集 190,802 行，94 特征 × 3 次置换，耗时约 4 分钟，seed=2025）。
+建议遵循以下顺序：
 
-| 汇总项 | 值 |
-| --- | --- |
-| 判定分布（通过 / 待确认 / 不通过） | 50 / 0 / 44 |
-| 影子特征 `shadow_0` 总体重要度 | 0.000095 ± 0.000062（低于 cutoff=0.001，正确判为“不通过”） |
-| 高相关数值特征对（\|r\| ≥ 0.9） | 93 对（主要为曝光/播放/点赞等计数族，需合并解读） |
+1. 先运行 `data_process.py`，确认 `pipeline_meta.json` 与三个 split 的行数。
+2. 只用 train 拟合编码器和标准化器；候选训练和模型选择只查看 val。
+3. 每个候选配置至少使用三个独立 seed，并保存配置、模型结构和运行目录。
+4. 将可发布的汇总放入 `docs/assets/`，并在 [`docs/experiments.md`](docs/experiments.md) 增加一行台账。
+5. 配置锁定后，才允许对 test 做一次最终确认；不要把 test 结果倒灌回模型选择。
+6. 排序评估需确认模型输出、`processed_ids_<split>.parquet` 和标签按 `row_id` 严格对齐。
 
-Top 10 特征（总体重要度 = 门控任务平均绝对 AUC 下降；分任务列为该任务 AUC 下降均值）：
+生成的 `KuaiRand-Pure/data_processed/`、`KuaiRand-Pure/saved/` 和临时 run 目录属于实验产物，不应代替 `docs/assets/` 中的发布汇总。
 
-| 特征 | 总体重要度 | 点击 | 点赞 | 关注 | 评论 |
-| --- | --- | --- | --- | --- | --- |
-| tab | 0.06120 ± 0.00119 | +0.0926 | +0.0298 | +0.0053 | +0.0289 |
-| onehot_feat3 | 0.03162 ± 0.00035 | +0.0195 | +0.0438 | +0.0052 | +0.0014 |
-| valid_play_user_num | 0.01991 ± 0.00074 | +0.0356 | +0.0042 | +0.0055 | +0.0027 |
-| valid_play_cnt | 0.01902 ± 0.00028 | +0.0362 | +0.0018 | +0.0044 | +0.0050 |
-| onehot_feat8 | 0.01532 ± 0.00052 | +0.0082 | +0.0224 | +0.0072 | +0.0049 |
-| follow_user_num | 0.01416 ± 0.00049 | +0.0021 | +0.0262 | +0.0830 | +0.0058 |
-| short_time_play_user_num | 0.01312 ± 0.00075 | +0.0235 | +0.0027 | +0.0089 | +0.0071 |
-| double_click_cnt | 0.01294 ± 0.00093 | +0.0021 | +0.0238 | +0.0009 | +0.0037 |
-| short_time_play_cnt | 0.01204 ± 0.00051 | +0.0202 | +0.0039 | +0.0020 | +0.0049 |
-| onehot_feat1 | 0.01104 ± 0.00048 | +0.0059 | +0.0162 | +0.0023 | +0.0203 |
+## 测试与代码检查
 
-![特征重要度 Top-N（蓝色=真实特征，橙色=影子特征）](docs/assets/feature_importance_top.png)
+运行完整测试：
 
-完整报告：[Markdown](docs/assets/feature_importance_report.md) · [CSV](docs/assets/feature_importance.csv) · [JSON](docs/assets/feature_importance.json)
+```powershell
+python -m pytest
+```
 
-设计决策与术语表见 [docs/adr/0002-permutation-importance-and-two-stage-gate.md](docs/adr/0002-permutation-importance-and-two-stage-gate.md) 与 [CONTEXT.md](CONTEXT.md)。
+只运行排序评估测试：
 
----
+```powershell
+python -m pytest tests/test_evaluation.py
+```
 
-## 📚 数据集引用
+检查脚本语法和 Git 差异：
 
-本项目使用的 KuaiRand 数据集来自 CIKM 2022：
+```powershell
+python -m py_compile evaluation.py aggregate_ranking.py
+git diff --check
+```
+
+## 已知限制
+
+- 这是离线精排研究代码，不提供线上服务、召回系统、候选覆盖率或延迟基准。
+- 用户级排序指标的候选集合仅是该 split 内用户的曝光样本；不能解读为全量视频库上的召回指标。
+- 关注和评论标签稀疏，单次结果波动可能较大；推荐同时报告多 seed 的均值和样本标准差。
+- 当前视频统计特征存在全期聚合带来的 point-in-time 风险，严格时间窗口重算尚未完成。
+- PLE-CGC 当前只有单层正式对照；`num_layers>1` 的性能、稳定性和计算成本尚未形成结论。
+- KuaiRand 的公开日志和特征文件不属于本仓库的研究产物，使用时请遵守原数据集许可证和引用要求。
+
+## 文档索引
+
+- [`docs/experiments.md`](docs/experiments.md)：唯一实验台账，记录有效、作废和工程验证运行。
+- [`docs/project_overview.md`](docs/project_overview.md)：项目架构、模型、评估和结果详述。
+- [`CONTEXT.md`](CONTEXT.md)：术语表和评估边界。
+- [`ROADMAP.md`](ROADMAP.md)：里程碑、验收标准和后续工作。
+- [`docs/leakage_audit.md`](docs/leakage_audit.md)：统计特征泄漏审计。
+- [`docs/adr/0001-feature-decision-set-discipline.md`](docs/adr/0001-feature-decision-set-discipline.md)：特征决策集纪律。
+- [`docs/adr/0002-permutation-importance-and-two-stage-gate.md`](docs/adr/0002-permutation-importance-and-two-stage-gate.md)：置换重要度与两阶段门控。
+- [`docs/adr/0005-pluggable-encoder-and-multi-task-structure.md`](docs/adr/0005-pluggable-encoder-and-multi-task-structure.md)：可插拔编码器与多任务结构。
+- [`docs/adr/0006-ple-cgc-multi-task-structure.md`](docs/adr/0006-ple-cgc-multi-task-structure.md)：PLE-CGC 结构约束。
+- [`docs/adr/0007-user-level-ranking-evaluation.md`](docs/adr/0007-user-level-ranking-evaluation.md)：用户级曝光内排序评估协议。
+
+## 数据集引用
 
 ```bibtex
 @inproceedings{gao2022kuairand,
@@ -330,32 +387,7 @@ Top 10 特征（总体重要度 = 门控任务平均绝对 AUC 下降；分任�
   doi = {10.1145/3511808.3557624},
   booktitle = {Proceedings of the 31st ACM International Conference on Information and Knowledge Management},
   series = {CIKM '22},
-  location = {Atlanta, GA, USA},
-  numpages = {5},
   year = {2022},
-  pages = {3953–3957}
+  pages = {3953--3957}
 }
 ```
-
----
-
-## 📌 后续计划
-
-完整的精排范围路线图（完整性定义、P0/P1/P2 里程碑、验收标准与 issue 清单）见 [ROADMAP.md](ROADMAP.md)，已完成实验的台账见 [docs/experiments.md](docs/experiments.md)。
-
-* ~~模块化数据处理与建模流程~~ 已完成（里程碑 1：train/val/test 协议 + 单一配置源 + run 产物归档）
-* ~~支持多反馈目标的多任务学习~~ 已完成（MMoE 四任务可复现基线）
-* ~~精排模型两轴可插拔（特征编码器 × 多任务结构）~~ 已完成（ADR-0005：`mlp`/`dcn`/`senet` × `mmoe`/`shared_bottom` 的 baseline v2 三 seed 对照与置换重要度重跑；ADR-0006 新增 `ple_cgc` 工程实现）
-* ~~多任务结构升级（PLE/CGC）~~ 已完成首版实现与验证集 3 seed 对照（`ple_cgc`，支持 `num_layers=n`）；当前单层 PLE 未替换 `mmoe+senet` 冠军，多层消融仍待做
-* 特征门控的确认阶段（ADR-0002 同种子重训对比，RANK-P2-1）
-* 排序指标套件（GAUC / NDCG@K / Recall@K / MAP）与概率校准（ECE）
-* 引入深度模型（如 Transformer）进行序列建模
-* 支持线上推理与实验评估
-* 稀疏任务 focal loss、随机曝光日志去偏等模型实验
-
----
-
-欢迎交流与贡献 👋
-
-```
-
