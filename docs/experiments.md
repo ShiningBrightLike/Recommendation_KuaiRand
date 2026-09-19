@@ -32,6 +32,29 @@
 | --- | --- | --- | --- | --- |
 | E9 | 2026-09-19 | `tests/test_model_builders.py`；`python -m models`；`ple-cgc-smoke_...` 与 `ple-cgc-baseline-smoke_...` | `ple_cgc` 注册、三种编码器组合、非法 `num_layers=0` 拒绝、保存后跨进程加载、1 epoch 训练与验证集-only metadata 落盘 | PLE-CGC 工程接缝与 smoke 链路已通过；单层 smoke 会提示 shared gate 无梯度（因为按 ADR-0006 最后一层 shared 输出不接预测头），该 smoke 指标无性能意义。结构决策见 ADR-0006；正式性能结果见 E10。 |
 
+### E11 — 用户级曝光内排序评估（2026-09-19）
+
+运行目录：`KuaiRand-Pure/saved/runs/ple-cgc-val-3seed_20260919_003412`。本次
+只使用验证集，对比 `ple_cgc+mlp`（`num_layers=1`）和 `mmoe+senet`，seed 为
+2025/2026/2027，K=10；每个任务按用户进行 1,000 次自助法（bootstrap）重采样。
+候选集合定义为该数据划分内同一用户的全部曝光行，分数相同时以 `row_id` 稳定排序。
+最终确认集未加载。
+
+| 模型 | 任务 | GAUC | NDCG@10 | Recall@10 | MAP@10 | ECE |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `ple_cgc+mlp` | `is_click` | 0.6534±0.0015 | 0.7045±0.0007 | 0.9161±0.0001 | 0.6313±0.0010 | 0.0251±0.0057 |
+| `ple_cgc+mlp` | `is_like` | 0.6927±0.0022 | 0.0554±0.0000 | 0.8896±0.0009 | 0.0456±0.0000 | 0.0042±0.0004 |
+| `ple_cgc+mlp` | `is_follow` | 0.6222±0.0217 | 0.0045±0.0000 | 0.8344±0.0232 | 0.0037±0.0000 | 0.0005±0.0004 |
+| `ple_cgc+mlp` | `is_comment` | 0.5979±0.0229 | 0.0082±0.0002 | 0.7949±0.0043 | 0.0063±0.0002 | 0.0004±0.0004 |
+| `mmoe+senet` | `is_click` | 0.6551±0.0019 | 0.7052±0.0006 | 0.9166±0.0002 | 0.6321±0.0008 | 0.0303±0.0047 |
+| `mmoe+senet` | `is_like` | 0.6970±0.0076 | 0.0557±0.0005 | 0.8944±0.0039 | 0.0459±0.0005 | 0.0050±0.0009 |
+| `mmoe+senet` | `is_follow` | 0.6453±0.0123 | 0.0048±0.0001 | 0.8572±0.0109 | 0.0040±0.0001 | 0.0002±0.0000 |
+| `mmoe+senet` | `is_comment` | 0.6101±0.0118 | 0.0084±0.0001 | 0.8005±0.0165 | 0.0065±0.0001 | 0.0002±0.0002 |
+
+发布汇总：[JSON](assets/ranking_metrics_val_ple_mmoe.json) /
+[Markdown](assets/ranking_metrics_val_ple_mmoe.md)。这些指标仅描述曝光集合内
+重排序能力，不代表全量推荐召回效果。
+
 ## 2. 产物约定
 
 - `main.py` 的 run 目录含 `metrics.json`、`model.keras`、`curves.png`、`training.log`。`baselines.py` 的每个「配置 × seed」保存在批次目录下的 `runs/<model-spec>/seed-<seed>/`，含独立 `metrics.json` 与模型文件；Single-task 每个任务各保存一个模型。`saved/` 不入库。

@@ -96,6 +96,30 @@ python baselines.py --models "mmoe+mlp" --final-test           # 配置锁定后
 `runs/<结构+编码器>/seed-<seed>/`，包含模型与独立 `metrics.json`。为保护最终确认集，
 多模型比较不能使用 `--final-test`；该选项只接受一个已经锁定的模型配置和一个 seed。
 
+## 用户级曝光内排序评估
+
+排序评估协议由 `evaluation.py` 实现：按 `user_id` 分组，在指定数据划分（split）
+内对该用户看到的全部曝光样本重新排序，并报告 GAUC、NDCG@10、Recall@10、
+MAP@10 和固定宽度分箱的 ECE。模型分数相同时，以评估侧表中的 `row_id`
+作为稳定的次级排序键。
+
+这里评估的是曝光集合内重排序，不是全量视频召回，也不是线上排序效果。
+GAUC 对同时包含正负样本的用户按曝光数加权；NDCG/MAP 对全部用户取宏平均，
+无正样本用户记为 0；Recall 只在至少有一个正样本的用户上平均。每个指标
+（包括 ECE）都在单个随机种子（seed）报告中按用户进行自助法（bootstrap）
+重采样，并给出默认 1,000 次重采样的 95% 百分位置信区间；汇总报告给出各
+随机种子的均值 ± 样本标准差。
+
+```powershell
+python evaluation.py --model <run>\model.keras --split val --k 10 --bootstrap 1000
+python aggregate_ranking.py --run-root <batch-run> --models ple_cgc+mlp,mmoe+senet --seeds 2025,2026,2027
+```
+
+验证集对比结果记录在
+[`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)
+和 [`docs/assets/ranking_metrics_val_ple_mmoe.json`](docs/assets/ranking_metrics_val_ple_mmoe.json) 中。
+最终确认集仍受保护，只有显式传入 `--final-confirmation` 才允许评估。
+
 ### PLE-CGC 结构
 
 PLE-CGC（Progressive Layered Extraction with Customized Gate Control）属于多任务结构轴，不是特征编码器。首版采用单层配置，但 `num_layers=n` 保留为正整数参数，后续可直接堆叠 progressive extraction 层。每层默认使用 2 个 shared experts、每个任务 2 个 task-specific experts，expert units=48、tower units=32；每层参数独立。任务 gate 混合 shared experts 与本任务 experts，shared gate 混合 shared experts 与全部 task experts，最后只把 task-specific 表征送入任务 tower。按此取舍，`n=1` 时最后一个 shared gate 没有下游 shared 层，因此不会获得反向梯度；这是已知结构现象。结构决策与序列化约束见 [ADR-0006](docs/adr/0006-ple-cgc-multi-task-structure.md)。

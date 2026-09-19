@@ -80,6 +80,14 @@ SPLIT_FILES = {
     "test": ("processed_X_test.parquet", "processed_y_test.parquet"),
 }
 
+# Evaluation-only sidecars. These preserve identifiers from the public logs
+# without feeding them into the model; row order must match SPLIT_FILES.
+ID_SPLIT_FILES = {
+    "train": "processed_ids.parquet",
+    "val": "processed_ids_val.parquet",
+    "test": "processed_ids_test.parquet",
+}
+
 # ---------------------------------------------------------------------------
 # Model architecture defaults
 # ---------------------------------------------------------------------------

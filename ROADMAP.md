@@ -21,8 +21,8 @@
 | 精排模型 | 两轴可插拔：特征编码器（`mlp`/`dcn`/`senet`）× 多任务结构（`mmoe`/`shared_bottom`/`ple_cgc`），另有 `single_task`/`logistic` 对照（ADR-0005、ADR-0006） | 缺 PLE-CGC 多层/超参消融、缺 FM/PNN 等编码器、缺序列建模（DIN） |
 | 训练协议 | train/val/test 时间切分、固定 seed、早停只看 val；`baselines.py --seeds` 支持多种子重跑并汇总 mean±std | 缺超参搜索、缺损失/采样策略实验 |
 | 特征迭代 | 置换重要度 + 影子特征噪声对照（`feature_importance.py`），已在新默认模型上重跑（v2 判定：通过 50 / 待确认 4 / 不通过 40） | ADR-0002 的“确认阶段（同种子重训对比）”未实现；特征无版本指纹 |
-| 评估指标 | 每任务 AUC | 缺排序指标（GAUC / NDCG@K / Recall@K / MAP）、缺概率校准（ECE）、缺分片评估 |
-| 评估单元 | 仅特征 + 标签 parquet | **缺 group/id 列**（`user_id` / `video_id` / `date`），无法按用户组成候选列表 |
+| 评估指标 | 每任务 AUC | 用户级 GAUC / NDCG@K / Recall@K / MAP 与 ECE 已实现；分片评估仍待补 |
+| 评估单元 | 仅特征 + 标签 parquet | 已补充与 split 行对齐的 id sidecar（`row_id` / `user_id` / `video_id` / `date`），用于用户候选分组 |
 | 数据正确性 | 离线静态 CSV | 视频统计特征是**全期聚合**，相对训练期可能含未来信息（潜在泄漏） |
 | 结果呈现 | README 已展示基线曲线与特征重要度 | 缺模型对比表、消融表、实验台账、批量打分脚本 |
 | 工程质量 | 特征模块单测、锁定依赖、ADR/术语表 | 缺 CI（smoke + 数据契约 + 单测）、缺 lint/格式检查、缺 schema 校验 |
@@ -46,15 +46,15 @@
 
 | ID | 任务 | 交付物 | 验收标准 | 预估 |
 | --- | --- | --- | --- | --- |
-| RANK-P0-1 | 评估用 id 侧表 | `data_process.py` 额外输出 `processed_ids[_val/_test].parquet`（`user_id, video_id, date`），不进模型输入 | 行数与 X/y 一致；可 join 回特征 | 0.5 天 |
-| RANK-P0-2 | 排序指标套件 | `evaluation.py`：GAUC、NDCG@K、Recall@K、MAP，按 D1/D2 口径 | 单测用合成候选列表验证指标数值；基线报告含新指标 | 2 天 |
-| RANK-P0-3 | 概率校准与 ECE | 校准层（Platt）+ 可靠性曲线，输出到 run 目录 | 校准前后 ECE 均记录；曲线入库 `docs/assets/` | 1 天 |
+| RANK-P0-1 | 评估用 id 侧表 | `data_process.py` 额外输出 `processed_ids[_val/_test].parquet`（`row_id, user_id, video_id, date`），不进模型输入 | 行数与 X/y 一致；可 join 回特征 | **已完成** |
+| RANK-P0-2 | 排序指标套件 | `evaluation.py`：用户级 GAUC、NDCG@K、Recall@K、MAP，按 D1/D2 口径 | 单测用合成候选列表验证指标数值；验证集三 seed 报告含新指标 | **已完成** |
+| RANK-P0-3 | 概率校准与 ECE | `evaluation.py` 报告固定宽度 ECE 与用户级自助法置信区间 | 每个随机种子的 ECE 与 95% 置信区间已记录；Platt/可靠性曲线仍待后续 | **基础版已完成** |
 | RANK-P0-4 | 统计特征泄漏审计 | “全期聚合 vs 仅训练期重算”两组对照实验 + ADR | 两组指标差异与结论写入 ADR，明确后续默认用哪版 | 1.5 天 |
-| RANK-P0-5 | 分片与置信区间 | 按用户活跃度/视频热度/冷启动分片评估 + bootstrap CI | 报告含分片表与 95% CI | 1 天 |
+| RANK-P0-5 | 分片与置信区间 | 用户级自助法置信区间已用于排序指标；按用户活跃度/视频热度/冷启动的分片表仍待补 | 报告含全体用户 95% 置信区间；分片表待后续 | **部分完成** |
 
 **P0 出口标准**：`main.py` 训练结束后自动产出“AUC + GAUC + NDCG@10 + ECE”评估报告，并带分片与置信区间；泄漏审计结论已写入 ADR。
 
-> 进度说明（2026-09-13）：本轮只完成了 FIX-1..FIX-5（见 §9），其中泄漏审计为“去特征”上界对照；GAUC/NDCG@10/ECE、评估 id 侧表、分片置信区间仍为 open，P0 出口标准尚未达成。
+> 进度说明（2026-09-19）：已完成评估 id 侧表、用户级 GAUC/NDCG@10/Recall@10/MAP@10、固定宽度 ECE，以及按用户自助法生成的 95% 置信区间；RANK-P0-4 的严格按时间点重算和 RANK-P0-5 的活跃度/热度/冷启动分片仍未完成，因此完整 P0 出口标准尚未达成。
 
 ### P1 — 让精排“可比较”
 
@@ -133,11 +133,11 @@
 
 | Issue 标题 | 对应任务 | 建议标签 | 优先级 |
 | --- | --- | --- | --- |
-| 输出评估用 user/video id 侧表 | RANK-P0-1 | `ready-for-agent` | P0 |
-| 精排排序指标套件（GAUC/NDCG@K/Recall@K/MAP） | RANK-P0-2 | `ready-for-agent` | P0 |
-| 概率校准与 ECE 报告 | RANK-P0-3 | `ready-for-agent` | P0 |
+| 输出评估用 user/video id 侧表 | RANK-P0-1 | **已完成** | P0 |
+| 精排排序指标套件（GAUC/NDCG@K/Recall@K/MAP） | RANK-P0-2 | **已完成** | P0 |
+| 概率校准与 ECE 报告 | RANK-P0-3 | **基础版已完成**（Platt/可靠性曲线待后续） | P0 |
 | 视频统计特征泄漏审计（全期 vs 训练期） | RANK-P0-4 | `ready-for-human` | P0 |
-| 分片评估与 bootstrap 置信区间 | RANK-P0-5 | `ready-for-agent` | P0 |
+| 分片评估与 bootstrap 置信区间 | RANK-P0-5 | **用户级自助法已完成；分片待后续** | P0 |
 | 模型对照矩阵（Shared-Bottom/MMoE/PLE-CGC） | RANK-P1-1 | `ready-for-agent` | P1（单层矩阵与三 seed 对照已完成；多层消融仍待做） |
 | DCN-v2/FM 特征交叉模块 | RANK-P1-2 | `ready-for-agent` | P1 |
 | 多种子方差报告 | RANK-P1-3 | `ready-for-agent` | P1 |
@@ -226,3 +226,4 @@
   - `ple_cgc+mlp`：四任务均值 `0.7355±0.0013`，门控均值 `0.7835±0.0023`，参数量 80,134。
   - `mmoe+senet`：四任务均值 `0.7395±0.0073`，门控均值 `0.7901±0.0028`，参数量 221,469。
   - `mmoe+senet` 在两个汇总口径分别高 +0.0040 / +0.0066；PLE 仅在关注任务均值高 +0.0089。结论只覆盖 `num_layers=1`，不外推到更深 PLE；发布资产见 `docs/assets/ple_cgc_val_3seed.*`。
+- **用户级曝光内排序评估完成基础版**：`evaluation.py` 使用数据划分内用户全部曝光样本作为候选集合，输出 GAUC、NDCG@10、Recall@10、MAP@10、ECE，并对所有指标按用户生成 1,000 次自助法 95% 置信区间；`aggregate_ranking.py` 输出三个随机种子的均值 ± 样本标准差。该结论仅表示曝光集合内重排序，不表示全量召回或线上排序；验证集汇总资产见 `docs/assets/ranking_metrics_val_ple_mmoe.*`。

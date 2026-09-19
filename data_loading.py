@@ -9,6 +9,7 @@ features keep every downstream script in sync automatically.
 import json
 from functools import lru_cache
 
+import numpy as np
 import pandas as pd
 
 import config as C
@@ -136,3 +137,31 @@ def load_split(name, max_rows=None, categorical_cols=None, numeric_cols=None):
     ]
     positive_ratios = {col: float(df_y[col].mean()) for col in C.LABEL_COLS}
     return x_categorical + [x_numeric], targets, len(df_x), positive_ratios
+
+
+def load_split_ids(name, max_rows=None):
+    """Load the evaluation-only id sidecar aligned with a processed split."""
+    if name not in C.ID_SPLIT_FILES:
+        raise ValueError(f"unknown split: {name}")
+    path = C.PROCESSED_DIR / C.ID_SPLIT_FILES[name]
+    if not path.exists():
+        raise FileNotFoundError(
+            f"missing evaluation id sidecar for split '{name}'. "
+            "Run `python data_process.py` to regenerate processed data."
+        )
+    ids = pd.read_parquet(path)
+    required = ["row_id", "user_id", "video_id", "date"]
+    missing = [col for col in required if col not in ids.columns]
+    if missing:
+        raise ValueError(f"id sidecar is missing columns: {missing}")
+    if ids["row_id"].duplicated().any():
+        raise ValueError(f"id sidecar for split '{name}' has duplicate row_id values")
+    if max_rows is not None:
+        ids = ids.head(max_rows)
+    ids = ids.reset_index(drop=True)
+    expected = np.arange(len(ids), dtype="int64")
+    if not np.array_equal(ids["row_id"].to_numpy(), expected):
+        raise ValueError(
+            f"id sidecar for split '{name}' must have contiguous row_id starting at 0"
+        )
+    return ids

@@ -361,6 +361,18 @@ ADR-0005 落地后默认模型变为「特征编码器 `mlp` → MMoE」。本�
 
 `mmoe+senet` 的四任务均值高 +0.0040、门控均值高 +0.0066；门控均值三个配对 seed 均胜出，四任务均值两个 seed 胜出。PLE-CGC 只在关注任务均值高 +0.0089，当前不替换冠军。该结论只覆盖单层 PLE，不外推到 `num_layers>1`。发布产物见 `docs/assets/ple_cgc_val_3seed.*`。
 
+### 7.8 用户级曝光内排序评估
+
+`evaluation.py` 以 `user_id` 为分组键，在每个数据划分（split）的全部曝光样本内重排，计算
+GAUC、NDCG@10、Recall@10、MAP@10 和固定宽度分箱的 ECE。`row_id` 作为相同
+分数时的稳定次级排序键。所有指标（包括 ECE）均以用户为 bootstrap（自助法）重采样单位，
+默认进行 1,000 次重采样并报告 95% 百分位置信区间；`aggregate_ranking.py`
+只汇总三个随机种子的点估计，报告均值 ± 样本标准差，不对 bootstrap 区间求平均。
+
+该口径衡量“给定曝光集合内的重排序”，不代表全量召回、候选覆盖率或线上排序
+效果。验证集汇总报告见 `docs/assets/ranking_metrics_val_ple_mmoe.{md,json}`；
+最终确认集仍保持保护。
+
 ---
 
 ## 8. 后续计划与建议

@@ -101,13 +101,32 @@ def _positive_ratios(df):
     return {col: float((df[col] == 1).mean()) for col in C.LABEL_COLS}
 
 
-def _save_split(name, df, feature_cols):
-    """Persist feature/label parquet files for a split and return (rows, ratios)."""
+def _build_id_sidecar(df):
+    """Capture evaluation identifiers before model-only transformations."""
+    required = ["user_id", "video_id", "date"]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise ValueError(f"raw split is missing evaluation identifiers: {missing}")
+    return pd.DataFrame(
+        {
+            "row_id": np.arange(len(df), dtype="int64"),
+            "user_id": df["user_id"].to_numpy(copy=True),
+            "video_id": df["video_id"].to_numpy(copy=True),
+            "date": df["date"].astype(str).to_numpy(copy=True),
+        }
+    )
+
+
+def _save_split(name, df, feature_cols, ids):
+    """Persist model arrays and an aligned evaluation-only id sidecar."""
     x_file, y_file = (C.PROCESSED_DIR / f for f in C.SPLIT_FILES[name])
     x = df[feature_cols]
     y = df[C.LABEL_COLS]
     x.to_parquet(x_file, index=False)
     y.to_parquet(y_file, index=False)
+    if len(ids) != len(df):
+        raise ValueError(f"id sidecar row count does not match split {name!r}")
+    ids.to_parquet(C.PROCESSED_DIR / C.ID_SPLIT_FILES[name], index=False)
     return len(df), _positive_ratios(df)
 
 
@@ -136,6 +155,15 @@ def main():
     train_df = train_all.loc[~val_mask].copy()
     val_df = train_all.loc[val_mask].copy()
     del train_all
+
+    # Keep raw dates and identifiers outside the model feature matrix. The
+    # sidecars are used for user-level ranking metrics and must retain the
+    # exact row order of each processed X/y pair.
+    ids = {
+        "train": _build_id_sidecar(train_df),
+        "val": _build_id_sidecar(val_df),
+        "test": _build_id_sidecar(test_df),
+    }
 
     train_df = _fill_missing(_convert_date_to_weekday(train_df))
     val_df = _fill_missing(_convert_date_to_weekday(val_df))
@@ -170,7 +198,7 @@ def main():
     print("Saving processed splits...")
     rows, ratios = {}, {}
     for name, df in (("train", train_df), ("val", val_df), ("test", test_df)):
-        n_rows, n_ratios = _save_split(name, df, feature_cols)
+        n_rows, n_ratios = _save_split(name, df, feature_cols, ids[name])
         rows[name] = n_rows
         ratios[name] = n_ratios
         print(f"  {name:5s}: {n_rows:,} rows | positive ratios: {n_ratios}")
@@ -188,6 +216,7 @@ def main():
         "numeric_cols": numeric_cols,
         "shadow_cols": shadow_cols,
         "label_cols": C.LABEL_COLS,
+        "id_files": C.ID_SPLIT_FILES,
         "rows": rows,
         "positive_ratios": ratios,
     }
