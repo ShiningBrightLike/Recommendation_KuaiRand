@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">用户级曝光内排序指标对照</title>
+  <desc id="desc">验证集上 ple_cgc+mlp 和 mmoe+senet 的 GAUC、NDCG@10、Recall@10 和 MAP@10，数值为三个随机种子的均值。</desc>
+  <style>
+    .title { font: 700 28px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+    .panel-title { font: 700 20px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+    .axis { font: 13px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #475569; }
+    .task { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #334155; }
+    .value { font: 12px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #334155; }
+    .grid { stroke: #e2e8f0; stroke-width: 1; }
+    .axis-line { stroke: #64748b; stroke-width: 1.5; }
+    .ple { fill: #3b82f6; }
+    .mmoe { fill: #f97316; }
+  </style>
+  <rect width="1400" height="900" fill="#ffffff"/>
+  <text x="700" y="46" text-anchor="middle" class="title">用户级曝光内排序指标（验证集，K=10）</text>
+  <text x="700" y="75" text-anchor="middle" class="axis">三个 seed 的均值；候选集合为同一用户在该 split 内的全部曝光行</text>
+  <rect x="515" y="94" width="22" height="14" class="ple"/><text x="545" y="106" class="axis">ple_cgc+mlp（单层）</text>
+  <rect x="760" y="94" width="22" height="14" class="mmoe"/><text x="790" y="106" class="axis">mmoe+senet</text>
+
+  <!-- GAUC -->
+  <g transform="translate(55,130)">
+    <rect x="0" y="0" width="620" height="330" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="310" y="30" text-anchor="middle" class="panel-title">GAUC</text>
+    <line x1="75" y1="70" x2="575" y2="70" class="grid"/><line x1="75" y1="140" x2="575" y2="140" class="grid"/><line x1="75" y1="210" x2="575" y2="210" class="grid"/><line x1="75" y1="280" x2="575" y2="280" class="axis-line"/>
+    <text x="65" y="75" text-anchor="end" class="axis">0.75</text><text x="65" y="145" text-anchor="end" class="axis">0.68</text><text x="65" y="215" text-anchor="end" class="axis">0.61</text><text x="65" y="285" text-anchor="end" class="axis">0.55</text>
+    <rect x="125" y="171.4" width="24" height="108.6" class="ple"/><rect x="154" y="169.7" width="24" height="110.3" class="mmoe"/>
+    <rect x="245" y="130.4" width="24" height="149.6" class="ple"/><rect x="274" y="125.4" width="24" height="154.6" class="mmoe"/>
+    <rect x="365" y="204.7" width="24" height="75.3" class="ple"/><rect x="394" y="179.9" width="24" height="100.1" class="mmoe"/>
+    <rect x="485" y="229.2" width="24" height="50.8" class="ple"/><rect x="514" y="216.4" width="24" height="63.6" class="mmoe"/>
+    <text x="151" y="305" text-anchor="middle" class="task">点击</text><text x="271" y="305" text-anchor="middle" class="task">点赞</text><text x="391" y="305" text-anchor="middle" class="task">关注</text><text x="511" y="305" text-anchor="middle" class="task">评论</text>
+  </g>
+
+  <!-- NDCG -->
+  <g transform="translate(725,130)">
+    <rect x="0" y="0" width="620" height="330" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="310" y="30" text-anchor="middle" class="panel-title">NDCG@10</text>
+    <line x1="75" y1="70" x2="575" y2="70" class="grid"/><line x1="75" y1="140" x2="575" y2="140" class="grid"/><line x1="75" y1="210" x2="575" y2="210" class="grid"/><line x1="75" y1="280" x2="575" y2="280" class="axis-line"/>
+    <text x="65" y="75" text-anchor="end" class="axis">0.8</text><text x="65" y="145" text-anchor="end" class="axis">0.6</text><text x="65" y="215" text-anchor="end" class="axis">0.4</text><text x="65" y="285" text-anchor="end" class="axis">0</text>
+    <rect x="125" y="95.6" width="24" height="184.4" class="ple"/><rect x="154" y="94.3" width="24" height="185.7" class="mmoe"/>
+    <rect x="245" y="265.5" width="24" height="14.5" class="ple"/><rect x="274" y="265.4" width="24" height="14.6" class="mmoe"/>
+    <rect x="365" y="278.8" width="24" height="1.2" class="ple"/><rect x="394" y="278.7" width="24" height="1.3" class="mmoe"/>
+    <rect x="485" y="277.8" width="24" height="2.2" class="ple"/><rect x="514" y="277.8" width="24" height="2.2" class="mmoe"/>
+    <text x="151" y="305" text-anchor="middle" class="task">点击</text><text x="271" y="305" text-anchor="middle" class="task">点赞</text><text x="391" y="305" text-anchor="middle" class="task">关注</text><text x="511" y="305" text-anchor="middle" class="task">评论</text>
+  </g>
+
+  <!-- Recall -->
+  <g transform="translate(55,505)">
+    <rect x="0" y="0" width="620" height="330" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="310" y="30" text-anchor="middle" class="panel-title">Recall@10</text>
+    <line x1="75" y1="70" x2="575" y2="70" class="grid"/><line x1="75" y1="140" x2="575" y2="140" class="grid"/><line x1="75" y1="210" x2="575" y2="210" class="grid"/><line x1="75" y1="280" x2="575" y2="280" class="axis-line"/>
+    <text x="65" y="75" text-anchor="end" class="axis">1.00</text><text x="65" y="145" text-anchor="end" class="axis">0.92</text><text x="65" y="215" text-anchor="end" class="axis">0.84</text><text x="65" y="285" text-anchor="end" class="axis">0.75</text>
+    <rect x="125" y="140.5" width="24" height="139.5" class="ple"/><rect x="154" y="140.1" width="24" height="139.9" class="mmoe"/>
+    <rect x="245" y="162.8" width="24" height="117.2" class="ple"/><rect x="274" y="158.7" width="24" height="121.3" class="mmoe"/>
+    <rect x="365" y="209.1" width="24" height="70.9" class="ple"/><rect x="394" y="190.0" width="24" height="90.0" class="mmoe"/>
+    <rect x="485" y="242.3" width="24" height="37.7" class="ple"/><rect x="514" y="237.6" width="24" height="42.4" class="mmoe"/>
+    <text x="151" y="305" text-anchor="middle" class="task">点击</text><text x="271" y="305" text-anchor="middle" class="task">点赞</text><text x="391" y="305" text-anchor="middle" class="task">关注</text><text x="511" y="305" text-anchor="middle" class="task">评论</text>
+  </g>
+
+  <!-- MAP -->
+  <g transform="translate(725,505)">
+    <rect x="0" y="0" width="620" height="330" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="310" y="30" text-anchor="middle" class="panel-title">MAP@10</text>
+    <line x1="75" y1="70" x2="575" y2="70" class="grid"/><line x1="75" y1="140" x2="575" y2="140" class="grid"/><line x1="75" y1="210" x2="575" y2="210" class="grid"/><line x1="75" y1="280" x2="575" y2="280" class="axis-line"/>
+    <text x="65" y="75" text-anchor="end" class="axis">0.70</text><text x="65" y="145" text-anchor="end" class="axis">0.50</text><text x="65" y="215" text-anchor="end" class="axis">0.25</text><text x="65" y="285" text-anchor="end" class="axis">0</text>
+    <rect x="125" y="90.6" width="24" height="189.4" class="ple"/><rect x="154" y="90.4" width="24" height="189.6" class="mmoe"/>
+    <rect x="245" y="266.3" width="24" height="13.7" class="ple"/><rect x="274" y="266.2" width="24" height="13.8" class="mmoe"/>
+    <rect x="365" y="278.9" width="24" height="1.1" class="ple"/><rect x="394" y="278.8" width="24" height="1.2" class="mmoe"/>
+    <rect x="485" y="278.1" width="24" height="1.9" class="ple"/><rect x="514" y="278.0" width="24" height="2.0" class="mmoe"/>
+    <text x="151" y="305" text-anchor="middle" class="task">点击</text><text x="271" y="305" text-anchor="middle" class="task">点赞</text><text x="391" y="305" text-anchor="middle" class="task">关注</text><text x="511" y="305" text-anchor="middle" class="task">评论</text>
+  </g>
+</svg>

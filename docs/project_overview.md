@@ -34,6 +34,10 @@
 
 ### 2.2 模型结构（MMoE）
 
+![模型两条正交轴与 PLE-CGC 结构](assets/model_architecture.svg)
+
+图：特征编码器和多任务结构可以独立替换；PLE-CGC 的 `num_layers` 用于控制渐进式抽取层数。
+
 ```
 输入
 ├── 35 个类别特征 (int32)
@@ -115,6 +119,10 @@ models/
 ## 3. 数据链路
 
 ### 3.1 整体流程
+
+![KuaiRand 多任务精排数据与评估流程](assets/pipeline_overview.svg)
+
+图：原始数据经过时间切分和训练集拟合的预处理后，进入多任务模型、验证集选择、排序评估和最终确认流程。
 
 ```
 KuaiRand-Pure/data/（原始 CSV）
@@ -361,6 +369,12 @@ ADR-0005 落地后默认模型变为「特征编码器 `mlp` → MMoE」。本�
 
 `mmoe+senet` 的四任务均值高 +0.0040、门控均值高 +0.0066；门控均值三个配对 seed 均胜出，四任务均值两个 seed 胜出。PLE-CGC 只在关注任务均值高 +0.0089，当前不替换冠军。该结论只覆盖单层 PLE，不外推到 `num_layers>1`。发布产物见 `docs/assets/ple_cgc_val_3seed.*`。
 
+训练过程诊断图（`mmoe+mlp`、seed=2025，含 `shadow_0` 的特征重要度基准 run）：
+
+![mmoe+mlp 训练与验证 loss/AUC 曲线](assets/training_curves_mmoe_mlp_seed2025.png)
+
+该图来自完整训练 run 的 `history`，用于查看收敛过程，不作为多 seed 性能汇总，也不替代当前 `mmoe+senet` 候选的验证集对照；`shadow_0` 只用于噪声基准。
+
 ### 7.8 用户级曝光内排序评估
 
 `evaluation.py` 以 `user_id` 为分组键，在每个数据划分（split）的全部曝光样本内重排，计算
@@ -372,6 +386,12 @@ GAUC、NDCG@10、Recall@10、MAP@10 和固定宽度分箱的 ECE。`row_id` 作�
 该口径衡量“给定曝光集合内的重排序”，不代表全量召回、候选覆盖率或线上排序
 效果。验证集汇总报告见 `docs/assets/ranking_metrics_val_ple_mmoe.{md,json}`；
 最终确认集仍保持保护。
+
+验证集排序指标图：
+
+![用户级曝光内排序指标对照](assets/ranking_metrics_val_ple_mmoe.svg)
+
+图中展示 GAUC、NDCG@10、Recall@10 和 MAP@10 的三 seed 均值；ECE 仍以发布表格中的数值为准。
 
 ---
 

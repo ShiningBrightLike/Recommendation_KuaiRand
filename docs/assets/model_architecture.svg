@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="680" viewBox="0 0 1400 680" role="img" aria-labelledby="title desc">
+  <title id="title">Recommendation_KuaiRand 模型两条正交轴</title>
+  <desc id="desc">类别 embedding 和数值特征进入可插拔特征编码器，再进入可插拔多任务结构，最后输出点击、点赞、关注和评论四个任务概率。PLE-CGC 由 shared experts、task-specific experts 和 CGC gate 组成。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 28px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+      .label { font: 700 19px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+      .text { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #334155; }
+      .small { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #475569; }
+      .box { stroke-width: 2; rx: 16; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .axis { stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 7; }
+    </style>
+  </defs>
+  <rect width="1400" height="680" fill="#ffffff"/>
+  <text x="700" y="48" text-anchor="middle" class="title">模型结构：特征编码器 × 多任务结构</text>
+
+  <rect x="45" y="150" width="220" height="150" class="box" fill="#eff6ff" stroke="#60a5fa"/>
+  <text x="155" y="190" text-anchor="middle" class="label">共享输入</text>
+  <text x="75" y="230" class="text">类别字段 embedding</text>
+  <text x="75" y="260" class="text">数值字段标准化</text>
+
+  <path d="M 267 225 L 335 225" class="arrow"/>
+
+  <rect x="340" y="85" width="260" height="280" class="box" fill="#f0fdf4" stroke="#4ade80"/>
+  <text x="470" y="127" text-anchor="middle" class="label">特征编码器</text>
+  <text x="380" y="177" class="text">MLP（默认）</text>
+  <text x="380" y="217" class="text">DCN</text>
+  <text x="380" y="257" class="text">SENet</text>
+  <text x="470" y="322" text-anchor="middle" class="small">可替换的共享表示变换</text>
+
+  <path d="M 602 225 L 670 225" class="arrow"/>
+
+  <rect x="675" y="85" width="310" height="280" class="box" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="830" y="127" text-anchor="middle" class="label">多任务结构</text>
+  <text x="710" y="177" class="text">MMoE：专家 + 任务 gate</text>
+  <text x="710" y="217" class="text">Shared-Bottom：共享底层</text>
+  <text x="710" y="257" class="text">PLE-CGC：渐进式抽取</text>
+  <text x="830" y="322" text-anchor="middle" class="small">决定任务之间如何共享与分化</text>
+
+  <path d="M 987 225 L 1055 225" class="arrow"/>
+
+  <rect x="1060" y="85" width="295" height="280" class="box" fill="#faf5ff" stroke="#c084fc"/>
+  <text x="1207" y="127" text-anchor="middle" class="label">四个任务 tower</text>
+  <text x="1110" y="177" class="text">点击 → is_click</text>
+  <text x="1110" y="217" class="text">点赞 → is_like</text>
+  <text x="1110" y="257" class="text">关注 → is_follow</text>
+  <text x="1110" y="297" class="text">评论 → is_comment</text>
+  <text x="1207" y="340" text-anchor="middle" class="small">sigmoid 概率输出</text>
+
+  <line x1="340" y1="430" x2="985" y2="430" class="axis"/>
+  <text x="662" y="416" text-anchor="middle" class="label">PLE-CGC 单层结构（当前正式对照：num_layers=1）</text>
+  <rect x="365" y="470" width="180" height="105" class="box" fill="#e0f2fe" stroke="#38bdf8"/>
+  <text x="455" y="510" text-anchor="middle" class="label">shared experts</text>
+  <text x="455" y="542" text-anchor="middle" class="small">默认 2 个</text>
+
+  <rect x="575" y="470" width="210" height="105" class="box" fill="#ffedd5" stroke="#fb923c"/>
+  <text x="680" y="510" text-anchor="middle" class="label">task experts</text>
+  <text x="680" y="542" text-anchor="middle" class="small">每任务默认 2 个</text>
+
+  <rect x="815" y="470" width="140" height="105" class="box" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="885" y="510" text-anchor="middle" class="label">CGC gate</text>
+  <text x="885" y="542" text-anchor="middle" class="small">softmax 混合</text>
+
+  <path d="M 545 522 L 568 522" class="arrow"/>
+  <path d="M 785 522 L 808 522" class="arrow"/>
+  <text x="1040" y="500" class="text">task gate：shared + 本任务</text>
+  <text x="1040" y="532" class="text">shared gate：shared + 全部任务</text>
+  <text x="1040" y="564" class="small">层数 n 可控；更深层数需单独验证</text>
+</svg>

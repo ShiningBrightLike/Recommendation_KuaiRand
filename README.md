@@ -19,6 +19,11 @@
 - [`docs/assets/baselines_v2.md`](docs/assets/baselines_v2.md)：六个配置 × 三个 seed 的合规验证集对照。
 - [`docs/assets/ple_cgc_val_3seed.md`](docs/assets/ple_cgc_val_3seed.md)：单层 PLE-CGC 与当前候选的验证集对照。
 - [`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)：用户级曝光内排序评估汇总。
+- [`docs/assets/training_curves_mmoe_mlp_seed2025.png`](docs/assets/training_curves_mmoe_mlp_seed2025.png)：代表性训练/验证收敛曲线。
+
+![KuaiRand 多任务精排数据与评估流程](docs/assets/pipeline_overview.svg)
+
+图：从原始日志、时间切分和预处理，到模型选择、排序评估和最终确认的完整流程。
 
 ## 快速开始
 
@@ -160,6 +165,10 @@ Recommendation_KuaiRand/
 
 ## 模型说明
 
+![模型两条正交轴与 PLE-CGC 结构](docs/assets/model_architecture.svg)
+
+图：特征编码器负责共享表示变换，多任务结构负责任务间共享与分化；PLE-CGC 的层数由 `num_layers=n` 控制。
+
 ### 两条正交轴
 
 模型构建由 `models/builders.py` 统一完成，不同轴可以独立组合：
@@ -241,6 +250,24 @@ python baselines.py --models "ple_cgc+mlp" --ple-layers 1 --seeds 2025,2026,2027
 
 默认报告只使用验证集，表格中的多 seed 结果是均值 ± 样本标准差。`--final-test` 只允许一个已经锁定的模型配置和一个 seed，用于最终确认；不要把 test 指标用于候选比较或调参。
 
+当前六配置对照图（验证集、三个 seed）：
+
+![Baseline v2 验证集多任务 AUC 对照](docs/assets/baselines_v2.png)
+
+图：六个候选配置在四个任务上的验证集 AUC，误差线为三个 seed 的样本标准差。完整数值见 [`docs/assets/baselines_v2.md`](docs/assets/baselines_v2.md)。
+
+代表性训练/验证曲线（`mmoe+mlp`、seed=2025，含 `shadow_0` 的特征重要度基准 run）：
+
+![mmoe+mlp 训练与验证 loss/AUC 曲线](docs/assets/training_curves_mmoe_mlp_seed2025.png)
+
+图：同一 run 的训练/验证 loss 与四个任务 AUC 曲线，用于查看优化过程和早停前后的收敛情况。它是过程诊断图，不是多 seed 性能汇总，也不代表当前 `mmoe+senet` 冠军的单独曲线；`shadow_0` 只用于噪声基准。
+
+单层 PLE-CGC 对照图：
+
+![单层 PLE-CGC 与 MMoE+SENet 验证集对照](docs/assets/ple_cgc_val_3seed.png)
+
+图：`ple_cgc+mlp`（`num_layers=1`）与 `mmoe+senet` 的验证集 AUC 对照；该图不代表更深 PLE 层数的结果。
+
 ## 用户级曝光内排序评估
 
 ### 评估含义
@@ -292,6 +319,12 @@ python aggregate_ranking.py `
 
 汇总脚本只对各 seed 的点估计计算均值和样本标准差，不平均 bootstrap 区间。已发布的验证集汇总见 [`docs/assets/ranking_metrics_val_ple_mmoe.md`](docs/assets/ranking_metrics_val_ple_mmoe.md)。
 
+当前验证集用户级排序指标对照：
+
+![用户级曝光内排序指标对照](docs/assets/ranking_metrics_val_ple_mmoe.svg)
+
+图：`ple_cgc+mlp`（单层）与 `mmoe+senet` 在 GAUC、NDCG@10、Recall@10、MAP@10 上的三个 seed 均值。ECE 量纲和数值范围不同，仍以汇总表和 JSON 为准。
+
 ## 特征重要度与泄漏审计
 
 ### 置换重要度
@@ -311,6 +344,12 @@ python feature_importance.py --model <run>/model.keras --repeats 5
 ```
 
 报告会写入模型目录下的 `feature_importance/`，包括 JSON、CSV、Markdown 和图表。完整判定规则见 [`docs/adr/0002-permutation-importance-and-two-stage-gate.md`](docs/adr/0002-permutation-importance-and-two-stage-gate.md)。
+
+当前默认模型的置换重要度图：
+
+![验证集置换特征重要度](docs/assets/feature_importance_v2_top.png)
+
+图：特征被打乱后门控任务 AUC 的平均绝对下降；红色虚线是默认门控阈值。它表示模型依赖程度，不是因果效应或业务价值排序。
 
 ### 泄漏审计
 

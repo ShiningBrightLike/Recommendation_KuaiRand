@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="620" viewBox="0 0 1400 620" role="img" aria-labelledby="title desc">
+  <title id="title">KuaiRand 多任务精排数据与评估流程</title>
+  <desc id="desc">原始日志和用户视频特征经过数据处理后产生 train、validation、test 以及评估 sidecar，模型训练后在验证集进行比较，并在配置锁定后进行最终确认和用户级排序评估。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 28px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+      .label { font: 700 19px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #0f172a; }
+      .text { font: 16px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #334155; }
+      .small { font: 14px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #475569; }
+      .box { stroke-width: 2; rx: 16; }
+      .arrow { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .note { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 7 6; fill: #f8fafc; rx: 12; }
+    </style>
+  </defs>
+  <rect width="1400" height="620" fill="#ffffff"/>
+  <text x="700" y="48" text-anchor="middle" class="title">KuaiRand 多任务精排：从数据到评估</text>
+
+  <rect x="45" y="100" width="250" height="205" class="box" fill="#eff6ff" stroke="#60a5fa"/>
+  <text x="170" y="137" text-anchor="middle" class="label">原始数据</text>
+  <text x="70" y="174" class="text">• 标准曝光日志</text>
+  <text x="70" y="203" class="text">• 用户特征</text>
+  <text x="70" y="232" class="text">• 视频基础特征</text>
+  <text x="70" y="261" class="text">• 视频统计特征</text>
+  <text x="170" y="289" text-anchor="middle" class="small">KuaiRand-Pure/data/</text>
+
+  <path d="M 296 202 L 370 202" class="arrow"/>
+
+  <rect x="375" y="100" width="270" height="205" class="box" fill="#f0fdf4" stroke="#4ade80"/>
+  <text x="510" y="137" text-anchor="middle" class="label">data_process.py</text>
+  <text x="400" y="174" class="text">• 按时间切分 train / val / test</text>
+  <text x="400" y="203" class="text">• 合并用户与视频字段</text>
+  <text x="400" y="232" class="text">• 训练集拟合编码与标准化</text>
+  <text x="400" y="261" class="text">• 保存对齐的评估 sidecar</text>
+  <text x="510" y="289" text-anchor="middle" class="small">data_processed/</text>
+
+  <path d="M 646 202 L 720 202" class="arrow"/>
+
+  <rect x="725" y="100" width="285" height="205" class="box" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="867" y="137" text-anchor="middle" class="label">模型训练与选择</text>
+  <text x="750" y="174" class="text">特征编码器：MLP / DCN / SENet</text>
+  <text x="750" y="203" class="text">多任务结构：MMoE / PLE-CGC</text>
+  <text x="750" y="232" class="text">早停指标：val_auc_mean</text>
+  <text x="750" y="261" class="text">多 seed 验证集对照</text>
+  <text x="867" y="289" text-anchor="middle" class="small">saved/runs/</text>
+
+  <path d="M 1011 202 L 1085 202" class="arrow"/>
+
+  <rect x="1090" y="100" width="265" height="205" class="box" fill="#faf5ff" stroke="#c084fc"/>
+  <text x="1222" y="137" text-anchor="middle" class="label">评估与发布</text>
+  <text x="1115" y="174" class="text">• AUC 与任务均值</text>
+  <text x="1115" y="203" class="text">• 用户级曝光内排序</text>
+  <text x="1115" y="232" class="text">• 特征重要度与泄漏审计</text>
+  <text x="1115" y="261" class="text">• 锁定后一次 test 确认</text>
+  <text x="1222" y="289" text-anchor="middle" class="small">docs/assets/</text>
+
+  <rect x="90" y="380" width="1220" height="150" class="note"/>
+  <text x="120" y="419" class="label">评估边界</text>
+  <text x="120" y="455" class="text">用户级排序的候选集合是同一 split 内该用户看到的全部曝光行，衡量的是曝光集合内重排序，不是全量视频召回或线上排序效果。</text>
+  <text x="120" y="487" class="text">user_id、video_id、row_id 保存在 sidecar 中用于分组和稳定排序，不进入模型输入；test 只在配置锁定后作为最终确认。</text>
+</svg>
