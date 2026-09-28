@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">用户级曝光内排序评估</title>
+  <desc id="desc">同一用户的曝光集合经过模型打分和重排，再计算 GAUC、NDCG、Recall、MAP 和 ECE；评估不是全量召回。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+    <style>
+      .title{font:700 28px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .label{font:700 19px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .text{font:16px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#334155}
+      .small{font:14px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:14}
+      .arrow{stroke:#475569;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="600" fill="#fff"/>
+  <text x="55" y="52" class="title">同一用户的曝光集合内重排序</text>
+  <rect x="55" y="115" width="245" height="160" class="box" stroke="#2563eb" fill="#eff6ff"/>
+  <text x="177" y="153" text-anchor="middle" class="label">用户 u1 的曝光</text><text x="100" y="195" class="text">v1  label=1</text><text x="100" y="225" class="text">v2  label=0</text><text x="100" y="255" class="text">v3  label=1</text>
+  <rect x="365" y="115" width="245" height="160" class="box" stroke="#7c3aed" fill="#f5f3ff"/>
+  <text x="487" y="153" text-anchor="middle" class="label">模型分数</text><text x="410" y="195" class="text">v1  0.90</text><text x="410" y="225" class="text">v2  0.80</text><text x="410" y="255" class="text">v3  0.20</text>
+  <rect x="675" y="115" width="245" height="160" class="box" stroke="#16a34a" fill="#f0fdf4"/>
+  <text x="797" y="153" text-anchor="middle" class="label">重排后</text><text x="720" y="195" class="text">1. v1 ✓</text><text x="720" y="225" class="text">2. v2 ✗</text><text x="720" y="255" class="text">3. v3 ✓</text>
+  <path d="M300 195H365M610 195H675" class="arrow"/>
+  <rect x="985" y="95" width="160" height="205" class="box" stroke="#f59e0b" fill="#fff7ed"/>
+  <text x="1065" y="132" text-anchor="middle" class="label">指标</text><text x="1065" y="165" text-anchor="middle" class="small">GAUC</text><text x="1065" y="192" text-anchor="middle" class="small">NDCG@K</text><text x="1065" y="219" text-anchor="middle" class="small">Recall@K</text><text x="1065" y="246" text-anchor="middle" class="small">MAP@K</text><text x="1065" y="273" text-anchor="middle" class="small">ECE</text>
+  <path d="M920 195H985" class="arrow"/>
+  <rect x="180" y="380" width="840" height="90" class="box" stroke="#dc2626" stroke-dasharray="8 6" fill="#fef2f2"/>
+  <text x="600" y="417" text-anchor="middle" class="label">边界提醒</text><text x="600" y="447" text-anchor="middle" class="text">这些指标衡量曝光内重排，不是全量召回、覆盖率或线上收益</text>
+</svg>

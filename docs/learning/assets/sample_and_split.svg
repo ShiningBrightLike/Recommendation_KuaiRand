@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+  <title id="title">曝光样本与时间切分</title>
+  <desc id="desc">每条曝光行产生四个反馈标签，模型特征与评估 sidecar 分离，并按时间切分 train、validation 和 test。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+    <style>
+      .title{font:700 28px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .label{font:700 19px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .text{font:16px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#334155}
+      .small{font:14px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:14}
+      .arrow{stroke:#475569;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="600" fill="#fff"/>
+  <text x="55" y="52" class="title">一条曝光行如何进入训练与评估</text>
+  <rect x="55" y="105" width="270" height="110" class="box" stroke="#2563eb" fill="#eff6ff"/>
+  <text x="190" y="145" text-anchor="middle" class="label">曝光行</text><text x="190" y="177" text-anchor="middle" class="text">user · video · date · context</text>
+  <rect x="385" y="105" width="285" height="110" class="box" stroke="#7c3aed" fill="#f5f3ff"/>
+  <text x="527" y="145" text-anchor="middle" class="label">模型输入 / 标签</text><text x="527" y="177" text-anchor="middle" class="text">weekday + features → 4 feedback labels</text>
+  <rect x="730" y="105" width="390" height="110" class="box" stroke="#f59e0b" stroke-dasharray="8 6" fill="#fff7ed"/>
+  <text x="925" y="145" text-anchor="middle" class="label">评估 sidecar</text><text x="925" y="177" text-anchor="middle" class="text">user_id · row_id · video_id · raw date</text>
+  <path d="M325 160H385M670 160H730" class="arrow"/>
+  <text x="55" y="285" class="label">时间切分</text>
+  <rect x="55" y="320" width="310" height="90" class="box" stroke="#2563eb" fill="#eff6ff"/>
+  <text x="210" y="358" text-anchor="middle" class="label">train</text><text x="210" y="389" text-anchor="middle" class="text">4/08–4/15：拟合与训练</text>
+  <rect x="445" y="320" width="310" height="90" class="box" stroke="#16a34a" fill="#f0fdf4"/>
+  <text x="600" y="358" text-anchor="middle" class="label">val</text><text x="600" y="389" text-anchor="middle" class="text">4/16–4/21：早停与选型</text>
+  <rect x="835" y="320" width="310" height="90" class="box" stroke="#dc2626" fill="#fef2f2"/>
+  <text x="990" y="358" text-anchor="middle" class="label">test</text><text x="990" y="389" text-anchor="middle" class="text">4/22–5/08：锁定后一次确认</text>
+  <path d="M365 365H445M755 365H835" class="arrow"/>
+  <rect x="260" y="470" width="680" height="65" class="box" stroke="#94a3b8" stroke-dasharray="8 6" fill="#f8fafc"/>
+  <text x="600" y="510" text-anchor="middle" class="small">sidecar 不进入模型；统计特征仍需单独审计 point-in-time 风险</text>
+</svg>

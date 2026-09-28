@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">特征编码器与多任务结构两条正交轴</title>
+  <desc id="desc">类别和数值字段形成输入向量，经过 MLP、DCN 或 SENet 编码，再组合 Shared-Bottom、MMoE 或 PLE-CGC 多任务结构。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+    <style>
+      .title{font:700 28px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .label{font:700 19px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .text{font:16px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#334155}
+      .small{font:14px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:14}
+      .arrow{stroke:#475569;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="620" fill="#fff"/>
+  <text x="55" y="52" class="title">模型两轴：表示变换 × 任务共享</text>
+  <rect x="55" y="125" width="240" height="120" class="box" stroke="#2563eb" fill="#eff6ff"/>
+  <text x="175" y="165" text-anchor="middle" class="label">输入字段</text><text x="175" y="197" text-anchor="middle" class="text">35 categorical + 58 numeric</text><text x="175" y="222" text-anchor="middle" class="small">93 fields → 338 dims</text>
+  <rect x="350" y="105" width="230" height="70" class="box" stroke="#7c3aed" fill="#f5f3ff"/><text x="465" y="148" text-anchor="middle" class="label">MLP</text>
+  <rect x="350" y="190" width="230" height="70" class="box" stroke="#7c3aed" fill="#f5f3ff"/><text x="465" y="233" text-anchor="middle" class="label">DCN</text>
+  <rect x="350" y="275" width="230" height="70" class="box" stroke="#7c3aed" fill="#f5f3ff"/><text x="465" y="318" text-anchor="middle" class="label">SENet</text>
+  <path d="M295 185H350" class="arrow"/>
+  <rect x="650" y="95" width="250" height="75" class="box" stroke="#16a34a" fill="#f0fdf4"/><text x="775" y="141" text-anchor="middle" class="label">Shared-Bottom</text>
+  <rect x="650" y="195" width="250" height="75" class="box" stroke="#16a34a" fill="#f0fdf4"/><text x="775" y="241" text-anchor="middle" class="label">MMoE</text>
+  <rect x="650" y="295" width="250" height="75" class="box" stroke="#16a34a" fill="#f0fdf4"/><text x="775" y="341" text-anchor="middle" class="label">PLE-CGC</text>
+  <path d="M580 225H650" class="arrow"/>
+  <rect x="970" y="135" width="175" height="205" class="box" stroke="#f59e0b" fill="#fff7ed"/>
+  <text x="1057" y="175" text-anchor="middle" class="label">4 towers</text><text x="1057" y="214" text-anchor="middle" class="text">click</text><text x="1057" y="242" text-anchor="middle" class="text">like</text><text x="1057" y="270" text-anchor="middle" class="text">follow</text><text x="1057" y="298" text-anchor="middle" class="text">comment</text>
+  <path d="M900 232H970" class="arrow"/>
+  <rect x="250" y="450" width="700" height="72" class="box" stroke="#94a3b8" stroke-dasharray="8 6" fill="#f8fafc"/>
+  <text x="600" y="493" text-anchor="middle" class="text">Logistic 与 single_task 是基线；编码器和多任务结构可以独立组合</text>
+</svg>

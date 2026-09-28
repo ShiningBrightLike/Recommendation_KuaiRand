@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">推荐系统全链路与本项目边界</title>
+  <desc id="desc">召回、粗排、精排、重排和服务组成推荐链路，本项目只实现给定曝光集合后的精排与离线评估。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#475569"/></marker>
+    <style>
+      .title{font:700 28px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .label{font:700 20px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#0f172a}
+      .text{font:16px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#334155}
+      .small{font:14px "Microsoft YaHei","Noto Sans CJK SC",sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:16}
+      .arrow{stroke:#475569;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .scope{stroke:#f59e0b;stroke-width:3;stroke-dasharray:9 7;fill:#fff7ed;rx:22}
+    </style>
+  </defs>
+  <rect width="1200" height="520" fill="#fff"/>
+  <text x="60" y="55" class="title">推荐系统全链路：本项目只覆盖精排</text>
+  <text x="60" y="88" class="small">实线 = 当前项目的可运行实现；虚线 = 概念边界或未来系统组件</text>
+  <rect x="60" y="150" width="210" height="105" class="box" stroke="#94a3b8" stroke-dasharray="8 6" fill="#f8fafc"/>
+  <text x="165" y="190" text-anchor="middle" class="label">召回</text><text x="165" y="222" text-anchor="middle" class="text">从海量内容找候选</text>
+  <rect x="330" y="150" width="210" height="105" class="box" stroke="#94a3b8" stroke-dasharray="8 6" fill="#f8fafc"/>
+  <text x="435" y="190" text-anchor="middle" class="label">粗排</text><text x="435" y="222" text-anchor="middle" class="text">轻量模型压缩规模</text>
+  <rect x="600" y="135" width="240" height="135" class="box" stroke="#7c3aed" fill="#f5f3ff"/>
+  <text x="720" y="183" text-anchor="middle" class="label">精排</text><text x="720" y="215" text-anchor="middle" class="text">多目标预测与排序</text><text x="720" y="242" text-anchor="middle" class="small">本项目：曝光集合内重排</text>
+  <rect x="930" y="150" width="210" height="105" class="box" stroke="#94a3b8" stroke-dasharray="8 6" fill="#f8fafc"/>
+  <text x="1035" y="190" text-anchor="middle" class="label">重排/服务</text><text x="1035" y="222" text-anchor="middle" class="text">策略、延迟、反馈</text>
+  <path d="M270 202H330M540 202H600M840 202H930" class="arrow"/>
+  <rect x="280" y="340" width="640" height="92" class="scope"/>
+  <text x="600" y="375" text-anchor="middle" class="label">项目边界</text>
+  <text x="600" y="405" text-anchor="middle" class="text">不实现召回、粗排、全量候选生成、线上服务或线上收益评估</text>
+</svg>
